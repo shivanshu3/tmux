@@ -54,7 +54,6 @@ add_executable(tmux
     cmd-move-window.c
     cmd-new-session.c
     cmd-new-window.c
-    cmd-parse.y
     cmd-paste-buffer.c
     cmd-pipe-pane.c
     cmd-queue.c
@@ -87,7 +86,6 @@ add_executable(tmux
     cmd-wait-for.c
     cmd.c
     colour.c
-    compat.h
     control-notify.c
     control.c
     environ.c
@@ -127,7 +125,6 @@ add_executable(tmux
     status.c
     style.c
     tmux.c
-    tmux.h
     tty-acs.c
     tty-features.c
     tty-keys.c
