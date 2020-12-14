@@ -12,12 +12,22 @@ find_path(EVENT_PATH event.h REQUIRED)
 
 find_library(C_LIB c REQUIRED)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${NCURSES_PATH})
 include_directories(${EVENT_PATH})
 
 add_subdirectory(compat)
 
+set(CMD_PARSE_C ${CMAKE_CURRENT_BINARY_DIR}/cmd_parse_generated.c)
+
+add_custom_command(
+    OUTPUT ${CMD_PARSE_C}
+    COMMAND yacc -o ${CMD_PARSE_C} cmd-parse.y
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
 add_executable(tmux
+    ${CMD_PARSE_C}
     alerts.c
     arguments.c
     attributes.c
