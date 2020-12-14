@@ -29,6 +29,9 @@
 #include "compat.h"
 #include "imsg.h"
 
+// Not sure why this is needed?
+#define IOV_MAX 1024
+
 static int	ibuf_realloc(struct ibuf *, size_t);
 static void	ibuf_enqueue(struct msgbuf *, struct ibuf *);
 static void	ibuf_dequeue(struct msgbuf *, struct ibuf *);

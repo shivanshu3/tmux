@@ -4,5 +4,12 @@ add_library(tmux_compat STATIC
     strlcpy.c
     getopt.c
     closefrom.c
+    base64.c
+    fgetln.c
+    getprogname.c
+    fdforkpty.c
+    imsg.c
+    imsg-buffer.c
+    vis.c
 )
 
