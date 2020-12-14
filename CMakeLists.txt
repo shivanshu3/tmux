@@ -26,6 +26,11 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+# NOTE: This will have to be changed for Windows
+add_library(tmux_misc STATIC
+    osdep-linux.c
+)
+
 add_executable(tmux
     ${CMD_PARSE_C}
     alerts.c
@@ -153,5 +158,6 @@ add_executable(tmux
 
 target_link_libraries(tmux ${NCURSES_LIB})
 target_link_libraries(tmux ${EVENT_LIB})
-target_link_libraries(tmux compat)
+target_link_libraries(tmux tmux_compat)
+target_link_libraries(tmux tmux_misc)
 
