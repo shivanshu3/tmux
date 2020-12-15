@@ -11,5 +11,9 @@ add_library(tmux_compat STATIC
     imsg.c
     imsg-buffer.c
     vis.c
+    unvis.c
+    getdtablecount.c
+    recallocarray.c
+    setproctitle.c
 )
 

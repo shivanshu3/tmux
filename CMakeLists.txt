@@ -2,15 +2,17 @@ cmake_minimum_required(VERSION 3.13.4)
 project(tmux)
 
 add_compile_definitions(TMUX_VERSION="4.0-win32")
-add_compile_definitions(HAVE_NCURSES_H)
 
 find_library(NCURSES_LIB ncurses REQUIRED)
 find_path(NCURSES_PATH ncurses.h REQUIRED)
+add_compile_definitions(HAVE_NCURSES_H)
 
 find_library(EVENT_LIB event REQUIRED)
 find_path(EVENT_PATH event.h REQUIRED)
 
 find_library(C_LIB c REQUIRED)
+
+find_library(UTIL_LIB util REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${NCURSES_PATH})
@@ -156,8 +158,9 @@ add_executable(tmux
     xmalloc.c
 )
 
-target_link_libraries(tmux ${NCURSES_LIB})
-target_link_libraries(tmux ${EVENT_LIB})
 target_link_libraries(tmux tmux_compat)
 target_link_libraries(tmux tmux_misc)
+target_link_libraries(tmux ${NCURSES_LIB})
+target_link_libraries(tmux ${EVENT_LIB})
+target_link_libraries(tmux ${UTIL_LIB})
 
