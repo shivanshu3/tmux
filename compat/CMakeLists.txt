@@ -1,19 +1,20 @@
 add_library(tmux_compat STATIC
-    strtonum.c
-    strlcat.c
-    strlcpy.c
-    getopt.c
-    closefrom.c
     base64.c
-    fgetln.c
-    getprogname.c
+    closefrom.c
     fdforkpty.c
-    imsg.c
-    imsg-buffer.c
-    vis.c
-    unvis.c
+    fgetln.c
+    freezero.c
     getdtablecount.c
+    getopt.c
+    getprogname.c
+    imsg-buffer.c
+    imsg.c
     recallocarray.c
     setproctitle.c
+    strlcat.c
+    strlcpy.c
+    strtonum.c
+    unvis.c
+    vis.c
 )
 

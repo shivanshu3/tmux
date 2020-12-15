@@ -107,8 +107,8 @@ add_executable(tmux
     control.c
     environ.c
     file.c
-    format.c
     format-draw.c
+    format.c
     grid-view.c
     grid.c
     input-keys.c
