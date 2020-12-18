@@ -3,12 +3,24 @@ project(tmux)
 
 add_compile_definitions(TMUX_VERSION="4.0-win32")
 
-find_library(NCURSES_LIB ncurses REQUIRED)
-find_path(NCURSES_PATH ncurses.h REQUIRED)
+if (MSVC)
+    set(CURSES_LIB_NAME "pdcurses")
+else()
+    set(CURSES_LIB_NAME "ncurses")
+endif()
+
+find_library(CURSES_LIB ${CURSES_LIB_NAME} REQUIRED)
+find_path(CURSES_PATH curses.h REQUIRED)
 add_compile_definitions(HAVE_NCURSES_H)
+
+message("Curses lib found: ${CURSES_LIB}")
+message("Curses header found: ${CURSES_PATH}")
 
 find_library(EVENT_LIB event REQUIRED)
 find_path(EVENT_PATH event.h REQUIRED)
+
+message("Event lib found: ${EVENT_LIB}")
+message("Event header found: ${EVENT_PATH}")
 
 find_library(C_LIB c REQUIRED)
 
@@ -17,7 +29,7 @@ find_library(UTIL_LIB util REQUIRED)
 find_library(M_LIB m REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${NCURSES_PATH})
+include_directories(${CURSES_PATH})
 include_directories(${EVENT_PATH})
 
 add_subdirectory(compat)
@@ -162,7 +174,7 @@ add_executable(tmux
 
 target_link_libraries(tmux tmux_compat)
 target_link_libraries(tmux tmux_misc)
-target_link_libraries(tmux ${NCURSES_LIB})
+target_link_libraries(tmux ${CURSES_LIB})
 target_link_libraries(tmux ${EVENT_LIB})
 target_link_libraries(tmux ${UTIL_LIB})
 target_link_libraries(tmux ${M_LIB})
