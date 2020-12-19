@@ -43,13 +43,8 @@
  */
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <arpa/nameser.h>
 
 #include <ctype.h>
-#include <resolv.h>
 #include <stdio.h>
 
 #include <stdlib.h>
@@ -131,9 +126,9 @@ b64_ntop
 	size_t targsize
 )
 {
-	size_t datalength = 0;
-	u_char input[3];
-	u_char output[4];
+	int datalength = 0;
+	char input[3];
+	char output[4];
 	int i;
 
 	while (2 < srclength) {
@@ -191,11 +186,11 @@ b64_ntop
 int
 b64_pton(src, target, targsize)
 	char const *src;
-	u_char *target;
+	char *target;
 	size_t targsize;
 {
 	int tarindex, state, ch;
-	u_char nextbyte;
+	char nextbyte;
 	char *pos;
 
 	state = 0;
@@ -217,7 +212,7 @@ b64_pton(src, target, targsize)
 			if (target) {
 				if (tarindex >= targsize)
 					return (-1);
-				target[tarindex] = (pos - Base64) << 2;
+				target[tarindex] = (char)((pos - Base64) << 2);
 			}
 			state = 1;
 			break;
