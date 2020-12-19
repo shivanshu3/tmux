@@ -22,11 +22,10 @@ find_path(EVENT_PATH event.h REQUIRED)
 message("Event lib found: ${EVENT_LIB}")
 message("Event header found: ${EVENT_PATH}")
 
-find_library(C_LIB c REQUIRED)
-
-find_library(UTIL_LIB util REQUIRED)
-
-find_library(M_LIB m REQUIRED)
+if (!MSVC)
+    find_library(UTIL_LIB util REQUIRED)
+    find_library(M_LIB m REQUIRED)
+endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CURSES_PATH})
@@ -176,6 +175,8 @@ target_link_libraries(tmux tmux_compat)
 target_link_libraries(tmux tmux_misc)
 target_link_libraries(tmux ${CURSES_LIB})
 target_link_libraries(tmux ${EVENT_LIB})
-target_link_libraries(tmux ${UTIL_LIB})
-target_link_libraries(tmux ${M_LIB})
 
+if (!MSVC)
+    target_link_libraries(tmux ${UTIL_LIB})
+    target_link_libraries(tmux ${M_LIB})
+endif()
