@@ -17,8 +17,6 @@
 #ifndef HAVE_CLOSEFROM
 
 #include <sys/types.h>
-#include <sys/param.h>
-#include <unistd.h>
 #include <stdio.h>
 #ifdef HAVE_FCNTL_H
 # include <fcntl.h>
@@ -27,7 +25,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include <unistd.h>
 #ifdef HAVE_DIRENT_H
 # include <dirent.h>
 # define NAMLEN(dirent) strlen((dirent)->d_name)

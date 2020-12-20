@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.13.4)
 project(tmux)
 
 add_compile_definitions(TMUX_VERSION="4.0-win32")
+add_compile_definitions(HAVE_STRNLEN)
 
 if (MSVC)
     add_compile_options(/WX)
@@ -36,6 +37,10 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CURSES_PATH})
 include_directories(${EVENT_PATH})
+
+if (MSVC)
+    include_directories(${CMAKE_SOURCE_DIR}/win32_headers)
+endif()
 
 add_subdirectory(compat)
 

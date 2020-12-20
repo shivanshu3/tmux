@@ -18,13 +18,20 @@
 #define COMPAT_H
 
 #include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/uio.h>
 
-#include <fnmatch.h>
+#ifdef _WIN32
+	#include "win32_numbers.h"
+	#include "win32_posix.h"
+	#include "win32_terminal.h"
+#else
+	#include <sys/ioctl.h>
+	#include <sys/uio.h>
+	#include <fnmatch.h>
+	#include <termios.h>
+#endif
+
 #include <limits.h>
 #include <stdio.h>
-#include <termios.h>
 #include <wchar.h>
 
 #ifdef HAVE_MALLOC_TRIM
