@@ -77,6 +77,9 @@ static const char	*client_exit_message(void);
 static int
 client_get_lock(char *lockfile)
 {
+    // WIN32_TODO: Figure out how to flock on windows
+    return -1;
+#if 0
 	int lockfd;
 
 	log_debug("lock file is %s", lockfile);
@@ -98,6 +101,7 @@ client_get_lock(char *lockfile)
 	log_debug("flock succeeded");
 
 	return (lockfd);
+#endif
 }
 
 /* Connect client to server. */

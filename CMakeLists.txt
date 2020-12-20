@@ -4,6 +4,12 @@ project(tmux)
 add_compile_definitions(TMUX_VERSION="4.0-win32")
 
 if (MSVC)
+    add_compile_options(/WX)
+else()
+    add_compile_options(-Werror)
+endif()
+
+if (MSVC)
     set(CURSES_LIB_NAME "pdcurses")
 else()
     set(CURSES_LIB_NAME "ncurses")

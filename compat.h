@@ -252,13 +252,6 @@ void	warnx(const char *, ...);
 #define HOST_NAME_MAX 255
 #endif
 
-#ifndef HAVE_FLOCK
-#define LOCK_SH 0
-#define LOCK_EX 0
-#define LOCK_NB 0
-#define flock(fd, op) (0)
-#endif
-
 #ifndef HAVE_EXPLICIT_BZERO
 /* explicit_bzero.c */
 void		 explicit_bzero(void *, size_t);
@@ -408,5 +401,8 @@ int	BSDgetopt(int, char *const *, const char *);
 #define optopt             BSDoptopt
 #define optreset           BSDoptreset
 #define optarg             BSDoptarg
+
+// These function prototypes were missing
+int wcwidth(wchar_t c);
 
 #endif /* COMPAT_H */
