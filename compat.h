@@ -25,9 +25,11 @@
 	#include "win32_terminal.h"
 #else
 	#include <sys/ioctl.h>
+	#include <sys/param.h>
 	#include <sys/uio.h>
 	#include <fnmatch.h>
 	#include <termios.h>
+	#include <unistd.h>
 #endif
 
 #include <limits.h>
