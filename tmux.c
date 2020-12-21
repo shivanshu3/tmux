@@ -16,6 +16,10 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifdef _WIN32
+#include "win32_headers/win32_posix.h"
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/utsname.h>
@@ -316,6 +320,27 @@ getversion(void)
 	return TMUX_VERSION;
 }
 
+// Inits the Windows Sockets DLL
+// Returns true on success, false otherwise
+int init_winsock()
+{
+#ifdef _WIN32
+	WSADATA wsaData;
+	int wsa_startup_result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (wsa_startup_result != 0)
+	{
+		fprintf(stderr, "WSAStartup failed: %d\n", wsa_startup_result);
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
+#else
+	return 1;
+#endif
+}
+
 int
 main(int argc, char **argv)
 {
@@ -333,6 +358,11 @@ main(int argc, char **argv)
 		s = nl_langinfo(CODESET);
 		if (strcasecmp(s, "UTF-8") != 0 && strcasecmp(s, "UTF8") != 0)
 			errx(1, "need UTF-8 locale (LC_CTYPE) but have %s", s);
+	}
+
+	if (!init_winsock())
+	{
+		errx(1, "Failed to initialize Winsock, terminating.");
 	}
 
 	setlocale(LC_TIME, "");

@@ -16,6 +16,10 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifdef _WIN32
+#include "win32_headers/win32_posix.h"
+#endif
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
