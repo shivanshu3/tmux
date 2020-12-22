@@ -235,7 +235,7 @@ strunvis(char *dst, const char *src)
 	if (unvis(dst, c, &state, UNVIS_END) == UNVIS_VALID)
 		dst++;
 	*dst = '\0';
-	return (dst - start);
+	return (int)(dst - start);
 }
 
 ssize_t

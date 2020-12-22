@@ -160,7 +160,7 @@ strvis(char *dst, const char *src, int flag)
 	for (start = dst; (c = *src);)
 		dst = vis(dst, c, flag, *++src);
 	*dst = '\0';
-	return (dst - start);
+	return (int)(dst - start);
 }
 
 int
@@ -186,7 +186,7 @@ strnvis(char *dst, const char *src, size_t siz, int flag)
 			*dst++ = c;
 			src++;
 		} else {
-			i = vis(tbuf, c, flag, *++src) - tbuf;
+			i = (int) (vis(tbuf, c, flag, *++src) - tbuf);
 			if (dst + i <= end) {
 				memcpy(dst, tbuf, i);
 				dst += i;
@@ -203,7 +203,7 @@ strnvis(char *dst, const char *src, size_t siz, int flag)
 		while ((c = *src))
 			dst += vis(tbuf, c, flag, *++src) - tbuf;
 	}
-	return (dst - start);
+	return (int)(dst - start);
 }
 
 int
@@ -238,5 +238,5 @@ strvisx(char *dst, const char *src, size_t len, int flag)
 	if (len)
 		dst = vis(dst, *src, flag, '\0');
 	*dst = '\0';
-	return (dst - start);
+	return (int)(dst - start);
 }
