@@ -33,6 +33,12 @@
 	#include <unistd.h>
 #endif
 
+#ifdef _WIN32
+typedef SOCKET TMUX_SOCKET;
+#else
+typedef int TMUX_SOCKET;
+#endif
+
 #include <limits.h>
 #include <stdio.h>
 #include <wchar.h>

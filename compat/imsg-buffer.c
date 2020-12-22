@@ -144,25 +144,58 @@ ibuf_close(struct msgbuf *msgbuf, struct ibuf *buf)
 int
 ibuf_write(struct msgbuf *msgbuf)
 {
+#ifdef _WIN32
+	WSABUF iov[IOV_MAX];
+	int wsa_send_retval = 0;
+	int wsa_send_error = 0;
+	DWORD wsa_num_bytes_sent;
+#else
 	struct iovec	 iov[IOV_MAX];
+#endif
 	struct ibuf	*buf;
 	unsigned int	 i = 0;
 	ssize_t	n;
+	int received_EINTR = 0;
+	int received_ENOBUFS = 0;
 
 	memset(&iov, 0, sizeof(iov));
 	TAILQ_FOREACH(buf, &msgbuf->bufs, entry) {
 		if (i >= IOV_MAX)
 			break;
-		iov[i].iov_base = buf->buf + buf->rpos;
-		iov[i].iov_len = buf->wpos - buf->rpos;
+		void* buffer_base = buf->buf + buf->rpos;
+		size_t buffer_len = buf->wpos - buf->rpos;
+#ifdef _WIN32
+		iov[i].buf = buffer_base;
+		iov[i].len = (ULONG)buffer_len;
+#else
+		iov[i].iov_base = buf;
+		iov[i].iov_len = len;
+#endif
 		i++;
 	}
 
 again:
-	if ((n = writev(msgbuf->fd, iov, i)) == -1) {
-		if (errno == EINTR)
+#ifdef _WIN32
+	wsa_send_retval = WSASend(msgbuf->fd, iov, i, &wsa_num_bytes_sent, 0, NULL, NULL);
+	n = wsa_num_bytes_sent;
+	if (wsa_send_retval == SOCKET_ERROR)
+	{
+		wsa_send_error = WSAGetLastError();
+		received_EINTR = wsa_send_error == WSAEINTR;
+		received_ENOBUFS = wsa_send_error == WSAENOBUFS;
+	}
+#else
+	n = writev(msgbuf->fd, iov, i);
+	if (n == -1)
+	{
+		received_EINTR = errno == EINTR;
+		received_ENOBUFS = errno == ENOBUFS;
+	}
+#endif
+	if (n == -1) {
+		if (received_EINTR)
 			goto again;
-		if (errno == ENOBUFS)
+		if (received_ENOBUFS)
 			errno = EAGAIN;
 		return (-1);
 	}
@@ -224,14 +257,29 @@ msgbuf_clear(struct msgbuf *msgbuf)
 int
 msgbuf_write(struct msgbuf *msgbuf)
 {
+#ifdef _WIN32
+	WSABUF iov[IOV_MAX];
+	WSAMSG msg;
+	WSACMSGHDR* cmsg;
+	int wsa_sendmsg_retval = 0;
+	int wsa_sendmsg_error = 0;
+	DWORD wsa_num_bytes_sent = 0;
+#else
 	struct iovec	 iov[IOV_MAX];
+	struct msghdr	 msg;
+	struct cmsghdr* cmsg;
+#endif
 	struct ibuf	*buf;
 	unsigned int	 i = 0;
 	ssize_t		 n;
-	struct msghdr	 msg;
-	struct cmsghdr	*cmsg;
+	int received_EINTR = 0;
+	int received_ENOBUFS = 0;
 	union {
+#ifdef _WIN32
+		WSACMSGHDR hdr;
+#else
 		struct cmsghdr	hdr;
+#endif
 		char		buf[CMSG_SPACE(sizeof(int))];
 	} cmsgbuf;
 
@@ -241,31 +289,66 @@ msgbuf_write(struct msgbuf *msgbuf)
 	TAILQ_FOREACH(buf, &msgbuf->bufs, entry) {
 		if (i >= IOV_MAX)
 			break;
-		iov[i].iov_base = buf->buf + buf->rpos;
-		iov[i].iov_len = buf->wpos - buf->rpos;
+		void* buffer_base = buf->buf + buf->rpos;
+		size_t buffer_len = buf->wpos - buf->rpos;
+#ifdef _WIN32
+		iov[i].buf = buffer_base;
+		iov[i].len = (ULONG)buffer_len;
+#else
+		iov[i].iov_base = buffer_base;
+		iov[i].iov_len = buffer_len;
+#endif
 		i++;
 		if (buf->fd != -1)
 			break;
 	}
 
+#ifdef _WIN32
+	msg.lpBuffers = iov;
+	msg.dwBufferCount = i;
+#else
 	msg.msg_iov = iov;
 	msg.msg_iovlen = i;
+#endif
 
 	if (buf != NULL && buf->fd != -1) {
-		msg.msg_control = (caddr_t)&cmsgbuf.buf;
+#ifdef _WIN32
+		msg.Control.buf = (char*)&cmsgbuf.buf;
+		msg.Control.len = sizeof(cmsgbuf.buf);
+#else
+		msg.msg_control = (caddr_t) &cmsgbuf.buf;
 		msg.msg_controllen = sizeof(cmsgbuf.buf);
+#endif
 		cmsg = CMSG_FIRSTHDR(&msg);
 		cmsg->cmsg_len = CMSG_LEN(sizeof(int));
 		cmsg->cmsg_level = SOL_SOCKET;
-		cmsg->cmsg_type = SCM_RIGHTS;
-		*(int *)CMSG_DATA(cmsg) = buf->fd;
+#ifdef _WIN32
+		*(int*) WSA_CMSG_DATA(cmsg) = buf->fd;
+#else
+		cmsg->cmsg_type = SCM_RIGHTS; // WIN32_TODO: This doesn't work in Windows
+		*(int*) CMSG_DATA(cmsg) = buf->fd;
+#endif
 	}
 
 again:
-	if ((n = sendmsg(msgbuf->fd, &msg, 0)) == -1) {
-		if (errno == EINTR)
+#ifdef WIN32
+	wsa_sendmsg_retval = WSASendMsg(msgbuf->fd, &msg, 0, &wsa_num_bytes_sent, NULL, NULL);
+	n = wsa_num_bytes_sent;
+	if (wsa_sendmsg_retval == SOCKET_ERROR)
+	{
+		wsa_sendmsg_error = WSAGetLastError();
+		received_EINTR = wsa_sendmsg_error == WSAEINTR;
+		received_ENOBUFS = wsa_sendmsg_error == WSAENOBUFS;
+	}
+#else
+	n = sendmsg(msgbuf->fd, &msg, 0);
+	received_EINTR = errno == EINTR;
+	received_ENOBUFS = errno == ENOBUFS;
+#endif
+	if (n == -1) {
+		if (received_EINTR)
 			goto again;
-		if (errno == ENOBUFS)
+		if (received_ENOBUFS)
 			errno = EAGAIN;
 		return (-1);
 	}
