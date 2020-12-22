@@ -373,7 +373,7 @@ client_main(struct event_base *base, int argc, char **argv, uint64_t flags,
 			fprintf(stderr, "command too long\n");
 			return (1);
 		}
-		data = xmalloc((sizeof *data) + size);
+		data = (struct msg_command*) xmalloc((sizeof *data) + size);
 
 		/* Prepare command for server. */
 		data->argc = argc;
@@ -490,7 +490,7 @@ static void
 client_write_error_callback(__unused struct bufferevent *bev,
     __unused short what, void *arg)
 {
-	struct client_file	*cf = arg;
+	struct client_file	*cf = (struct client_file*) arg;
 
 	log_debug("write error file %d", cf->stream);
 
@@ -508,7 +508,7 @@ client_write_error_callback(__unused struct bufferevent *bev,
 static void
 client_write_callback(__unused struct bufferevent *bev, void *arg)
 {
-	struct client_file	*cf = arg;
+	struct client_file	*cf = (struct client_file*) arg;
 
 	if (cf->closed && EVBUFFER_LENGTH(cf->event->output) == 0) {
 		bufferevent_free(cf->event);
@@ -525,7 +525,7 @@ client_write_callback(__unused struct bufferevent *bev, void *arg)
 static void
 client_write_open(void *data, size_t datalen)
 {
-	struct msg_write_open	*msg = data;
+	struct msg_write_open	*msg = (struct msg_write_open*) data;
 	const char		*path;
 	struct msg_write_ready	 reply;
 	struct client_file	 find, *cf;
@@ -585,7 +585,7 @@ reply:
 static void
 client_write_data(void *data, size_t datalen)
 {
-	struct msg_write_data	*msg = data;
+	struct msg_write_data	*msg = (struct msg_write_data*) data;
 	struct client_file	 find, *cf;
 	size_t			 size = datalen - sizeof *msg;
 
@@ -604,7 +604,7 @@ client_write_data(void *data, size_t datalen)
 static void
 client_write_close(void *data, size_t datalen)
 {
-	struct msg_write_close	*msg = data;
+	struct msg_write_close	*msg = (struct msg_write_close*) data;
 	struct client_file	 find, *cf;
 
 	if (datalen != sizeof *msg)
@@ -628,13 +628,13 @@ client_write_close(void *data, size_t datalen)
 static void
 client_read_callback(__unused struct bufferevent *bev, void *arg)
 {
-	struct client_file	*cf = arg;
+	struct client_file	*cf = (struct client_file*) arg;
 	void			*bdata;
 	size_t			 bsize;
 	struct msg_read_data	*msg;
 	size_t			 msglen;
 
-	msg = xmalloc(sizeof *msg);
+	msg = (struct msg_read_data*) xmalloc(sizeof *msg);
 	for (;;) {
 		bdata = EVBUFFER_DATA(cf->event->input);
 		bsize = EVBUFFER_LENGTH(cf->event->input);
@@ -646,7 +646,7 @@ client_read_callback(__unused struct bufferevent *bev, void *arg)
 		log_debug("read %zu from file %d", bsize, cf->stream);
 
 		msglen = (sizeof *msg) + bsize;
-		msg = xrealloc(msg, msglen);
+		msg = (struct msg_read_data*) xrealloc(msg, msglen);
 		msg->stream = cf->stream;
 		memcpy(msg + 1, bdata, bsize);
 		proc_send(client_peer, MSG_READ, -1, msg, msglen);
@@ -661,7 +661,7 @@ static void
 client_read_error_callback(__unused struct bufferevent *bev,
     __unused short what, void *arg)
 {
-	struct client_file	*cf = arg;
+	struct client_file	*cf = (struct client_file*) arg;
 	struct msg_read_done	 msg;
 
 	log_debug("read error file %d", cf->stream);
@@ -680,7 +680,7 @@ client_read_error_callback(__unused struct bufferevent *bev,
 static void
 client_read_open(void *data, size_t datalen)
 {
-	struct msg_read_open	*msg = data;
+	struct msg_read_open	*msg = (struct msg_read_open*) data;
 	const char		*path;
 	struct msg_read_done	 reply;
 	struct client_file	 find, *cf;
@@ -845,7 +845,7 @@ client_dispatch_exit_message(char *data, size_t datalen)
 		datalen -= sizeof retval;
 		data += sizeof retval;
 
-		client_exitmessage = xmalloc(datalen);
+		client_exitmessage = (char*) xmalloc(datalen);
 		memcpy(client_exitmessage, data, datalen);
 		client_exitmessage[datalen - 1] = '\0';
 
@@ -875,7 +875,7 @@ client_dispatch_wait(struct imsg *imsg)
 		pledge_applied = 1;
 	}
 
-	data = imsg->data;
+	data = (char*) imsg->data;
 	datalen = imsg->hdr.len - IMSG_HEADER_SIZE;
 
 	switch (imsg->hdr.type) {
@@ -952,7 +952,7 @@ client_dispatch_attached(struct imsg *imsg)
 	char			*data;
 	ssize_t			 datalen;
 
-	data = imsg->data;
+	data = (char*) imsg->data;
 	datalen = imsg->hdr.len - IMSG_HEADER_SIZE;
 
 	switch (imsg->hdr.type) {
@@ -970,7 +970,7 @@ client_dispatch_attached(struct imsg *imsg)
 			fatalx("bad MSG_DETACH string");
 
 		client_exitsession = xstrdup(data);
-		client_exittype = imsg->hdr.type;
+		client_exittype = (enum msgtype) imsg->hdr.type;
 		if (imsg->hdr.type == MSG_DETACHKILL)
 			client_exitreason = CLIENT_EXIT_DETACHED_HUP;
 		else
@@ -984,7 +984,7 @@ client_dispatch_attached(struct imsg *imsg)
 		client_execcmd = xstrdup(data);
 		client_execshell = xstrdup(data + strlen(data) + 1);
 
-		client_exittype = imsg->hdr.type;
+		client_exittype = (enum msgtype) imsg->hdr.type;
 		proc_send(client_peer, MSG_EXITING, -1, NULL, 0);
 		break;
 	case MSG_EXIT:
