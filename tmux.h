@@ -1594,7 +1594,7 @@ struct client {
 	struct timeval	 creation_time;
 	struct timeval	 activity_time;
 
-	struct environ_tree	*environ;
+	struct environ_tree	*env;
 	struct format_job_tree	*jobs;
 
 	char		*title;
@@ -1845,7 +1845,7 @@ struct spawn_context {
 	const char		 *name;
 	char			**argv;
 	int			  argc;
-	struct environ_tree		 *environ;
+	struct environ_tree		 *env;
 
 	int			  idx;
 	const char		 *cwd;
