@@ -1962,16 +1962,16 @@ static void
 server_client_set_title(struct client *c)
 {
 	struct session		*s = c->session;
-	const char		*template;
+	const char		*template_;
 	char			*title;
 	struct format_tree	*ft;
 
-	template = options_get_string(s->options, "set-titles-string");
+	template_ = options_get_string(s->options, "set-titles-string");
 
 	ft = format_create(c, NULL, FORMAT_NONE, 0);
 	format_defaults(ft, c, NULL, NULL, NULL);
 
-	title = format_expand_time(ft, template);
+	title = format_expand_time(ft, template_);
 	if (c->title == NULL || strcmp(title, c->title) != 0) {
 		free(c->title);
 		c->title = xstrdup(title);

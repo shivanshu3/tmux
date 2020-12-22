@@ -56,12 +56,12 @@ cmd_list_sessions_exec(struct cmd *self, struct cmdq_item *item)
 	struct session		*s;
 	u_int		 	 n;
 	struct format_tree	*ft;
-	const char		*template, *filter;
+	const char		*template_, *filter;
 	char			*line, *expanded;
 	int			 flag;
 
-	if ((template = args_get(args, 'F')) == NULL)
-		template = LIST_SESSIONS_TEMPLATE;
+	if ((template_ = args_get(args, 'F')) == NULL)
+		template_ = LIST_SESSIONS_TEMPLATE;
 	filter = args_get(args, 'f');
 
 	n = 0;
@@ -77,7 +77,7 @@ cmd_list_sessions_exec(struct cmd *self, struct cmdq_item *item)
 		} else
 			flag = 1;
 		if (flag) {
-			line = format_expand(ft, template);
+			line = format_expand(ft, template_);
 			cmdq_print(item, "%s", line);
 			free(line);
 		}

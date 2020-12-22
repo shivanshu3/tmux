@@ -61,7 +61,7 @@ cmd_new_window_exec(struct cmd *self, struct cmdq_item *item)
 	int			 idx = target->idx, before;
 	struct winlink		*new_wl;
 	char			*cause = NULL, *cp;
-	const char		*template, *add;
+	const char		*template_, *add;
 	struct cmd_find_state	 fs;
 	struct args_value	*value;
 
@@ -109,9 +109,9 @@ cmd_new_window_exec(struct cmd *self, struct cmdq_item *item)
 		server_status_session_group(s);
 
 	if (args_has(args, 'P')) {
-		if ((template = args_get(args, 'F')) == NULL)
-			template = NEW_WINDOW_TEMPLATE;
-		cp = format_single(item, template, tc, s, new_wl,
+		if ((template_ = args_get(args, 'F')) == NULL)
+			template_ = NEW_WINDOW_TEMPLATE;
+		cp = format_single(item, template_, tc, s, new_wl,
 			new_wl->window->active);
 		cmdq_print(item, "%s", cp);
 		free(cp);

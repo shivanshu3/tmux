@@ -1499,7 +1499,7 @@ struct cmd_entry {
 	const char		*alias;
 
 	struct {
-		const char	*template;
+		const char	*template_;
 		int		 lower;
 		int		 upper;
 	} args;

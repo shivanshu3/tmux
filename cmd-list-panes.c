@@ -92,29 +92,29 @@ cmd_list_panes_window(struct cmd *self, struct session *s, struct winlink *wl,
 	struct window_pane	*wp;
 	u_int			 n;
 	struct format_tree	*ft;
-	const char		*template, *filter;
+	const char		*template_, *filter;
 	char			*line, *expanded;
 	int			 flag;
 
-	template = args_get(args, 'F');
-	if (template == NULL) {
+	template_ = args_get(args, 'F');
+	if (template_ == NULL) {
 		switch (type) {
 		case 0:
-			template = "#{pane_index}: "
+			template_ = "#{pane_index}: "
 			    "[#{pane_width}x#{pane_height}] [history "
 			    "#{history_size}/#{history_limit}, "
 			    "#{history_bytes} bytes] #{pane_id}"
 			    "#{?pane_active, (active),}#{?pane_dead, (dead),}";
 			break;
 		case 1:
-			template = "#{window_index}.#{pane_index}: "
+			template_ = "#{window_index}.#{pane_index}: "
 			    "[#{pane_width}x#{pane_height}] [history "
 			    "#{history_size}/#{history_limit}, "
 			    "#{history_bytes} bytes] #{pane_id}"
 			    "#{?pane_active, (active),}#{?pane_dead, (dead),}";
 			break;
 		case 2:
-			template = "#{session_name}:#{window_index}."
+			template_ = "#{session_name}:#{window_index}."
 			    "#{pane_index}: [#{pane_width}x#{pane_height}] "
 			    "[history #{history_size}/#{history_limit}, "
 			    "#{history_bytes} bytes] #{pane_id}"
@@ -137,7 +137,7 @@ cmd_list_panes_window(struct cmd *self, struct session *s, struct winlink *wl,
 		} else
 			flag = 1;
 		if (flag) {
-			line = format_expand(ft, template);
+			line = format_expand(ft, template_);
 			cmdq_print(item, "%s", line);
 			free(line);
 		}

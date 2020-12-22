@@ -64,7 +64,7 @@ cmd_split_window_exec(struct cmd *self, struct cmdq_item *item)
 	struct layout_cell	*lc;
 	struct cmd_find_state	 fs;
 	int			 size, percentage, flags, input;
-	const char		*template, *add, *errstr, *p;
+	const char		*template_, *add, *errstr, *p;
 	char			*cause, *cp, *copy;
 	size_t			 plen;
 	struct args_value	*value;
@@ -172,9 +172,9 @@ cmd_split_window_exec(struct cmd *self, struct cmdq_item *item)
 	server_status_session(s);
 
 	if (args_has(args, 'P')) {
-		if ((template = args_get(args, 'F')) == NULL)
-			template = SPLIT_WINDOW_TEMPLATE;
-		cp = format_single(item, template, tc, s, wl, new_wp);
+		if ((template_ = args_get(args, 'F')) == NULL)
+			template_ = SPLIT_WINDOW_TEMPLATE;
+		cp = format_single(item, template_, tc, s, wl, new_wp);
 		cmdq_print(item, "%s", cp);
 		free(cp);
 	}

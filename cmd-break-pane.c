@@ -60,7 +60,7 @@ cmd_break_pane_exec(struct cmd *self, struct cmdq_item *item)
 	struct window		*w = wl->window;
 	char			*name, *cause, *cp;
 	int			 idx = target->idx, before;
-	const char		*template;
+	const char		*template_;
 
 	before = args_has(args, 'b');
 	if (args_has(args, 'a') || before) {
@@ -132,9 +132,9 @@ cmd_break_pane_exec(struct cmd *self, struct cmdq_item *item)
 		server_status_session_group(dst_s);
 
 	if (args_has(args, 'P')) {
-		if ((template = args_get(args, 'F')) == NULL)
-			template = BREAK_PANE_TEMPLATE;
-		cp = format_single(item, template, tc, dst_s, wl, wp);
+		if ((template_ = args_get(args, 'F')) == NULL)
+			template_ = BREAK_PANE_TEMPLATE;
+		cp = format_single(item, template_, tc, dst_s, wl, wp);
 		cmdq_print(item, "%s", cp);
 		free(cp);
 	}

@@ -89,18 +89,18 @@ cmd_list_windows_session(struct cmd *self, struct session *s,
 	struct winlink		*wl;
 	u_int			 n;
 	struct format_tree	*ft;
-	const char		*template, *filter;
+	const char		*template_, *filter;
 	char			*line, *expanded;
 	int			 flag;
 
-	template = args_get(args, 'F');
-	if (template == NULL) {
+	template_ = args_get(args, 'F');
+	if (template_ == NULL) {
 		switch (type) {
 		case 0:
-			template = LIST_WINDOWS_TEMPLATE;
+			template_ = LIST_WINDOWS_TEMPLATE;
 			break;
 		case 1:
-			template = LIST_WINDOWS_WITH_SESSION_TEMPLATE;
+			template_ = LIST_WINDOWS_WITH_SESSION_TEMPLATE;
 			break;
 		}
 	}
@@ -119,7 +119,7 @@ cmd_list_windows_session(struct cmd *self, struct session *s,
 		} else
 			flag = 1;
 		if (flag) {
-			line = format_expand(ft, template);
+			line = format_expand(ft, template_);
 			cmdq_print(item, "%s", line);
 			free(line);
 		}

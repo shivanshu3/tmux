@@ -65,7 +65,7 @@ args_find(struct args *args, u_char flag)
 
 /* Parse an argv and argc into a new argument set. */
 struct args *
-args_parse(const char *template, int argc, char **argv)
+args_parse(const char *template_, int argc, char **argv)
 {
 	struct args	*args;
 	int		 opt;
@@ -76,10 +76,10 @@ args_parse(const char *template, int argc, char **argv)
 	optind = 1;
 	optarg = NULL;
 
-	while ((opt = getopt(argc, argv, template)) != -1) {
+	while ((opt = getopt(argc, argv, template_)) != -1) {
 		if (opt < 0)
 			continue;
-		if (opt == '?' || strchr(template, opt) == NULL) {
+		if (opt == '?' || strchr(template_, opt) == NULL) {
 			args_free(args);
 			return (NULL);
 		}

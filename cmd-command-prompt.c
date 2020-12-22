@@ -57,7 +57,7 @@ struct cmd_command_prompt_cdata {
 	char	*prompts;
 	char	*next_prompt;
 
-	char	*template;
+	char	*template_;
 	int	 idx;
 };
 
@@ -83,19 +83,19 @@ cmd_command_prompt_exec(struct cmd *self, struct cmdq_item *item)
 	cdata->prompts = NULL;
 	cdata->next_prompt = NULL;
 
-	cdata->template = NULL;
+	cdata->template_ = NULL;
 	cdata->idx = 1;
 
 	if (args->argc != 0)
-		cdata->template = xstrdup(args->argv[0]);
+		cdata->template_ = xstrdup(args->argv[0]);
 	else
-		cdata->template = xstrdup("%1");
+		cdata->template_ = xstrdup("%1");
 
 	if ((prompts = args_get(args, 'p')) != NULL)
 		cdata->prompts = xstrdup(prompts);
 	else if (args->argc != 0) {
-		n = strcspn(cdata->template, " ,");
-		xasprintf(&cdata->prompts, "(%.*s) ", (int) n, cdata->template);
+		n = strcspn(cdata->template_, " ,");
+		xasprintf(&cdata->prompts, "(%.*s) ", (int) n, cdata->template_);
 	} else
 		cdata->prompts = xstrdup(":");
 
@@ -148,10 +148,10 @@ cmd_command_prompt_callback(struct client *c, void *data, const char *s,
 	if (done && (cdata->flags & PROMPT_INCREMENTAL))
 		return (0);
 
-	new_template = cmd_template_replace(cdata->template, s, cdata->idx);
+	new_template = cmd_template_replace(cdata->template_, s, cdata->idx);
 	if (done) {
-		free(cdata->template);
-		cdata->template = new_template;
+		free(cdata->template_);
+		cdata->template_ = new_template;
 	}
 
 	/*
@@ -188,6 +188,6 @@ cmd_command_prompt_free(void *data)
 
 	free(cdata->inputs);
 	free(cdata->prompts);
-	free(cdata->template);
+	free(cdata->template_);
 	free(cdata);
 }

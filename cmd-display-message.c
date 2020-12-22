@@ -66,7 +66,7 @@ cmd_display_message_exec(struct cmd *self, struct cmdq_item *item)
 	struct session		*s = target->s;
 	struct winlink		*wl = target->wl;
 	struct window_pane	*wp = target->wp;
-	const char		*template;
+	const char		*template_;
 	char			*msg, *cause;
 	int			 delay = -1;
 	struct format_tree	*ft;
@@ -95,11 +95,11 @@ cmd_display_message_exec(struct cmd *self, struct cmdq_item *item)
 		}
 	}
 
-	template = args_get(args, 'F');
+	template_ = args_get(args, 'F');
 	if (args->argc != 0)
-		template = args->argv[0];
-	if (template == NULL)
-		template = DISPLAY_MESSAGE_TEMPLATE;
+		template_ = args->argv[0];
+	if (template_ == NULL)
+		template_ = DISPLAY_MESSAGE_TEMPLATE;
 
 	/*
 	 * -c is intended to be the client where the message should be
@@ -123,7 +123,7 @@ cmd_display_message_exec(struct cmd *self, struct cmdq_item *item)
 		return (CMD_RETURN_NORMAL);
 	}
 
-	msg = format_expand_time(ft, template);
+	msg = format_expand_time(ft, template_);
 	if (args_has(args, 'p'))
 		cmdq_print(item, "%s", msg);
 	else if (tc != NULL)

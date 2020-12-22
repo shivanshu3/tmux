@@ -49,12 +49,12 @@ cmd_list_buffers_exec(struct cmd *self, struct cmdq_item *item)
 	struct args		*args = cmd_get_args(self);
 	struct paste_buffer	*pb;
 	struct format_tree	*ft;
-	const char		*template, *filter;
+	const char		*template_, *filter;
 	char			*line, *expanded;
 	int			 flag;
 
-	if ((template = args_get(args, 'F')) == NULL)
-		template = LIST_BUFFERS_TEMPLATE;
+	if ((template_ = args_get(args, 'F')) == NULL)
+		template_ = LIST_BUFFERS_TEMPLATE;
 	filter = args_get(args, 'f');
 
 	pb = NULL;
@@ -69,7 +69,7 @@ cmd_list_buffers_exec(struct cmd *self, struct cmdq_item *item)
 		} else
 			flag = 1;
 		if (flag) {
-			line = format_expand(ft, template);
+			line = format_expand(ft, template_);
 			cmdq_print(item, "%s", line);
 			free(line);
 		}

@@ -75,7 +75,7 @@ cmd_new_session_exec(struct cmd *self, struct cmdq_item *item)
 	struct options		*oo;
 	struct termios		 tio, *tiop;
 	struct session_group	*sg = NULL;
-	const char		*errstr, *template, *group, *tmp, *add;
+	const char		*errstr, *template_, *group, *tmp, *add;
 	char			*cause, *cwd = NULL, *cp, *newname = NULL;
 	char			*name, *prefix = NULL;
 	int			 detached, already_attached, is_control = 0;
@@ -338,9 +338,9 @@ cmd_new_session_exec(struct cmd *self, struct cmdq_item *item)
 
 	/* Print if requested. */
 	if (args_has(args, 'P')) {
-		if ((template = args_get(args, 'F')) == NULL)
-			template = NEW_SESSION_TEMPLATE;
-		cp = format_single(item, template, c, s, s->curw, NULL);
+		if ((template_ = args_get(args, 'F')) == NULL)
+			template_ = NEW_SESSION_TEMPLATE;
+		cp = format_single(item, template_, c, s, s->curw, NULL);
 		cmdq_print(item, "%s", cp);
 		free(cp);
 	}

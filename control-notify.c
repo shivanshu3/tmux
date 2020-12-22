@@ -45,10 +45,10 @@ control_notify_window_layout_changed(struct window *w)
 	struct client	*c;
 	struct session	*s;
 	struct winlink	*wl;
-	const char	*template;
+	const char	*template_;
 	char		*cp;
 
-	template = "%layout-change #{window_id} #{window_layout} "
+	template_ = "%layout-change #{window_id} #{window_layout} "
 	    "#{window_visible_layout} #{window_flags}";
 
 	TAILQ_FOREACH(c, &clients, entry) {
@@ -69,7 +69,7 @@ control_notify_window_layout_changed(struct window *w)
 
 		wl = winlink_find_by_window(&s->windows, w);
 		if (wl != NULL) {
-			cp = format_single(NULL, template, c, NULL, wl, NULL);
+			cp = format_single(NULL, template_, c, NULL, wl, NULL);
 			control_write(c, "%s", cp);
 			free(cp);
 		}

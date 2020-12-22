@@ -320,14 +320,14 @@ cmd_list_keys_commands(struct cmd *self, struct cmdq_item *item)
 	const struct cmd_entry	**entryp;
 	const struct cmd_entry	 *entry;
 	struct format_tree	 *ft;
-	const char		 *template, *s, *command = NULL;
+	const char		 *template_, *s, *command = NULL;
 	char			 *line;
 
 	if (args->argc != 0)
 		command = args->argv[0];
 
-	if ((template = args_get(args, 'F')) == NULL) {
-		template = "#{command_list_name}"
+	if ((template_ = args_get(args, 'F')) == NULL) {
+		template_ = "#{command_list_name}"
 		    "#{?command_list_alias, (#{command_list_alias}),} "
 		    "#{command_list_usage}";
 	}
@@ -355,7 +355,7 @@ cmd_list_keys_commands(struct cmd *self, struct cmdq_item *item)
 			s = "";
 		format_add(ft, "command_list_usage", "%s", s);
 
-		line = format_expand(ft, template);
+		line = format_expand(ft, template_);
 		if (*line != '\0')
 			cmdq_print(item, "%s", line);
 		free(line);

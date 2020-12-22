@@ -513,7 +513,7 @@ cmd_parse(int argc, char **argv, const char *file, u_int line, char **cause)
 		return (NULL);
 	cmd_log_argv(argc, argv, "%s: %s", __func__, entry->name);
 
-	args = args_parse(entry->args.template, argc, argv);
+	args = args_parse(entry->args.template_, argc, argv);
 	if (args == NULL)
 		goto usage;
 	if (entry->args.lower != -1 && args->argc < entry->args.lower)
@@ -773,24 +773,24 @@ cmd_mouse_pane(struct mouse_event *m, struct session **sp,
 	return (wp);
 }
 
-/* Replace the first %% or %idx in template by s. */
+/* Replace the first %% or %idx in template_ by s. */
 char *
-cmd_template_replace(const char *template, const char *s, int idx)
+cmd_template_replace(const char *template_, const char *s, int idx)
 {
 	char		 ch, *buf;
 	const char	*ptr, *cp, quote[] = "\"\\$;~";
 	int		 replaced, quoted;
 	size_t		 len;
 
-	if (strchr(template, '%') == NULL)
-		return (xstrdup(template));
+	if (strchr(template_, '%') == NULL)
+		return (xstrdup(template_));
 
 	buf = xmalloc(1);
 	*buf = '\0';
 	len = 0;
 	replaced = 0;
 
-	ptr = template;
+	ptr = template_;
 	while (*ptr != '\0') {
 		switch (ch = *ptr++) {
 		case '%':

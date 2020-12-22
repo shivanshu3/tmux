@@ -208,7 +208,7 @@ static const struct tty_default_key_raw tty_default_raw_keys[] = {
 
 /* Default xterm keys. */
 struct tty_default_key_xterm {
-	const char	*template;
+	const char	*template_;
 	key_code	 key;
 };
 static const struct tty_default_key_xterm tty_default_xterm_keys[] = {
@@ -492,7 +492,7 @@ tty_keys_build(struct tty *tty)
 	for (i = 0; i < nitems(tty_default_xterm_keys); i++) {
 		tdkx = &tty_default_xterm_keys[i];
 		for (j = 2; j < nitems(tty_default_xterm_modifiers); j++) {
-			strlcpy(copy, tdkx->template, sizeof copy);
+			strlcpy(copy, tdkx->template_, sizeof copy);
 			copy[strcspn(copy, "_")] = '0' + j;
 
 			key = tdkx->key|tty_default_xterm_modifiers[j];

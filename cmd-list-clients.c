@@ -56,7 +56,7 @@ cmd_list_clients_exec(struct cmd *self, struct cmdq_item *item)
 	struct client		*c;
 	struct session		*s;
 	struct format_tree	*ft;
-	const char		*template;
+	const char		*template_;
 	u_int			 idx;
 	char			*line;
 
@@ -65,8 +65,8 @@ cmd_list_clients_exec(struct cmd *self, struct cmdq_item *item)
 	else
 		s = NULL;
 
-	if ((template = args_get(args, 'F')) == NULL)
-		template = LIST_CLIENTS_TEMPLATE;
+	if ((template_ = args_get(args, 'F')) == NULL)
+		template_ = LIST_CLIENTS_TEMPLATE;
 
 	idx = 0;
 	TAILQ_FOREACH(c, &clients, entry) {
@@ -77,7 +77,7 @@ cmd_list_clients_exec(struct cmd *self, struct cmdq_item *item)
 		format_add(ft, "line", "%u", idx);
 		format_defaults(ft, c, NULL, NULL, NULL);
 
-		line = format_expand(ft, template);
+		line = format_expand(ft, template_);
 		cmdq_print(item, "%s", line);
 		free(line);
 

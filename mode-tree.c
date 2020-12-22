@@ -1163,13 +1163,13 @@ mode_tree_key(struct mode_tree_data *mtd, struct client *c, key_code *key,
 
 void
 mode_tree_run_command(struct client *c, struct cmd_find_state *fs,
-    const char *template, const char *name)
+    const char *template_, const char *name)
 {
 	struct cmdq_state	*state;
 	char			*command, *error;
 	enum cmd_parse_status	 status;
 
-	command = cmd_template_replace(template, name, 1);
+	command = cmd_template_replace(template_, name, 1);
 	if (command != NULL && *command != '\0') {
 		state = cmdq_new_state(fs, NULL, 0);
 		status = cmd_parse_and_append(command, NULL, c, state, &error);

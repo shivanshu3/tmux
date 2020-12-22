@@ -2526,7 +2526,7 @@ fail:
 	return (-1);
 }
 
-/* Expand keys in a template. */
+/* Expand keys in a template_. */
 static char *
 format_expand1(struct format_expand_state *es, const char *fmt)
 {
@@ -2689,7 +2689,7 @@ format_expand1(struct format_expand_state *es, const char *fmt)
 	return (buf);
 }
 
-/* Expand keys in a template, passing through strftime first. */
+/* Expand keys in a template_, passing through strftime first. */
 char *
 format_expand_time(struct format_tree *ft, const char *fmt)
 {
@@ -2701,7 +2701,7 @@ format_expand_time(struct format_tree *ft, const char *fmt)
 	return (format_expand1(&es, fmt));
 }
 
-/* Expand keys in a template. */
+/* Expand keys in a template_. */
 char *
 format_expand(struct format_tree *ft, const char *fmt)
 {
