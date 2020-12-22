@@ -48,7 +48,7 @@ struct cmdq_list;
 struct cmdq_state;
 struct cmds;
 struct control_state;
-struct environ;
+struct environ_tree;
 struct format_job_tree;
 struct format_tree;
 struct input_ctx;
@@ -1178,7 +1178,7 @@ struct session {
 
 	struct termios	*tio;
 
-	struct environ	*environ;
+	struct environ_tree	*environ;
 
 	int		 references;
 
@@ -1594,7 +1594,7 @@ struct client {
 	struct timeval	 creation_time;
 	struct timeval	 activity_time;
 
-	struct environ	*environ;
+	struct environ_tree	*environ;
 	struct format_job_tree	*jobs;
 
 	char		*title;
@@ -1845,7 +1845,7 @@ struct spawn_context {
 	const char		 *name;
 	char			**argv;
 	int			  argc;
-	struct environ		 *environ;
+	struct environ_tree		 *environ;
 
 	int			  idx;
 	const char		 *cwd;
@@ -1870,7 +1870,7 @@ struct mode_tree_sort_criteria {
 extern struct options	*global_options;
 extern struct options	*global_s_options;
 extern struct options	*global_w_options;
-extern struct environ	*global_environ;
+extern struct environ_tree	*global_environ;
 extern struct timeval	 start_time;
 extern const char	*socket_path;
 extern const char	*shell_command;
@@ -2076,21 +2076,21 @@ int		 job_still_running(void);
 void		 job_print_summary(struct cmdq_item *, int);
 
 /* environ.c */
-struct environ *environ_create(void);
-void	environ_free(struct environ *);
-struct environ_entry *environ_first(struct environ *);
+struct environ_tree *environ_create(void);
+void	environ_free(struct environ_tree *);
+struct environ_entry *environ_first(struct environ_tree *);
 struct environ_entry *environ_next(struct environ_entry *);
-void	environ_copy(struct environ *, struct environ *);
-struct environ_entry *environ_find(struct environ *, const char *);
-void printflike(4, 5) environ_set(struct environ *, const char *, int,
+void	environ_copy(struct environ_tree *, struct environ_tree *);
+struct environ_entry *environ_find(struct environ_tree *, const char *);
+void printflike(4, 5) environ_set(struct environ_tree *, const char *, int,
 	    const char *, ...);
-void	environ_clear(struct environ *, const char *);
-void	environ_put(struct environ *, const char *, int);
-void	environ_unset(struct environ *, const char *);
-void	environ_update(struct options *, struct environ *, struct environ *);
-void	environ_push(struct environ *);
-void printflike(2, 3) environ_log(struct environ *, const char *, ...);
-struct environ *environ_for_session(struct session *, int);
+void	environ_clear(struct environ_tree *, const char *);
+void	environ_put(struct environ_tree *, const char *, int);
+void	environ_unset(struct environ_tree *, const char *);
+void	environ_update(struct options *, struct environ_tree *, struct environ_tree *);
+void	environ_push(struct environ_tree *);
+void printflike(2, 3) environ_log(struct environ_tree *, const char *, ...);
+struct environ_tree *environ_for_session(struct session *, int);
 
 /* tty.c */
 void	tty_create_log(void);
@@ -2913,7 +2913,7 @@ struct session	*session_find(const char *);
 struct session	*session_find_by_id_str(const char *);
 struct session	*session_find_by_id(u_int);
 struct session	*session_create(const char *, const char *, const char *,
-		     struct environ *, struct options *, struct termios *);
+		     struct environ_tree *, struct options *, struct termios *);
 void		 session_destroy(struct session *, int,	 const char *);
 void		 session_add_ref(struct session *, const char *);
 void		 session_remove_ref(struct session *, const char *);

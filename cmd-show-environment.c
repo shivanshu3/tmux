@@ -99,7 +99,7 @@ cmd_show_environment_exec(struct cmd *self, struct cmdq_item *item)
 {
 	struct args		*args = cmd_get_args(self);
 	struct cmd_find_state	*target = cmdq_get_target(item);
-	struct environ		*env;
+	struct environ_tree		*env;
 	struct environ_entry	*envent;
 	const char		*tflag;
 

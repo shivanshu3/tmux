@@ -71,7 +71,7 @@ cmd_new_session_exec(struct cmd *self, struct cmdq_item *item)
 	struct cmd_find_state	*target = cmdq_get_target(item);
 	struct client		*c = cmdq_get_client(item);
 	struct session		*s, *as, *groupwith = NULL;
-	struct environ		*env;
+	struct environ_tree		*env;
 	struct options		*oo;
 	struct termios		 tio, *tiop;
 	struct session_group	*sg = NULL;

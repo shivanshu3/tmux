@@ -112,7 +112,7 @@ session_find_by_id(u_int id)
 /* Create a new session. */
 struct session *
 session_create(const char *prefix, const char *name, const char *cwd,
-    struct environ *env, struct options *oo, struct termios *tio)
+    struct environ_tree *env, struct options *oo, struct termios *tio)
 {
 	struct session	*s;
 

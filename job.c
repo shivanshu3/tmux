@@ -73,7 +73,7 @@ job_run(const char *cmd, struct session *s, const char *cwd,
     void *data, int flags, int sx, int sy)
 {
 	struct job	*job;
-	struct environ	*env;
+	struct environ_tree	*env;
 	pid_t		 pid;
 	int		 nullfd, out[2], master;
 	const char	*home;

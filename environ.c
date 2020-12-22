@@ -29,7 +29,7 @@
  * Environment - manipulate a set of environment variables.
  */
 
-RB_HEAD(environ, environ_entry);
+RB_HEAD(environ_tree, environ_entry);
 static int environ_cmp(struct environ_entry *, struct environ_entry *);
 RB_GENERATE_STATIC(environ, environ_entry, entry, environ_cmp);
 
@@ -40,10 +40,10 @@ environ_cmp(struct environ_entry *envent1, struct environ_entry *envent2)
 }
 
 /* Initialise the environment. */
-struct environ *
+struct environ_tree *
 environ_create(void)
 {
-	struct environ	*env;
+	struct environ_tree	*env;
 
 	env = xcalloc(1, sizeof *env);
 	RB_INIT(env);
@@ -53,7 +53,7 @@ environ_create(void)
 
 /* Free an environment. */
 void
-environ_free(struct environ *env)
+environ_free(struct environ_tree *env)
 {
 	struct environ_entry	*envent, *envent1;
 
@@ -67,7 +67,7 @@ environ_free(struct environ *env)
 }
 
 struct environ_entry *
-environ_first(struct environ *env)
+environ_first(struct environ_tree *env)
 {
 	return (RB_MIN(environ, env));
 }
@@ -80,7 +80,7 @@ environ_next(struct environ_entry *envent)
 
 /* Copy one environment into another. */
 void
-environ_copy(struct environ *srcenv, struct environ *dstenv)
+environ_copy(struct environ_tree *srcenv, struct environ_tree *dstenv)
 {
 	struct environ_entry	*envent;
 
@@ -96,7 +96,7 @@ environ_copy(struct environ *srcenv, struct environ *dstenv)
 
 /* Find an environment variable. */
 struct environ_entry *
-environ_find(struct environ *env, const char *name)
+environ_find(struct environ_tree *env, const char *name)
 {
 	struct environ_entry	envent;
 
@@ -106,7 +106,7 @@ environ_find(struct environ *env, const char *name)
 
 /* Set an environment variable. */
 void
-environ_set(struct environ *env, const char *name, int flags, const char *fmt,
+environ_set(struct environ_tree *env, const char *name, int flags, const char *fmt,
     ...)
 {
 	struct environ_entry	*envent;
@@ -129,7 +129,7 @@ environ_set(struct environ *env, const char *name, int flags, const char *fmt,
 
 /* Clear an environment variable. */
 void
-environ_clear(struct environ *env, const char *name)
+environ_clear(struct environ_tree *env, const char *name)
 {
 	struct environ_entry	*envent;
 
@@ -147,7 +147,7 @@ environ_clear(struct environ *env, const char *name)
 
 /* Set an environment variable from a NAME=VALUE string. */
 void
-environ_put(struct environ *env, const char *var, int flags)
+environ_put(struct environ_tree *env, const char *var, int flags)
 {
 	char	*name, *value;
 
@@ -165,7 +165,7 @@ environ_put(struct environ *env, const char *var, int flags)
 
 /* Unset an environment variable. */
 void
-environ_unset(struct environ *env, const char *name)
+environ_unset(struct environ_tree *env, const char *name)
 {
 	struct environ_entry	*envent;
 
@@ -179,7 +179,7 @@ environ_unset(struct environ *env, const char *name)
 
 /* Copy variables from a destination into a source environment. */
 void
-environ_update(struct options *oo, struct environ *src, struct environ *dst)
+environ_update(struct options *oo, struct environ_tree *src, struct environ_tree *dst)
 {
 	struct environ_entry		*envent;
 	struct options_entry		*o;
@@ -206,7 +206,7 @@ environ_update(struct options *oo, struct environ *src, struct environ *dst)
 
 /* Push environment into the real environment - use after fork(). */
 void
-environ_push(struct environ *env)
+environ_push(struct environ_tree *env)
 {
 	struct environ_entry	*envent;
 
@@ -221,7 +221,7 @@ environ_push(struct environ *env)
 
 /* Log the environment. */
 void
-environ_log(struct environ *env, const char *fmt, ...)
+environ_log(struct environ_tree *env, const char *fmt, ...)
 {
 	struct environ_entry	*envent;
 	va_list			 ap;
@@ -242,10 +242,10 @@ environ_log(struct environ *env, const char *fmt, ...)
 }
 
 /* Create initial environment for new child. */
-struct environ *
+struct environ_tree *
 environ_for_session(struct session *s, int no_TERM)
 {
-	struct environ	*env;
+	struct environ_tree	*env;
 	const char	*value;
 	int		 idx;
 

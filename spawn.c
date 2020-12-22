@@ -206,7 +206,7 @@ spawn_pane(struct spawn_context *sc, char **cause)
 	struct session		 *s = sc->s;
 	struct window		 *w = sc->wl->window;
 	struct window_pane	 *new_wp;
-	struct environ		 *child;
+	struct environ_tree		 *child;
 	struct environ_entry	 *ee;
 	char			**argv, *cp, **argvp, *argv0, *cwd;
 	const char		 *cmd, *tmp;

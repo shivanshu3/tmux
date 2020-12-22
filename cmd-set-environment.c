@@ -48,7 +48,7 @@ cmd_set_environment_exec(struct cmd *self, struct cmdq_item *item)
 {
 	struct args		*args = cmd_get_args(self);
 	struct cmd_find_state	*target = cmdq_get_target(item);
-	struct environ		*env;
+	struct environ_tree		*env;
 	const char		*name, *value, *tflag;
 	char			*expand = NULL;
 	enum cmd_retval		 retval = CMD_RETURN_NORMAL;
