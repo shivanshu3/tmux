@@ -17,13 +17,10 @@
  */
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/uio.h>
 
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "compat.h"
 #include "imsg.h"
@@ -46,26 +43,53 @@ imsg_init(struct imsgbuf *ibuf, int fd)
 ssize_t
 imsg_read(struct imsgbuf *ibuf)
 {
-	struct msghdr		 msg;
-	struct cmsghdr		*cmsg;
+#ifdef _WIN32
+	WSAMSG msg;
+	WSACMSGHDR* cmsg;
+	WSABUF iov;
+	GUID wsa_recvmsg_guid = WSAID_WSARECVMSG;
+	LPFN_WSARECVMSG WSARecvMsg;
+	DWORD wsa_num_bytes_returned = 0;
+	int wsa_retval;
+	int wsa_error;
+#else
+	struct msghdr msg;
+	struct cmsghdr* cmsg;
+	struct iovec iov;
+#endif
 	union {
+#ifdef _WIN32
+		WSACMSGHDR hdr;
+#else
 		struct cmsghdr hdr;
+#endif
 		char	buf[CMSG_SPACE(sizeof(int) * 1)];
 	} cmsgbuf;
-	struct iovec		 iov;
 	ssize_t			 n = -1;
 	int			 fd;
 	struct imsg_fd		*ifd;
+	int received_EINTR = 0;
 
 	memset(&msg, 0, sizeof(msg));
 	memset(&cmsgbuf, 0, sizeof(cmsgbuf));
 
-	iov.iov_base = ibuf->r.buf + ibuf->r.wpos;
-	iov.iov_len = sizeof(ibuf->r.buf) - ibuf->r.wpos;
+	void* buffer_base = ibuf->r.buf + ibuf->r.wpos;
+	size_t buffer_len = sizeof(ibuf->r.buf) - ibuf->r.wpos;
+#ifdef _WIN32
+	iov.buf = buffer_base;
+	iov.len = (ULONG)buffer_len;
+	msg.lpBuffers = &iov;
+	msg.dwBufferCount = 1;
+	msg.Control.buf = (char*)&cmsgbuf.buf;
+	msg.Control.len = sizeof(cmsgbuf.buf);
+#else
+	iov.iov_base = buffer_base;
+	iov.iov_len = buffer_len;
 	msg.msg_iov = &iov;
 	msg.msg_iovlen = 1;
 	msg.msg_control = &cmsgbuf.buf;
 	msg.msg_controllen = sizeof(cmsgbuf.buf);
+#endif
 
 	if ((ifd = calloc(1, sizeof(struct imsg_fd))) == NULL)
 		return (-1);
@@ -79,8 +103,32 @@ again:
 		return (-1);
 	}
 
-	if ((n = recvmsg(ibuf->fd, &msg, 0)) == -1) {
-		if (errno == EINTR)
+#ifdef _WIN32
+	// WIN32_TODO: Cache the function pointer
+	wsa_retval = WSAIoctl(ibuf->fd, SIO_GET_EXTENSION_FUNCTION_POINTER,
+		&wsa_recvmsg_guid, sizeof wsa_recvmsg_guid,
+		&WSARecvMsg, sizeof WSARecvMsg,
+		&wsa_num_bytes_returned, NULL, NULL);
+	if (wsa_retval == SOCKET_ERROR)
+	{
+		wsa_error = WSAGetLastError();
+		WSARecvMsg = NULL;
+		return 0;
+	}
+	wsa_retval = WSARecvMsg(ibuf->fd, &msg, &wsa_num_bytes_returned, NULL, NULL);
+	n = wsa_num_bytes_returned;
+	if (wsa_retval == SOCKET_ERROR)
+	{
+		wsa_error = WSAGetLastError();
+		received_EINTR = wsa_error == WSAEINTR;
+	}
+#else
+	n = recvmsg(ibuf->fd, &msg, 0);
+	received_EINTR = errno == EINTR;
+#endif
+
+	if (n == -1) {
+		if (received_EINTR)
 			goto again;
 		goto fail;
 	}
@@ -89,8 +137,11 @@ again:
 
 	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
 	    cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-		if (cmsg->cmsg_level == SOL_SOCKET &&
-		    cmsg->cmsg_type == SCM_RIGHTS) {
+		if (cmsg->cmsg_level == SOL_SOCKET
+#ifndef _WIN32
+			&& cmsg->cmsg_type == SCM_RIGHTS // WIN32_TODO: SCM_RIGHTS doesn't work on Windows
+#endif
+			) {
 			int i;
 			int j;
 
@@ -99,10 +150,20 @@ again:
 			 * padding rules, our control buffer might contain
 			 * more than one fd, and we must close them.
 			 */
-			j = ((char *)cmsg + cmsg->cmsg_len -
-			    (char *)CMSG_DATA(cmsg)) / sizeof(int);
+#ifdef _WIN32
+			char* cmsg_data_char_ptr = (char*) WSA_CMSG_DATA(cmsg);
+#else
+			char* cmsg_data_char_ptr = (char*) CMSG_DATA(cmsg);
+#endif
+			int* cmsg_data_int_ptr;
+			j = (int) ((char *)cmsg + cmsg->cmsg_len - cmsg_data_char_ptr) / sizeof(int);
 			for (i = 0; i < j; i++) {
-				fd = ((int *)CMSG_DATA(cmsg))[i];
+#ifdef _WIN32
+				cmsg_data_int_ptr = (int*) WSA_CMSG_DATA(cmsg);
+#else
+				cmsg_data_int_ptr = (int*) CMSG_DATA(cmsg);
+#endif
+				fd = cmsg_data_int_ptr[i];
 				if (ifd != NULL) {
 					ifd->fd = fd;
 					TAILQ_INSERT_TAIL(&ibuf->fds, ifd,
@@ -181,6 +242,8 @@ imsg_compose(struct imsgbuf *ibuf, uint32_t type, uint32_t peerid, pid_t pid,
 	return (1);
 }
 
+// This function is not used by Tmux
+#if 0
 int
 imsg_composev(struct imsgbuf *ibuf, uint32_t type, uint32_t peerid, pid_t pid,
     int fd, const struct iovec *iov, int iovcnt)
@@ -204,6 +267,7 @@ imsg_composev(struct imsgbuf *ibuf, uint32_t type, uint32_t peerid, pid_t pid,
 
 	return (1);
 }
+#endif
 
 /* ARGSUSED */
 struct ibuf *

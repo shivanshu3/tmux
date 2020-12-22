@@ -7,14 +7,17 @@
 #include <Windows.h>
 #include <windows.h>
 #include <winsock2.h>
+#include <Mswsock.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
 #include <io.h>
 #include <errno.h>
+#include <process.h>
 
-typedef HANDLE pid_t;
+typedef int pid_t;
 
 #define close _close
+#define getpid _getpid
 
 // TODO: Return 1024
 int getdtablesize(void);
