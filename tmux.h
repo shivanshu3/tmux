@@ -1178,7 +1178,7 @@ struct session {
 
 	struct termios	*tio;
 
-	struct environ_tree	*environ;
+	struct environ_tree	*env;
 
 	int		 references;
 

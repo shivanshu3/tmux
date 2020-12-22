@@ -82,7 +82,7 @@ cmd_set_environment_exec(struct cmd *self, struct cmdq_item *item)
 			retval = CMD_RETURN_ERROR;
 			goto out;
 		}
-		env = target->s->environ;
+		env = target->s->env;
 	}
 
 	if (args_has(args, 'u')) {

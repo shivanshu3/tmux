@@ -66,11 +66,11 @@ cmd_respawn_window_exec(struct cmd *self, struct cmdq_item *item)
 	sc.name = NULL;
 	sc.argc = args->argc;
 	sc.argv = args->argv;
-	sc.environ = environ_create();
+	sc.env = environ_create();
 
 	add = args_first_value(args, 'e', &value);
 	while (add != NULL) {
-		environ_put(sc.environ, add, 0);
+		environ_put(sc.env, add, 0);
 		add = args_next_value(&value);
 	}
 
@@ -89,6 +89,6 @@ cmd_respawn_window_exec(struct cmd *self, struct cmdq_item *item)
 
 	server_redraw_window(wl->window);
 
-	environ_free(sc.environ);
+	environ_free(sc.env);
 	return (CMD_RETURN_NORMAL);
 }

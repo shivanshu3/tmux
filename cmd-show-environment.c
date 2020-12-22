@@ -121,7 +121,7 @@ cmd_show_environment_exec(struct cmd *self, struct cmdq_item *item)
 				cmdq_error(item, "no current session");
 			return (CMD_RETURN_ERROR);
 		}
-		env = target->s->environ;
+		env = target->s->env;
 	}
 
 	if (args->argc != 0) {

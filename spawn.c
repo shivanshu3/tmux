@@ -296,8 +296,8 @@ spawn_pane(struct spawn_context *sc, char **cause)
 
 	/* Create an environment for this pane. */
 	child = environ_for_session(s, 0);
-	if (sc->environ != NULL)
-		environ_copy(sc->environ, child);
+	if (sc->env != NULL)
+		environ_copy(sc->env, child);
 	environ_set(child, "TMUX_PANE", 0, "%%%u", new_wp->id);
 
 	/*
@@ -306,7 +306,7 @@ spawn_pane(struct spawn_context *sc, char **cause)
 	 * myprogram" wouldn't work if myprogram isn't in the session's path.
 	 */
 	if (c != NULL && c->session == NULL) { /* only unattached clients */
-		ee = environ_find(c->environ, "PATH");
+		ee = environ_find(c->env, "PATH");
 		if (ee != NULL)
 			environ_set(child, "PATH", 0, "%s", ee->value);
 	}

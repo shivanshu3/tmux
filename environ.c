@@ -252,7 +252,7 @@ environ_for_session(struct session *s, int no_TERM)
 	env = environ_create();
 	environ_copy(global_environ, env);
 	if (s != NULL)
-		environ_copy(s->environ, env);
+		environ_copy(s->env, env);
 
 	if (!no_TERM) {
 		value = options_get_string(global_options, "default-terminal");

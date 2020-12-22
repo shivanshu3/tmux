@@ -132,7 +132,7 @@ cmd_switch_client_exec(struct cmd *self, struct cmdq_item *item)
 	}
 
 	if (!args_has(args, 'E'))
-		environ_update(s->options, tc->environ, s->environ);
+		environ_update(s->options, tc->env, s->env);
 
 	if (tc->session != NULL && tc->session != s)
 		tc->last_session = tc->session;

@@ -257,7 +257,7 @@ cmd_new_session_exec(struct cmd *self, struct cmdq_item *item)
 	}
 	env = environ_create();
 	if (c != NULL && !args_has(args, 'E'))
-		environ_update(global_s_options, c->environ, env);
+		environ_update(global_s_options, c->env, env);
 	add = args_first_value(args, 'e', &value);
 	while (add != NULL) {
 		environ_put(env, add, 0);

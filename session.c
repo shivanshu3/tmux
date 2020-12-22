@@ -125,7 +125,7 @@ session_create(const char *prefix, const char *name, const char *cwd,
 	TAILQ_INIT(&s->lastw);
 	RB_INIT(&s->windows);
 
-	s->environ = env;
+	s->env = env;
 	s->options = oo;
 
 	status_update_cache(s);
@@ -188,7 +188,7 @@ session_free(__unused int fd, __unused short events, void *arg)
 	log_debug("session %s freed (%d references)", s->name, s->references);
 
 	if (s->references == 0) {
-		environ_free(s->environ);
+		environ_free(s->env);
 		options_free(s->options);
 
 		free(s->name);

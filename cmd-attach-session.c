@@ -122,7 +122,7 @@ cmd_attach_session(struct cmdq_item *item, const char *tflag, int dflag,
 			}
 		}
 		if (!Eflag)
-			environ_update(s->options, c->environ, s->environ);
+			environ_update(s->options, c->env, s->env);
 
 		c->session = s;
 		if (~cmdq_get_flags(item) & CMDQ_STATE_REPEAT)
@@ -154,7 +154,7 @@ cmd_attach_session(struct cmdq_item *item, const char *tflag, int dflag,
 			}
 		}
 		if (!Eflag)
-			environ_update(s->options, c->environ, s->environ);
+			environ_update(s->options, c->env, s->env);
 
 		c->session = s;
 		server_client_set_key_table(c, NULL);
