@@ -212,7 +212,7 @@ cfg_add_cause(const char *fmt, ...)
 	va_end(ap);
 
 	cfg_ncauses++;
-	cfg_causes = xreallocarray(cfg_causes, cfg_ncauses, sizeof *cfg_causes);
+	cfg_causes = (char**) xreallocarray(cfg_causes, cfg_ncauses, sizeof *cfg_causes);
 	cfg_causes[cfg_ncauses - 1] = msg;
 }
 

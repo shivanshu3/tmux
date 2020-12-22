@@ -43,7 +43,7 @@ static TAILQ_HEAD(, window) alerts_list = TAILQ_HEAD_INITIALIZER(alerts_list);
 static void
 alerts_timer(__unused int fd, __unused short events, void *arg)
 {
-	struct window	*w = arg;
+	struct window *w = (struct window*) arg;
 
 	log_debug("@%u alerts timer expired", w->id);
 	alerts_queue(w, WINDOW_SILENCE);

@@ -70,7 +70,7 @@ args_parse(const char *template_, int argc, char **argv)
 	struct args	*args;
 	int		 opt;
 
-	args = xcalloc(1, sizeof *args);
+	args = (struct args*) xcalloc(1, sizeof *args);
 
 	optreset = 1;
 	optind = 1;
@@ -132,7 +132,7 @@ args_print_add(char **buf, size_t *len, const char *fmt, ...)
 	va_end(ap);
 
 	*len += slen;
-	*buf = xrealloc(*buf, *len);
+	*buf = (char*) xrealloc(*buf, *len);
 
 	strlcat(*buf, s, *len);
 	free(s);
@@ -181,7 +181,7 @@ args_print(struct args *args)
 	struct args_value	*value;
 
 	len = 1;
-	buf = xcalloc(1, len);
+	buf = (char*) xcalloc(1, len);
 
 	/* Process the flags first. */
 	RB_FOREACH(entry, args_tree, &args->tree) {
@@ -275,7 +275,7 @@ args_set(struct args *args, u_char flag, const char *s)
 
 	entry = args_find(args, flag);
 	if (entry == NULL) {
-		entry = xcalloc(1, sizeof *entry);
+		entry = (struct args_entry*) xcalloc(1, sizeof *entry);
 		entry->flag = flag;
 		entry->count = 1;
 		TAILQ_INIT(&entry->values);
@@ -284,7 +284,7 @@ args_set(struct args *args, u_char flag, const char *s)
 		entry->count++;
 
 	if (s != NULL) {
-		value = xcalloc(1, sizeof *value);
+		value = (struct args_value*) xcalloc(1, sizeof *value);
 		value->value = xstrdup(s);
 		TAILQ_INSERT_TAIL(&entry->values, value, entry);
 	}
