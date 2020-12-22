@@ -67,6 +67,14 @@ else()
     target_sources(tmux_misc PUBLIC osdep-linux.c)
 endif()
 
+# There is a bug with enum sizes with MSVC C compiler, which is why
+# we have to use C++ on that platform.
+if (TMUX_USE_CXX OR MSVC)
+    file(GLOB_RECURSE SOURCE_FILES_C *.c)
+    list(APPEND SOURCE_FILES_C ${CMD_PARSE_C})
+    set_source_files_properties(${SOURCE_FILES_C} PROPERTIES LANGUAGE CXX)
+endif()
+
 add_executable(tmux
     ${CMD_PARSE_C}
     alerts.c
