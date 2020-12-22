@@ -168,8 +168,8 @@ ibuf_write(struct msgbuf *msgbuf)
 		iov[i].buf = buffer_base;
 		iov[i].len = (ULONG)buffer_len;
 #else
-		iov[i].iov_base = buf;
-		iov[i].iov_len = len;
+		iov[i].iov_base = buffer_base;
+		iov[i].iov_len = buffer_len;
 #endif
 		i++;
 	}
