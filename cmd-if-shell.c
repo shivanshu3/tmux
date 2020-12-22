@@ -99,7 +99,7 @@ cmd_if_shell_exec(struct cmd *self, struct cmdq_item *item)
 		return (CMD_RETURN_NORMAL);
 	}
 
-	cdata = xcalloc(1, sizeof *cdata);
+	cdata = (struct cmd_if_shell_data*) xcalloc(1, sizeof *cdata);
 
 	cdata->cmd_if = xstrdup(args->argv[1]);
 	if (args->argc == 3)
@@ -147,7 +147,7 @@ cmd_if_shell_exec(struct cmd *self, struct cmdq_item *item)
 static void
 cmd_if_shell_callback(struct job *job)
 {
-	struct cmd_if_shell_data	*cdata = job_get_data(job);
+	struct cmd_if_shell_data	*cdata = (struct cmd_if_shell_data*) job_get_data(job);
 	struct client			*c = cdata->client;
 	struct cmdq_item		*new_item = NULL;
 	struct cmdq_state		*new_state = NULL;
@@ -198,7 +198,7 @@ out:
 static void
 cmd_if_shell_free(void *data)
 {
-	struct cmd_if_shell_data	*cdata = data;
+	struct cmd_if_shell_data	*cdata = (struct cmd_if_shell_data*) data;
 
 	if (cdata->client != NULL)
 		server_client_unref(cdata->client);

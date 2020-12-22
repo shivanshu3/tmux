@@ -185,7 +185,7 @@ cmd_find_best_session_with_window(struct cmd_find_state *fs)
 	RB_FOREACH(s, sessions, &sessions) {
 		if (!session_has(s, fs->w))
 			continue;
-		slist = xreallocarray(slist, ssize + 1, sizeof *slist);
+		slist = (struct session**) xreallocarray(slist, ssize + 1, sizeof *slist);
 		slist[ssize++] = s;
 	}
 	if (ssize == 0)

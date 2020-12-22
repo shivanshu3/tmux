@@ -202,7 +202,7 @@ cmd_display_panes_draw(struct client *c, struct screen_redraw_ctx *ctx)
 static void
 cmd_display_panes_free(struct client *c)
 {
-	struct cmd_display_panes_data	*cdata = c->overlay_data;
+	struct cmd_display_panes_data	*cdata = (struct cmd_display_panes_data*) c->overlay_data;
 
 	if (cdata->item != NULL)
 		cmdq_continue(cdata->item);
@@ -213,7 +213,7 @@ cmd_display_panes_free(struct client *c)
 static int
 cmd_display_panes_key(struct client *c, struct key_event *event)
 {
-	struct cmd_display_panes_data	*cdata = c->overlay_data;
+	struct cmd_display_panes_data	*cdata = (struct cmd_display_panes_data*) c->overlay_data;
 	char				*cmd, *expanded, *error;
 	struct window			*w = c->session->curw->window;
 	struct window_pane		*wp;
@@ -274,7 +274,7 @@ cmd_display_panes_exec(struct cmd *self, struct cmdq_item *item)
 	} else
 		delay = options_get_number(s->options, "display-panes-time");
 
-	cdata = xmalloc(sizeof *cdata);
+	cdata = (struct cmd_display_panes_data*) xmalloc(sizeof *cdata);
 	if (args->argc != 0)
 		cdata->command = xstrdup(args->argv[0]);
 	else

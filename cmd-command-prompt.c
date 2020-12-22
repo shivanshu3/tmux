@@ -75,7 +75,7 @@ cmd_command_prompt_exec(struct cmd *self, struct cmdq_item *item)
 	if (tc->prompt_string != NULL)
 		return (CMD_RETURN_NORMAL);
 
-	cdata = xcalloc(1, sizeof *cdata);
+	cdata = (struct cmd_command_prompt_cdata*) xcalloc(1, sizeof *cdata);
 
 	cdata->inputs = NULL;
 	cdata->next_input = NULL;
@@ -138,7 +138,7 @@ static int
 cmd_command_prompt_callback(struct client *c, void *data, const char *s,
     int done)
 {
-	struct cmd_command_prompt_cdata	*cdata = data;
+	struct cmd_command_prompt_cdata	*cdata = (struct cmd_command_prompt_cdata*) data;
 	char				*new_template, *prompt, *ptr, *error;
 	char				*input = NULL;
 	enum cmd_parse_status		 status;
@@ -184,7 +184,7 @@ cmd_command_prompt_callback(struct client *c, void *data, const char *s,
 static void
 cmd_command_prompt_free(void *data)
 {
-	struct cmd_command_prompt_cdata	*cdata = data;
+	struct cmd_command_prompt_cdata	*cdata = (struct cmd_command_prompt_cdata*) data;
 
 	free(cdata->inputs);
 	free(cdata->prompts);

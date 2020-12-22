@@ -52,7 +52,7 @@ const struct cmd_entry cmd_display_message_entry = {
 static void
 cmd_display_message_each(const char *key, const char *value, void *arg)
 {
-	struct cmdq_item	*item = arg;
+	struct cmdq_item	*item = (struct cmdq_item*) arg;
 
 	cmdq_print(item, "%s=%s", key, value);
 }

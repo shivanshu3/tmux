@@ -241,7 +241,7 @@ cmd_list_keys_exec(struct cmd *self, struct cmdq_item *item)
 	}
 
 	tmpsize = 256;
-	tmp = xmalloc(tmpsize);
+	tmp = (char*) xmalloc(tmpsize);
 
 	table = key_bindings_first_table ();
 	while (table != NULL) {
@@ -270,7 +270,7 @@ cmd_list_keys_exec(struct cmd *self, struct cmdq_item *item)
 			cplen = strlen(cp) + 1;
 			while (tmpused + cplen + 1 >= tmpsize) {
 				tmpsize *= 2;
-				tmp = xrealloc(tmp, tmpsize);
+				tmp = (char*) xrealloc(tmp, tmpsize);
 			}
 			strlcat(tmp, cp, tmpsize);
 			tmpused = strlcat(tmp, " ", tmpsize);
@@ -280,7 +280,7 @@ cmd_list_keys_exec(struct cmd *self, struct cmdq_item *item)
 			cplen = strlen(cp) + 1;
 			while (tmpused + cplen + 1 >= tmpsize) {
 				tmpsize *= 2;
-				tmp = xrealloc(tmp, tmpsize);
+				tmp = (char*) xrealloc(tmp, tmpsize);
 			}
 			strlcat(tmp, cp, tmpsize);
 			tmpused = strlcat(tmp, " ", tmpsize);
@@ -290,7 +290,7 @@ cmd_list_keys_exec(struct cmd *self, struct cmdq_item *item)
 			cplen = strlen(cp);
 			while (tmpused + cplen + 1 >= tmpsize) {
 				tmpsize *= 2;
-				tmp = xrealloc(tmp, tmpsize);
+				tmp = (char*) xrealloc(tmp, tmpsize);
 			}
 			strlcat(tmp, cp, tmpsize);
 			free(cp);

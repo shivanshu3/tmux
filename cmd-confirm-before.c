@@ -69,7 +69,7 @@ cmd_confirm_before_exec(struct cmd *self, struct cmdq_item *item)
 		free(copy);
 	}
 
-	cdata = xmalloc(sizeof *cdata);
+	cdata = (struct cmd_confirm_before_data*) xmalloc(sizeof *cdata);
 	cdata->cmd = xstrdup(args->argv[0]);
 
 	status_prompt_set(tc, target, new_prompt, NULL,
@@ -84,7 +84,7 @@ static int
 cmd_confirm_before_callback(struct client *c, void *data, const char *s,
     __unused int done)
 {
-	struct cmd_confirm_before_data	*cdata = data;
+	struct cmd_confirm_before_data	*cdata = (struct cmd_confirm_before_data*) data;
 	char				*error;
 	enum cmd_parse_status		 status;
 
@@ -108,7 +108,7 @@ cmd_confirm_before_callback(struct client *c, void *data, const char *s,
 static void
 cmd_confirm_before_free(void *data)
 {
-	struct cmd_confirm_before_data	*cdata = data;
+	struct cmd_confirm_before_data	*cdata = (struct cmd_confirm_before_data*) data;
 
 	free(cdata->cmd);
 	free(cdata);

@@ -65,7 +65,7 @@ const struct cmd_entry cmd_clear_history_entry = {
 static char *
 cmd_capture_pane_append(char *buf, size_t *len, char *line, size_t linelen)
 {
-	buf = xrealloc(buf, *len + linelen + 1);
+	buf = (char*) xrealloc(buf, *len + linelen + 1);
 	memcpy(buf + *len, line, linelen);
 	*len += linelen;
 	return (buf);
@@ -84,7 +84,7 @@ cmd_capture_pane_pending(struct args *args, struct window_pane *wp,
 	if (pending == NULL)
 		return (xstrdup(""));
 
-	line = EVBUFFER_DATA(pending);
+	line = (char*) EVBUFFER_DATA(pending);
 	linelen = EVBUFFER_LENGTH(pending);
 
 	buf = xstrdup("");
