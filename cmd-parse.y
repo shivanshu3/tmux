@@ -138,12 +138,12 @@ statements	: statement '\n'
 
 statement	: /* empty */
 		{
-			$$ = xmalloc (sizeof *$$);
+			$$ = (struct cmd_parse_commands*) xmalloc (sizeof *$$);
 			TAILQ_INIT($$);
 		}
 		| hidden_assignment
 		{
-			$$ = xmalloc (sizeof *$$);
+			$$ = (struct cmd_parse_commands*) xmalloc (sizeof *$$);
 			TAILQ_INIT($$);
 		}
 		| condition
@@ -232,7 +232,7 @@ if_open		: TMUX_YACC_IF expanded
 			struct cmd_parse_state	*ps = &parse_state;
 			struct cmd_parse_scope	*scope;
 
-			scope = xmalloc(sizeof *scope);
+			scope = (struct cmd_parse_scope*) xmalloc(sizeof *scope);
 			$$ = scope->flag = format_true($2);
 			free($2);
 
@@ -246,7 +246,7 @@ if_else		: TMUX_YACC_ELSE
 			struct cmd_parse_state	*ps = &parse_state;
 			struct cmd_parse_scope	*scope;
 
-			scope = xmalloc(sizeof *scope);
+			scope = (struct cmd_parse_scope*) xmalloc(sizeof *scope);
 			scope->flag = !ps->scope->flag;
 
 			free(ps->scope);
@@ -258,7 +258,7 @@ if_elif		: TMUX_YACC_ELIF expanded
 			struct cmd_parse_state	*ps = &parse_state;
 			struct cmd_parse_scope	*scope;
 
-			scope = xmalloc(sizeof *scope);
+			scope = (struct cmd_parse_scope*) xmalloc(sizeof *scope);
 			$$ = scope->flag = format_true($2);
 			free($2);
 
@@ -399,14 +399,14 @@ command		: assignment
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 
-			$$ = xcalloc(1, sizeof *$$);
+			$$ = (struct cmd_parse_command*) xcalloc(1, sizeof *$$);
 			$$->line = ps->input->line;
 		}
 		| optional_assignment TMUX_YACC_TOKEN
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 
-			$$ = xcalloc(1, sizeof *$$);
+			$$ = (struct cmd_parse_command*) xcalloc(1, sizeof *$$);
 			$$->line = ps->input->line;
 
 			cmd_prepend_argv(&$$->argc, &$$->argv, $2);
@@ -416,7 +416,7 @@ command		: assignment
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 
-			$$ = xcalloc(1, sizeof *$$);
+			$$ = (struct cmd_parse_command*) xcalloc(1, sizeof *$$);
 			$$->line = ps->input->line;
 
 			$$->argc = $3.argc;
@@ -506,7 +506,7 @@ elif1		: if_elif commands
 arguments	: argument
 		{
 			$$.argc = 1;
-			$$.argv = xreallocarray(NULL, 1, sizeof *$$.argv);
+			$$.argv = (char**) xreallocarray(NULL, 1, sizeof *$$.argv);
 
 			$$.argv[0] = $1;
 		}
@@ -584,7 +584,7 @@ cmd_parse_new_commands(void)
 {
 	struct cmd_parse_commands	*cmds;
 
-	cmds = xmalloc(sizeof *cmds);
+	cmds = (struct cmd_parse_commands*) xmalloc(sizeof *cmds);
 	TAILQ_INIT (cmds);
 	return (cmds);
 }
@@ -751,7 +751,10 @@ cmd_parse_build_commands(struct cmd_parse_commands *cmds,
 	TAILQ_FOREACH(cmd, cmds, entry) {
 		name = cmd->argv[0];
 		log_debug("%s: %u %s", __func__, cmd->line, name);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-security"
 		cmd_log_argv(cmd->argc, cmd->argv, __func__);
+#pragma GCC diagnostic pop
 
 		if (cmdlist == NULL ||
 		    ((~pi->flags & CMD_PARSE_ONEGROUP) && cmd->line != line)) {
@@ -909,7 +912,7 @@ cmd_parse_from_buffer(const void *buf, size_t len, struct cmd_parse_input *pi)
 		return (&pr);
 	}
 
-	cmds = cmd_parse_do_buffer(buf, len, pi, &cause);
+	cmds = cmd_parse_do_buffer((const char*)buf, len, pi, &cause);
 	if (cmds == NULL) {
 		pr.status = CMD_PARSE_ERROR;
 		pr.error = cause;
@@ -962,7 +965,7 @@ cmd_parse_from_arguments(int argc, char **argv, struct cmd_parse_input *pi)
 			cmd_log_argv(new_argc, new_argv, "%s: at %u", __func__,
 			    i);
 
-			cmd = xcalloc(1, sizeof *cmd);
+			cmd = (struct cmd_parse_command*) xcalloc(1, sizeof *cmd);
 			cmd->line = pi->line;
 
 			cmd->argc = new_argc;
@@ -981,7 +984,7 @@ cmd_parse_from_arguments(int argc, char **argv, struct cmd_parse_input *pi)
 			cmd_log_argv(new_argc, new_argv, "%s: at %u", __func__,
 			    last);
 
-			cmd = xcalloc(1, sizeof *cmd);
+			cmd = (struct cmd_parse_command*) xcalloc(1, sizeof *cmd);
 			cmd->line = pi->line;
 
 			cmd->argc = new_argc;
@@ -1030,7 +1033,7 @@ yylex_append(char **buf, size_t *len, const char *add, size_t addlen)
 {
 	if (addlen > SIZE_MAX - 1 || *len > SIZE_MAX - 1 - addlen)
 		fatalx("buffer is too big");
-	*buf = xrealloc(*buf, (*len) + 1 + addlen);
+	*buf = (char*) xrealloc(*buf, (*len) + 1 + addlen);
 	memcpy((*buf) + *len, add, addlen);
 	(*len) += addlen;
 }
@@ -1107,7 +1110,7 @@ yylex_get_word(int ch)
 	size_t	 len;
 
 	len = 0;
-	buf = xmalloc(1);
+	buf = (char*) xmalloc(1);
 
 	do
 		yylex_append1(&buf, &len, ch);
@@ -1257,7 +1260,7 @@ yylex_format(void)
 	int	 ch, brackets = 1;
 
 	len = 0;
-	buf = xmalloc(1);
+	buf = (char*) xmalloc(1);
 
 	yylex_append(&buf, &len, "#{", 2);
 	for (;;) {
@@ -1493,7 +1496,7 @@ yylex_token(int ch)
 	       SINGLE_QUOTES }	 state = NONE, last = START;
 
 	len = 0;
-	buf = xmalloc(1);
+	buf = (char*) xmalloc(1);
 
 	for (;;) {
 		/* EOF or \n are always the end of the token. */

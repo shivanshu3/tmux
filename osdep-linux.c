@@ -51,7 +51,7 @@ osdep_get_name(int fd, __unused char *tty)
 	while ((ch = fgetc(f)) != EOF) {
 		if (ch == '\0')
 			break;
-		buf = xrealloc(buf, len + 2);
+		buf = (char*) xrealloc(buf, len + 2);
 		buf[len++] = ch;
 	}
 	if (buf != NULL)

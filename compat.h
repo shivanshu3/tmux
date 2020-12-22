@@ -18,6 +18,7 @@
 #define COMPAT_H
 
 #include <sys/types.h>
+#include "extern-c.h"
 
 #ifdef _WIN32
 	#include "win32_numbers.h"
@@ -285,7 +286,7 @@ void		 closefrom(int);
 
 #ifndef HAVE_STRCASESTR
 /* strcasestr.c */
-char		*strcasestr(const char *, const char *);
+EXTERN_CPP const char *strcasestr(const char *, const char *);
 #endif
 
 #ifndef HAVE_STRSEP
