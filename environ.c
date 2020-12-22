@@ -31,7 +31,7 @@
 
 RB_HEAD(environ_tree, environ_entry);
 static int environ_cmp(struct environ_entry *, struct environ_entry *);
-RB_GENERATE_STATIC(environ, environ_entry, entry, environ_cmp);
+RB_GENERATE_STATIC(environ_tree, environ_entry, entry, environ_cmp);
 
 static int
 environ_cmp(struct environ_entry *envent1, struct environ_entry *envent2)
@@ -57,8 +57,8 @@ environ_free(struct environ_tree *env)
 {
 	struct environ_entry	*envent, *envent1;
 
-	RB_FOREACH_SAFE(envent, environ, env, envent1) {
-		RB_REMOVE(environ, env, envent);
+	RB_FOREACH_SAFE(envent, environ_tree, env, envent1) {
+		RB_REMOVE(environ_tree, env, envent);
 		free(envent->name);
 		free(envent->value);
 		free(envent);
@@ -69,13 +69,13 @@ environ_free(struct environ_tree *env)
 struct environ_entry *
 environ_first(struct environ_tree *env)
 {
-	return (RB_MIN(environ, env));
+	return (RB_MIN(environ_tree, env));
 }
 
 struct environ_entry *
 environ_next(struct environ_entry *envent)
 {
-	return (RB_NEXT(environ, env, envent));
+	return (RB_NEXT(environ_tree, env, envent));
 }
 
 /* Copy one environment into another. */
@@ -84,7 +84,7 @@ environ_copy(struct environ_tree *srcenv, struct environ_tree *dstenv)
 {
 	struct environ_entry	*envent;
 
-	RB_FOREACH(envent, environ, srcenv) {
+	RB_FOREACH(envent, environ_tree, srcenv) {
 		if (envent->value == NULL)
 			environ_clear(dstenv, envent->name);
 		else {
@@ -101,7 +101,7 @@ environ_find(struct environ_tree *env, const char *name)
 	struct environ_entry	envent;
 
 	envent.name = (char *) name;
-	return (RB_FIND(environ, env, &envent));
+	return (RB_FIND(environ_tree, env, &envent));
 }
 
 /* Set an environment variable. */
@@ -122,7 +122,7 @@ environ_set(struct environ_tree *env, const char *name, int flags, const char *f
 		envent->name = xstrdup(name);
 		envent->flags = flags;
 		xvasprintf(&envent->value, fmt, ap);
-		RB_INSERT(environ, env, envent);
+		RB_INSERT(environ_tree, env, envent);
 	}
 	va_end(ap);
 }
@@ -141,7 +141,7 @@ environ_clear(struct environ_tree *env, const char *name)
 		envent->name = xstrdup(name);
 		envent->flags = 0;
 		envent->value = NULL;
-		RB_INSERT(environ, env, envent);
+		RB_INSERT(environ_tree, env, envent);
 	}
 }
 
@@ -171,7 +171,7 @@ environ_unset(struct environ_tree *env, const char *name)
 
 	if ((envent = environ_find(env, name)) == NULL)
 		return;
-	RB_REMOVE(environ, env, envent);
+	RB_REMOVE(environ_tree, env, envent);
 	free(envent->name);
 	free(envent->value);
 	free(envent);
@@ -192,7 +192,7 @@ environ_update(struct options *oo, struct environ_tree *src, struct environ_tree
 	a = options_array_first(o);
 	while (a != NULL) {
 		ov = options_array_item_value(a);
-		RB_FOREACH(envent, environ, src) {
+		RB_FOREACH(envent, environ_tree, src) {
 			if (fnmatch(ov->string, envent->name, 0) == 0)
 				break;
 		}
@@ -211,7 +211,7 @@ environ_push(struct environ_tree *env)
 	struct environ_entry	*envent;
 
 	environ = xcalloc(1, sizeof *environ);
-	RB_FOREACH(envent, environ, env) {
+	RB_FOREACH(envent, environ_tree, env) {
 		if (envent->value != NULL &&
 		    *envent->name != '\0' &&
 		    (~envent->flags & ENVIRON_HIDDEN))
@@ -231,7 +231,7 @@ environ_log(struct environ_tree *env, const char *fmt, ...)
 	vasprintf(&prefix, fmt, ap);
 	va_end(ap);
 
-	RB_FOREACH(envent, environ, env) {
+	RB_FOREACH(envent, environ_tree, env) {
 		if (envent->value != NULL && *envent->name != '\0') {
 			log_debug("%s%s=%s", prefix, envent->name,
 			    envent->value);
