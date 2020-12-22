@@ -57,6 +57,7 @@ add_custom_command(
     COMMAND yacc ${CMAKE_SOURCE_DIR}/cmd-parse.y
     COMMAND mv y.tab.c ${CMD_PARSE_C}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    DEPENDS ${CMAKE_SOURCE_DIR}/cmd-parse.y
 )
 
 add_library(tmux_misc STATIC)

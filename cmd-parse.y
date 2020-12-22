@@ -99,13 +99,13 @@ static void	 cmd_parse_print_commands(struct cmd_parse_input *, u_int,
 	struct cmd_parse_command		 *command;
 }
 
-%token ERROR
-%token HIDDEN
-%token IF
-%token ELSE
-%token ELIF
-%token ENDIF
-%token <token> FORMAT TOKEN EQUALS
+%token TMUX_YACC_ERROR
+%token TMUX_YACC_HIDDEN
+%token TMUX_YACC_IF
+%token TMUX_YACC_ELSE
+%token TMUX_YACC_ELIF
+%token TMUX_YACC_ENDIF
+%token <token> TMUX_YACC_FORMAT TMUX_YACC_TOKEN TMUX_YACC_EQUALS
 
 %type <token> argument expanded format
 %type <arguments> arguments
@@ -169,11 +169,11 @@ statement	: /* empty */
 			}
 		}
 
-format		: FORMAT
+format		: TMUX_YACC_FORMAT
 		{
 			$$ = $1;
 		}
-		| TOKEN
+		| TMUX_YACC_TOKEN
 		{
 			$$ = $1;
 		}
@@ -205,7 +205,7 @@ expanded	: format
 optional_assignment	: /* empty */
 			| assignment
 
-assignment	: EQUALS
+assignment	: TMUX_YACC_EQUALS
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 			int			 flags = ps->input->flags;
@@ -216,7 +216,7 @@ assignment	: EQUALS
 			free($1);
 		}
 
-hidden_assignment : HIDDEN EQUALS
+hidden_assignment : TMUX_YACC_HIDDEN TMUX_YACC_EQUALS
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 			int			 flags = ps->input->flags;
@@ -227,7 +227,7 @@ hidden_assignment : HIDDEN EQUALS
 			free($2);
 		}
 
-if_open		: IF expanded
+if_open		: TMUX_YACC_IF expanded
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 			struct cmd_parse_scope	*scope;
@@ -241,7 +241,7 @@ if_open		: IF expanded
 			ps->scope = scope;
 		}
 
-if_else		: ELSE
+if_else		: TMUX_YACC_ELSE
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 			struct cmd_parse_scope	*scope;
@@ -253,7 +253,7 @@ if_else		: ELSE
 			ps->scope = scope;
 		}
 
-if_elif		: ELIF expanded
+if_elif		: TMUX_YACC_ELIF expanded
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 			struct cmd_parse_scope	*scope;
@@ -266,7 +266,7 @@ if_elif		: ELIF expanded
 			ps->scope = scope;
 		}
 
-if_close	: ENDIF
+if_close	: TMUX_YACC_ENDIF
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 
@@ -402,7 +402,7 @@ command		: assignment
 			$$ = xcalloc(1, sizeof *$$);
 			$$->line = ps->input->line;
 		}
-		| optional_assignment TOKEN
+		| optional_assignment TMUX_YACC_TOKEN
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 
@@ -412,7 +412,7 @@ command		: assignment
 			cmd_prepend_argv(&$$->argc, &$$->argv, $2);
 
 		}
-		| optional_assignment TOKEN arguments
+		| optional_assignment TMUX_YACC_TOKEN arguments
 		{
 			struct cmd_parse_state	*ps = &parse_state;
 
@@ -517,11 +517,11 @@ arguments	: argument
 			$$ = $2;
 		}
 
-argument	: TOKEN
+argument	: TMUX_YACC_TOKEN
 		{
 			$$ = $1;
 		}
-		| EQUALS
+		| TMUX_YACC_EQUALS
 		{
 			$$ = $1;
 		}
@@ -1179,8 +1179,8 @@ yylex(void)
 			if (condition && next == '{') {
 				yylval.token = yylex_format();
 				if (yylval.token == NULL)
-					return (ERROR);
-				return (FORMAT);
+					return (TMUX_YACC_ERROR);
+				return (TMUX_YACC_FORMAT);
 			}
 			while (next != '\n' && next != EOF)
 				next = yylex_getc();
@@ -1202,30 +1202,30 @@ yylex(void)
 					break;
 			}
 			if (*cp == '\0')
-				return (TOKEN);
+				return (TMUX_YACC_TOKEN);
 			ps->condition = 1;
 			if (strcmp(yylval.token, "%hidden") == 0) {
 				free(yylval.token);
-				return (HIDDEN);
+				return (TMUX_YACC_HIDDEN);
 			}
 			if (strcmp(yylval.token, "%if") == 0) {
 				free(yylval.token);
-				return (IF);
+				return (TMUX_YACC_IF);
 			}
 			if (strcmp(yylval.token, "%else") == 0) {
 				free(yylval.token);
-				return (ELSE);
+				return (TMUX_YACC_ELSE);
 			}
 			if (strcmp(yylval.token, "%elif") == 0) {
 				free(yylval.token);
-				return (ELIF);
+				return (TMUX_YACC_ELIF);
 			}
 			if (strcmp(yylval.token, "%endif") == 0) {
 				free(yylval.token);
-				return (ENDIF);
+				return (TMUX_YACC_ENDIF);
 			}
 			free(yylval.token);
-			return (ERROR);
+			return (TMUX_YACC_ERROR);
 		}
 
 		/*
@@ -1233,7 +1233,7 @@ yylex(void)
 		 */
 		token = yylex_token(ch);
 		if (token == NULL)
-			return (ERROR);
+			return (TMUX_YACC_ERROR);
 		yylval.token = token;
 
 		if (strchr(token, '=') != NULL && yylex_is_var(*token, 1)) {
@@ -1242,9 +1242,9 @@ yylex(void)
 					break;
 			}
 			if (*cp == '=')
-				return (EQUALS);
+				return (TMUX_YACC_EQUALS);
 		}
-		return (TOKEN);
+		return (TMUX_YACC_TOKEN);
 	}
 	return (0);
 }
