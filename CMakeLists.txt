@@ -25,9 +25,11 @@ message("Curses header found: ${CURSES_PATH}")
 
 find_library(EVENT_LIB event REQUIRED)
 find_path(EVENT_PATH event.h REQUIRED)
+find_path(EVENT_CONFIG_PATH event2/event-config.h REQUIRED)
 
 message("Event lib found: ${EVENT_LIB}")
 message("Event header found: ${EVENT_PATH}")
+message("Event-config header found: ${EVENT_CONFIG_PATH}")
 
 if (MSVC)
     find_library(WINSOCK2_LIB Ws2_32 REQUIRED)
@@ -40,6 +42,7 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CURSES_PATH})
 include_directories(${EVENT_PATH})
+include_directories(${EVENT_CONFIG_PATH})
 
 if (MSVC)
     include_directories(${CMAKE_SOURCE_DIR}/win32_headers)
@@ -55,10 +58,12 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# NOTE: This will have to be changed for Windows
-add_library(tmux_misc STATIC
-    osdep-linux.c
-)
+add_library(tmux_misc STATIC)
+if (MSVC)
+    target_sources(tmux_misc PUBLIC osdep-windows.c)
+else()
+    target_sources(tmux_misc PUBLIC osdep-linux.c)
+endif()
 
 add_executable(tmux
     ${CMD_PARSE_C}
