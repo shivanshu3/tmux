@@ -286,7 +286,7 @@ void		 closefrom(int);
 
 #ifndef HAVE_STRCASESTR
 /* strcasestr.c */
-EXTERN_CPP const char *strcasestr(const char *, const char *);
+EXTERN_CPP const char *strcasestr(const char *, const char *) __THROW;
 #endif
 
 #ifndef HAVE_STRSEP
