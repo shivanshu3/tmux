@@ -696,7 +696,11 @@ format_draw(struct screen_write_ctx *octx, const struct grid_cell *base,
 					map[STYLE_ALIGN_DEFAULT] = AFTER;
 				list_state = 1;
 			}
-			current = map[sy.align];
+			current = 
+#ifdef __cplusplus
+			(decltype(current))
+#endif
+			map[sy.align];
 			break;
 		case STYLE_LIST_LEFT_MARKER:
 			/* Entering left marker. */
@@ -747,7 +751,7 @@ format_draw(struct screen_write_ctx *octx, const struct grid_cell *base,
 				fr = NULL;
 			}
 			if (fr == NULL && sy.range_type != STYLE_RANGE_NONE) {
-				fr = xcalloc(1, sizeof *fr);
+				fr = (struct format_range*) xcalloc(1, sizeof *fr);
 				fr->index = current;
 
 				fr->s = &s[current];
@@ -813,7 +817,7 @@ format_draw(struct screen_write_ctx *octx, const struct grid_cell *base,
 
 	/* Create ranges to return. */
 	TAILQ_FOREACH_SAFE(fr, &frs, entry, fr1) {
-		sr = xcalloc(1, sizeof *sr);
+		sr = (struct style_range*) xcalloc(1, sizeof *sr);
 		sr->type = fr->type;
 		sr->argument = fr->argument;
 		sr->start = fr->start;
@@ -901,7 +905,7 @@ format_trim_left(const char *expanded, u_int limit)
 	struct utf8_data	 ud;
 	enum utf8_state		 more;
 
-	out = copy = xcalloc(1, strlen(expanded) + 1);
+	out = copy = (char*) xcalloc(1, strlen(expanded) + 1);
 	while (*cp != '\0') {
 		if (width >= limit)
 			break;
@@ -984,7 +988,7 @@ format_trim_right(const char *expanded, u_int limit)
 		return (xstrdup(expanded));
 	skip = total_width - limit;
 
-	out = copy = xcalloc(1, strlen(expanded) + 1);
+	out = copy = (char*) xcalloc(1, strlen(expanded) + 1);
 	while (*cp != '\0') {
 		if (*cp == '#') {
 			for (end = cp + 1; *end == '#'; end++)
