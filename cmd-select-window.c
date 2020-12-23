@@ -131,7 +131,7 @@ cmd_select_window_exec(struct cmd *self, struct cmdq_item *item)
 		if (args_has(args, 'T') && wl == s->curw) {
 			if (session_last(s) != 0) {
 				cmdq_error(item, "no last window");
-				return (-1);
+				return (enum cmd_retval) (-1);
 			}
 			if (current->s == s)
 				cmd_find_from_session(current, s, 0);

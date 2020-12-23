@@ -100,10 +100,10 @@ cmd_resize_window_exec(struct cmd *self, struct cmdq_item *item)
 		sy += adjust;
 
 	if (args_has(args, 'A')) {
-		default_window_size(NULL, s, w, &sx, &sy, &xpixel, &ypixel,
+		default_window_size(NULL, s, w, &sx, &sy, (u_int*)&xpixel, (u_int*)&ypixel,
 		    WINDOW_SIZE_LARGEST);
 	} else if (args_has(args, 'a')) {
-		default_window_size(NULL, s, w, &sx, &sy, &xpixel, &ypixel,
+		default_window_size(NULL, s, w, &sx, &sy, (u_int*)&xpixel, (u_int*)&ypixel,
 		    WINDOW_SIZE_SMALLEST);
 	}
 

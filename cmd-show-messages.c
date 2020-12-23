@@ -65,7 +65,7 @@ cmd_show_messages_terminals(struct cmd *self, struct cmdq_item *item, int blank)
 		    term->name, term->tty->client->name, term->flags);
 		n++;
 		for (i = 0; i < tty_term_ncodes(); i++)
-			cmdq_print(item, "%s", tty_term_describe(term, i));
+			cmdq_print(item, "%s", tty_term_describe(term, (enum tty_code_code)i));
 	}
 	return (n != 0);
 }

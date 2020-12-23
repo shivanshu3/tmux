@@ -59,7 +59,7 @@ static void
 cmd_save_buffer_done(__unused struct client *c, const char *path, int error,
     __unused int closed, __unused struct evbuffer *buffer, void *data)
 {
-	struct cmdq_item	*item = data;
+	struct cmdq_item	*item = (struct cmdq_item*) data;
 
 	if (!closed)
 		return;

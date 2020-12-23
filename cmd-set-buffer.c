@@ -106,11 +106,11 @@ cmd_set_buffer_exec(struct cmd *self, struct cmdq_item *item)
 
 	if (args_has(args, 'a') && pb != NULL) {
 		olddata = paste_buffer_data(pb, &bufsize);
-		bufdata = xmalloc(bufsize);
+		bufdata = (char*) xmalloc(bufsize);
 		memcpy(bufdata, olddata, bufsize);
 	}
 
-	bufdata = xrealloc(bufdata, bufsize + newsize);
+	bufdata = (char*) xrealloc(bufdata, bufsize + newsize);
 	memcpy(bufdata + bufsize, args->argv[0], newsize);
 	bufsize += newsize;
 

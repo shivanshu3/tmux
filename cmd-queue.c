@@ -487,7 +487,7 @@ cmdq_get_command(struct cmd_list *cmdlist, struct cmdq_state *state)
 	while (cmd != NULL) {
 		entry = cmd_get_entry(cmd);
 
-		item = xcalloc(1, sizeof *item);
+		item = (struct cmdq_item*) xcalloc(1, sizeof *item);
 		xasprintf(&item->name, "[%s/%p]", entry->name, item);
 		item->type = CMDQ_COMMAND;
 
@@ -641,7 +641,7 @@ cmdq_get_callback1(const char *name, cmdq_cb cb, void *data)
 {
 	struct cmdq_item	*item;
 
-	item = xcalloc(1, sizeof *item);
+	item = (struct cmdq_item*) xcalloc(1, sizeof *item);
 	xasprintf(&item->name, "[%s/%p]", name, item);
 	item->type = CMDQ_CALLBACK;
 
@@ -658,7 +658,7 @@ cmdq_get_callback1(const char *name, cmdq_cb cb, void *data)
 static enum cmd_retval
 cmdq_error_callback(struct cmdq_item *item, void *data)
 {
-	char	*error = data;
+	char	*error = (char*) data;
 
 	cmdq_error(item, "%s", error);
 	free(error);

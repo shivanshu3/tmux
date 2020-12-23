@@ -85,7 +85,7 @@ cmd_wait_for_add(const char *name)
 {
 	struct wait_channel *wc;
 
-	wc = xmalloc(sizeof *wc);
+	wc = (struct wait_channel*) xmalloc(sizeof *wc);
 	wc->name = xstrdup(name);
 
 	wc->locked = 0;
@@ -185,7 +185,7 @@ cmd_wait_for_wait(struct cmdq_item *item, const char *name,
 	}
 	log_debug("wait channel %s not woken (%p)", wc->name, c);
 
-	wi = xcalloc(1, sizeof *wi);
+	wi = (struct wait_item*) xcalloc(1, sizeof *wi);
 	wi->item = item;
 	TAILQ_INSERT_TAIL(&wc->waiters, wi, entry);
 
@@ -207,7 +207,7 @@ cmd_wait_for_lock(struct cmdq_item *item, const char *name,
 		wc = cmd_wait_for_add(name);
 
 	if (wc->locked) {
-		wi = xcalloc(1, sizeof *wi);
+		wi = (struct wait_item*) xcalloc(1, sizeof *wi);
 		wi->item = item;
 		TAILQ_INSERT_TAIL(&wc->lockers, wi, entry);
 		return (CMD_RETURN_WAIT);

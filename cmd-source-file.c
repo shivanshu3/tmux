@@ -81,7 +81,7 @@ static void
 cmd_source_file_done(struct client *c, const char *path, int error,
     int closed, struct evbuffer *buffer, void *data)
 {
-	struct cmd_source_file_data	*cdata = data;
+	struct cmd_source_file_data	*cdata = (struct cmd_source_file_data*) data;
 	struct cmdq_item		*item = cdata->item;
 	void				*bdata = EVBUFFER_DATA(buffer);
 	size_t				 bsize = EVBUFFER_LENGTH(buffer);
@@ -114,7 +114,7 @@ static void
 cmd_source_file_add(struct cmd_source_file_data *cdata, const char *path)
 {
 	log_debug("%s: %s", __func__, path);
-	cdata->files = xreallocarray(cdata->files, cdata->nfiles + 1,
+	cdata->files = (char**) xreallocarray(cdata->files, cdata->nfiles + 1,
 	    sizeof *cdata->files);
 	cdata->files[cdata->nfiles++] = xstrdup(path);
 }
@@ -132,7 +132,7 @@ cmd_source_file_exec(struct cmd *self, struct cmdq_item *item)
 	int				 i, result;
 	u_int				 j;
 
-	cdata = xcalloc(1, sizeof *cdata);
+	cdata = (struct cmd_source_file_data*) xcalloc(1, sizeof *cdata);
 	cdata->item = item;
 
 	if (args_has(args, 'q'))

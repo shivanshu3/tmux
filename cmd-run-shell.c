@@ -62,7 +62,7 @@ struct cmd_run_shell_data {
 static void
 cmd_run_shell_print(struct job *job, const char *msg)
 {
-	struct cmd_run_shell_data	*cdata = job_get_data(job);
+	struct cmd_run_shell_data	*cdata = (struct cmd_run_shell_data*) job_get_data(job);
 	struct window_pane		*wp = NULL;
 	struct cmd_find_state		 fs;
 	struct window_mode_entry	*wme;
@@ -100,7 +100,7 @@ cmd_run_shell_exec(struct cmd *self, struct cmdq_item *item)
 	struct timeval			 tv;
 	char				*end;
 
-	cdata = xcalloc(1, sizeof *cdata);
+	cdata = (struct cmd_run_shell_data*) xcalloc(1, sizeof *cdata);
 	if (args->argc != 0)
 		cdata->cmd = format_single_from_target(item, args->argv[0]);
 
@@ -143,7 +143,7 @@ cmd_run_shell_exec(struct cmd *self, struct cmdq_item *item)
 static void
 cmd_run_shell_timer(__unused int fd, __unused short events, void* arg)
 {
-	struct cmd_run_shell_data	*cdata = arg;
+	struct cmd_run_shell_data	*cdata = (struct cmd_run_shell_data*) arg;
 
 	if (cdata->cmd != NULL) {
 		if (job_run(cdata->cmd, cdata->s, cdata->cwd, NULL,
@@ -160,7 +160,7 @@ cmd_run_shell_timer(__unused int fd, __unused short events, void* arg)
 static void
 cmd_run_shell_callback(struct job *job)
 {
-	struct cmd_run_shell_data	*cdata = job_get_data(job);
+	struct cmd_run_shell_data	*cdata = (struct cmd_run_shell_data*) job_get_data(job);
 	struct bufferevent		*event = job_get_event(job);
 	struct cmdq_item		*item = cdata->item;
 	char				*cmd = cdata->cmd, *msg = NULL, *line;
@@ -176,7 +176,7 @@ cmd_run_shell_callback(struct job *job)
 
 	size = EVBUFFER_LENGTH(event->input);
 	if (size != 0) {
-		line = xmalloc(size + 1);
+		line = (char*) xmalloc(size + 1);
 		memcpy(line, EVBUFFER_DATA(event->input), size);
 		line[size] = '\0';
 
@@ -210,7 +210,7 @@ cmd_run_shell_callback(struct job *job)
 static void
 cmd_run_shell_free(void *data)
 {
-	struct cmd_run_shell_data	*cdata = data;
+	struct cmd_run_shell_data	*cdata = (struct cmd_run_shell_data*) data;
 
 	evtimer_del(&cdata->timer);
 	if (cdata->s != NULL)
