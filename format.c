@@ -2151,7 +2151,7 @@ format_replace(struct format_expand_state *es, const char *key, size_t keylen,
 	struct window_pane		 *wp = ft->wp;
 	const char			 *errptr, *copy, *cp, *marker = NULL;
 	const char			 *time_format = NULL;
-	char				 *copy0, *condition, *found, *new;
+	char				 *copy0, *condition, *found, *new_;
 	char				 *value, *left, *right;
 	size_t				  valuelen;
 	int				  modifiers = 0, limit = 0, width = 0;
@@ -2294,15 +2294,15 @@ format_replace(struct format_expand_state *es, const char *key, size_t keylen,
 			goto fail;
 	} else if (search != NULL) {
 		/* Search in pane. */
-		new = format_expand1(es, copy);
+		new_ = format_expand1(es, copy);
 		if (wp == NULL) {
-			format_log(es, "search '%s' but no pane", new);
+			format_log(es, "search '%s' but no pane", new_);
 			value = xstrdup("0");
 		} else {
-			format_log(es, "search '%s' pane %%%u", new, wp->id);
-			value = format_search(fm, wp, new);
+			format_log(es, "search '%s' pane %%%u", new_, wp->id);
+			value = format_search(fm, wp, new_);
 		}
-		free(new);
+		free(new_);
 	} else if (cmp != NULL) {
 		/* Comparison of left and right. */
 		if (format_choose(es, copy, &left, &right, 1) != 0) {
@@ -2430,76 +2430,76 @@ format_replace(struct format_expand_state *es, const char *key, size_t keylen,
 done:
 	/* Expand again if required. */
 	if (modifiers & FORMAT_EXPAND) {
-		new = format_expand1(es, value);
+		new_ = format_expand1(es, value);
 		free(value);
-		value = new;
+		value = new_;
 	} else if (modifiers & FORMAT_EXPANDTIME) {
 		format_copy_state(&next, es, FORMAT_EXPAND_TIME);
-		new = format_expand1(&next, value);
+		new_ = format_expand1(&next, value);
 		free(value);
-		value = new;
+		value = new_;
 	}
 
 	/* Perform substitution if any. */
 	for (i = 0; i < nsub; i++) {
 		left = format_expand1(es, sub[i]->argv[0]);
 		right = format_expand1(es, sub[i]->argv[1]);
-		new = format_sub(sub[i], value, left, right);
-		format_log(es, "substitute '%s' to '%s': %s", left, right, new);
+		new_ = format_sub(sub[i], value, left, right);
+		format_log(es, "substitute '%s' to '%s': %s", left, right, new_);
 		free(value);
-		value = new;
+		value = new_;
 		free(right);
 		free(left);
 	}
 
 	/* Truncate the value if needed. */
 	if (limit > 0) {
-		new = format_trim_left(value, limit);
-		if (marker != NULL && strcmp(new, value) != 0) {
+		new_ = format_trim_left(value, limit);
+		if (marker != NULL && strcmp(new_, value) != 0) {
 			free(value);
-			xasprintf(&value, "%s%s", new, marker);
+			xasprintf(&value, "%s%s", new_, marker);
 		} else {
 			free(value);
-			value = new;
+			value = new_;
 		}
 		format_log(es, "applied length limit %d: %s", limit, value);
 	} else if (limit < 0) {
-		new = format_trim_right(value, -limit);
-		if (marker != NULL && strcmp(new, value) != 0) {
+		new_ = format_trim_right(value, -limit);
+		if (marker != NULL && strcmp(new_, value) != 0) {
 			free(value);
-			xasprintf(&value, "%s%s", marker, new);
+			xasprintf(&value, "%s%s", marker, new_);
 		} else {
 			free(value);
-			value = new;
+			value = new_;
 		}
 		format_log(es, "applied length limit %d: %s", limit, value);
 	}
 
 	/* Pad the value if needed. */
 	if (width > 0) {
-		new = utf8_padcstr(value, width);
+		new_ = utf8_padcstr(value, width);
 		free(value);
-		value = new;
+		value = new_;
 		format_log(es, "applied padding width %d: %s", width, value);
 	} else if (width < 0) {
-		new = utf8_rpadcstr(value, -width);
+		new_ = utf8_rpadcstr(value, -width);
 		free(value);
-		value = new;
+		value = new_;
 		format_log(es, "applied padding width %d: %s", width, value);
 	}
 
 	/* Replace with the length or width if needed. */
 	if (modifiers & FORMAT_LENGTH) {
-		xasprintf(&new, "%zu", strlen(value));
+		xasprintf(&new_, "%zu", strlen(value));
 		free(value);
-		value = new;
-		format_log(es, "replacing with length: %s", new);
+		value = new_;
+		format_log(es, "replacing with length: %s", new_);
 	}
 	if (modifiers & FORMAT_WIDTH) {
-		xasprintf(&new, "%u", format_width(value));
+		xasprintf(&new_, "%u", format_width(value));
 		free(value);
-		value = new;
-		format_log(es, "replacing with width: %s", new);
+		value = new_;
+		format_log(es, "replacing with width: %s", new_);
 	}
 
 	/* Expand the buffer and copy in the value. */
