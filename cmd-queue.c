@@ -456,16 +456,16 @@ cmdq_remove(struct cmdq_item *item)
 static void
 cmdq_remove_group(struct cmdq_item *item)
 {
-	struct cmdq_item	*this, *next;
+	struct cmdq_item	*this_, *next;
 
 	if (item->group == 0)
 		return;
-	this = TAILQ_NEXT(item, entry);
-	while (this != NULL) {
-		next = TAILQ_NEXT(this, entry);
-		if (this->group == item->group)
-			cmdq_remove(this);
-		this = next;
+	this_ = TAILQ_NEXT(item, entry);
+	while (this_ != NULL) {
+		next = TAILQ_NEXT(this_, entry);
+		if (this_->group == item->group)
+			cmdq_remove(this_);
+		this_ = next;
 	}
 }
 

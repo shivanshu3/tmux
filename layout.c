@@ -1049,7 +1049,7 @@ int
 layout_spread_cell(struct window *w, struct layout_cell *parent)
 {
 	struct layout_cell	*lc;
-	u_int			 number, each, size, this;
+	u_int			 number, each, size, this_;
 	int			 change, changed, status;
 
 	number = 0;
@@ -1084,10 +1084,10 @@ layout_spread_cell(struct window *w, struct layout_cell *parent)
 			layout_resize_adjust(w, lc, LAYOUT_LEFTRIGHT, change);
 		} else if (parent->type == LAYOUT_TOPBOTTOM) {
 			if (layout_add_border(w, lc, status))
-				this = each + 1;
+				this_ = each + 1;
 			else
-				this = each;
-			change = this - (int)lc->sy;
+				this_ = each;
+			change = this_ - (int)lc->sy;
 			layout_resize_adjust(w, lc, LAYOUT_TOPBOTTOM, change);
 		}
 		if (change != 0)
