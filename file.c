@@ -58,7 +58,7 @@ file_create(struct client *c, int stream, client_file_cb cb, void *cbdata)
 {
 	struct client_file	*cf;
 
-	cf = xcalloc(1, sizeof *cf);
+	cf = (struct client_file*) xcalloc(1, sizeof *cf);
 	cf->c = c;
 	cf->references = 1;
 	cf->stream = stream;
@@ -97,7 +97,7 @@ file_free(struct client_file *cf)
 static void
 file_fire_done_cb(__unused int fd, __unused short events, void *arg)
 {
-	struct client_file	*cf = arg;
+	struct client_file	*cf = (struct client_file*) arg;
 	struct client		*c = cf->c;
 
 	if (cf->cb != NULL && (c == NULL || (~c->flags & CLIENT_DEAD)))
@@ -278,7 +278,7 @@ skip:
 		cf->error = E2BIG;
 		goto done;
 	}
-	msg = xmalloc(msglen);
+	msg = (struct msg_write_open*) xmalloc(msglen);
 	msg->stream = cf->stream;
 	msg->fd = fd;
 	msg->flags = flags;
@@ -351,7 +351,7 @@ skip:
 		cf->error = E2BIG;
 		goto done;
 	}
-	msg = xmalloc(msglen);
+	msg = (struct msg_read_open*) xmalloc(msglen);
 	msg->stream = cf->stream;
 	msg->fd = fd;
 	memcpy(msg + 1, cf->path, msglen - sizeof *msg);
@@ -370,7 +370,7 @@ done:
 static void
 file_push_cb(__unused int fd, __unused short events, void *arg)
 {
-	struct client_file	*cf = arg;
+	struct client_file	*cf = (struct client_file*) arg;
 	struct client		*c = cf->c;
 
 	if (~c->flags & CLIENT_DEAD)
@@ -386,7 +386,7 @@ file_push(struct client_file *cf)
 	size_t			 msglen, sent, left;
 	struct msg_write_close	 close;
 
-	msg = xmalloc(sizeof *msg);
+	msg = (struct msg_write_data*) xmalloc(sizeof *msg);
 	left = EVBUFFER_LENGTH(cf->buffer);
 	while (left != 0) {
 		sent = left;
@@ -394,7 +394,7 @@ file_push(struct client_file *cf)
 			sent = MAX_IMSGSIZE - IMSG_HEADER_SIZE - sizeof *msg;
 
 		msglen = (sizeof *msg) + sent;
-		msg = xrealloc(msg, msglen);
+		msg = (struct msg_write_data*) xrealloc(msg, msglen);
 		msg->stream = cf->stream;
 		memcpy(msg + 1, EVBUFFER_DATA(cf->buffer), sent);
 		if (proc_send(c->peer, MSG_WRITE, -1, msg, msglen) != 0)

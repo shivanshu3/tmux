@@ -45,7 +45,7 @@ environ_create(void)
 {
 	struct environ_tree	*env;
 
-	env = xcalloc(1, sizeof *env);
+	env = (struct environ_tree*) xcalloc(1, sizeof *env);
 	RB_INIT(env);
 
 	return (env);
@@ -118,7 +118,7 @@ environ_set(struct environ_tree *env, const char *name, int flags, const char *f
 		free(envent->value);
 		xvasprintf(&envent->value, fmt, ap);
 	} else {
-		envent = xmalloc(sizeof *envent);
+		envent = (struct environ_entry*) xmalloc(sizeof *envent);
 		envent->name = xstrdup(name);
 		envent->flags = flags;
 		xvasprintf(&envent->value, fmt, ap);
@@ -137,7 +137,7 @@ environ_clear(struct environ_tree *env, const char *name)
 		free(envent->value);
 		envent->value = NULL;
 	} else {
-		envent = xmalloc(sizeof *envent);
+		envent = (struct environ_entry*) xmalloc(sizeof *envent);
 		envent->name = xstrdup(name);
 		envent->flags = 0;
 		envent->value = NULL;
@@ -151,7 +151,7 @@ environ_put(struct environ_tree *env, const char *var, int flags)
 {
 	char	*name, *value;
 
-	value = strchr(var, '=');
+	value = (char*) strchr(var, '=');
 	if (value == NULL)
 		return;
 	value++;
@@ -210,7 +210,7 @@ environ_push(struct environ_tree *env)
 {
 	struct environ_entry	*envent;
 
-	environ = xcalloc(1, sizeof *environ);
+	environ = (char**) xcalloc(1, sizeof *environ);
 	RB_FOREACH(envent, environ_tree, env) {
 		if (envent->value != NULL &&
 		    *envent->name != '\0' &&
