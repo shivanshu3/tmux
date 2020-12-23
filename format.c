@@ -117,6 +117,8 @@ struct format_entry {
 	RB_ENTRY(format_entry)	 entry;
 };
 
+RB_HEAD(format_entry_tree, format_entry);
+
 /* Format entry tree. */
 struct format_tree {
 	struct client		*c;
@@ -132,7 +134,7 @@ struct format_tree {
 
 	struct mouse_event	 m;
 
-	RB_HEAD(format_entry_tree, format_entry) tree;
+	struct format_entry_tree tree;
 };
 static int format_entry_cmp(struct format_entry *, struct format_entry *);
 RB_GENERATE_STATIC(format_entry_tree, format_entry, entry, format_entry_cmp);
@@ -268,7 +270,7 @@ format_copy_state(struct format_expand_state *to,
 static void
 format_job_update(struct job *job)
 {
-	struct format_job	*fj = job_get_data(job);
+	struct format_job	*fj = (struct format_job*) job_get_data(job);
 	struct evbuffer		*evb = job_get_event(job)->input;
 	char			*line = NULL, *next;
 	time_t			 t;
@@ -298,7 +300,7 @@ format_job_update(struct job *job)
 static void
 format_job_complete(struct job *job)
 {
-	struct format_job	*fj = job_get_data(job);
+	struct format_job	*fj = (struct format_job*) job_get_data(job);
 	struct evbuffer		*evb = job_get_event(job)->input;
 	char			*line, *buf;
 	size_t			 len;
@@ -308,7 +310,7 @@ format_job_complete(struct job *job)
 	buf = NULL;
 	if ((line = evbuffer_readline(evb)) == NULL) {
 		len = EVBUFFER_LENGTH(evb);
-		buf = xmalloc(len + 1);
+		buf = (char*) xmalloc(len + 1);
 		if (len != 0)
 			memcpy(buf, EVBUFFER_DATA(evb), len);
 		buf[len] = '\0';
@@ -347,14 +349,14 @@ format_job_get(struct format_expand_state *es, const char *cmd)
 	else if (ft->client->jobs != NULL)
 		jobs = ft->client->jobs;
 	else {
-		jobs = ft->client->jobs = xmalloc(sizeof *ft->client->jobs);
+		jobs = ft->client->jobs = (struct format_job_tree*) xmalloc(sizeof *ft->client->jobs);
 		RB_INIT(jobs);
 	}
 
 	fj0.tag = ft->tag;
 	fj0.cmd = cmd;
 	if ((fj = RB_FIND(format_job_tree, jobs, &fj0)) == NULL) {
-		fj = xcalloc(1, sizeof *fj);
+		fj = (struct format_job*) xcalloc(1, sizeof *fj);
 		fj->client = ft->client;
 		fj->tag = ft->tag;
 		fj->cmd = xstrdup(cmd);
@@ -1085,7 +1087,7 @@ format_grid_word(struct grid *gd, u_int x, u_int y)
 		if (utf8_cstrhas(ws, &gc.data))
 			break;
 
-		ud = xreallocarray(ud, size + 2, sizeof *ud);
+		ud = (struct utf8_data*) xreallocarray(ud, size + 2, sizeof *ud);
 		memcpy(&ud[size++], &gc.data, sizeof *ud);
 	}
 	if (size != 0) {
@@ -1138,7 +1140,7 @@ format_grid_line(struct grid *gd, u_int y)
 		if (gc.flags & GRID_FLAG_PADDING)
 			break;
 
-		ud = xreallocarray(ud, size + 2, sizeof *ud);
+		ud = (struct utf8_data*) xreallocarray(ud, size + 2, sizeof *ud);
 		memcpy(&ud[size++], &gc.data, sizeof *ud);
 	}
 	if (size != 0) {
@@ -1230,7 +1232,7 @@ format_create(struct client *c, struct cmdq_item *item, int tag, int flags)
 		format_job_timer(-1, 0, NULL);
 	}
 
-	ft = xcalloc(1, sizeof *ft);
+	ft = (struct format_tree*) xcalloc(1, sizeof *ft);
 	RB_INIT(&ft->tree);
 
 	if (c != NULL) {
@@ -1312,7 +1314,7 @@ format_add(struct format_tree *ft, const char *key, const char *fmt, ...)
 	struct format_entry	*fe_now;
 	va_list			 ap;
 
-	fe = xmalloc(sizeof *fe);
+	fe = (struct format_entry*) xmalloc(sizeof *fe);
 	fe->key = xstrdup(key);
 
 	fe_now = RB_INSERT(format_entry_tree, &ft->tree, fe);
@@ -1337,7 +1339,7 @@ format_add_tv(struct format_tree *ft, const char *key, struct timeval *tv)
 {
 	struct format_entry	*fe, *fe_now;
 
-	fe = xmalloc(sizeof *fe);
+	fe = (struct format_entry*) xmalloc(sizeof *fe);
 	fe->key = xstrdup(key);
 
 	fe_now = RB_INSERT(format_entry_tree, &ft->tree, fe);
@@ -1361,7 +1363,7 @@ format_add_cb(struct format_tree *ft, const char *key, format_cb cb)
 	struct format_entry	*fe;
 	struct format_entry	*fe_now;
 
-	fe = xmalloc(sizeof *fe);
+	fe = (struct format_entry*) xmalloc(sizeof *fe);
 	fe->key = xstrdup(key);
 
 	fe_now = RB_INSERT(format_entry_tree, &ft->tree, fe);
@@ -1385,7 +1387,7 @@ format_quote(const char *s)
 	const char	*cp;
 	char		*out, *at;
 
-	at = out = xmalloc(strlen(s) * 2 + 1);
+	at = out = (char*) xmalloc(strlen(s) * 2 + 1);
 	for (cp = s; *cp != '\0'; cp++) {
 		if (strchr("|&;<>()$`\\\"'*?[# =%", *cp) != NULL)
 			*at++ = '\\';
@@ -1402,7 +1404,7 @@ format_escape(const char *s)
 	const char	*cp;
 	char		*out, *at;
 
-	at = out = xmalloc(strlen(s) * 2 + 1);
+	at = out = (char*) xmalloc(strlen(s) * 2 + 1);
 	for (cp = s; *cp != '\0'; cp++) {
 		if (*cp == '#')
 			*at++ = '#';
@@ -1572,7 +1574,7 @@ format_strip(const char *s)
 	char	*out, *cp;
 	int	 brackets = 0;
 
-	cp = out = xmalloc(strlen(s) + 1);
+	cp = out = (char*) xmalloc(strlen(s) + 1);
 	for (; *s != '\0'; s++) {
 		if (*s == '#' && s[1] == '{')
 			brackets++;
@@ -1661,7 +1663,7 @@ format_add_modifier(struct format_modifier **list, u_int *count,
 {
 	struct format_modifier *fm;
 
-	*list = xreallocarray(*list, (*count) + 1, sizeof **list);
+	*list = (struct format_modifier*) xreallocarray(*list, (*count) + 1, sizeof **list);
 	fm = &(*list)[(*count)++];
 
 	memcpy(fm->modifier, c, n);
@@ -1752,7 +1754,7 @@ format_build_modifiers(struct format_expand_state *es, const char **s,
 			if (end == NULL)
 				break;
 
-			argv = xcalloc(1, sizeof *argv);
+			argv = (char**) xcalloc(1, sizeof *argv);
 			value = xstrndup(cp + 1, end - (cp + 1));
 			argv[0] = format_expand1(es, value);
 			free(value);
@@ -1776,7 +1778,7 @@ format_build_modifiers(struct format_expand_state *es, const char **s,
 				break;
 			cp++;
 
-			argv = xreallocarray (argv, argc + 1, sizeof *argv);
+			argv = (char**) xreallocarray (argv, argc + 1, sizeof *argv);
 			value = xstrndup(cp, end - cp);
 			argv[argc++] = format_expand1(es, value);
 			free(value);
@@ -1870,7 +1872,7 @@ format_loop_sessions(struct format_expand_state *es, const char *fmt)
 	size_t				 valuelen;
 	struct session			*s;
 
-	value = xcalloc(1, 1);
+	value = (char*) xcalloc(1, 1);
 	valuelen = 1;
 
 	RB_FOREACH(s, sessions, &sessions) {
@@ -1883,7 +1885,7 @@ format_loop_sessions(struct format_expand_state *es, const char *fmt)
 		format_free(next.ft);
 
 		valuelen += strlen(expanded);
-		value = xrealloc(value, valuelen);
+		value = (char*) xrealloc(value, valuelen);
 
 		strlcat(value, expanded, valuelen);
 		free(expanded);
@@ -1916,7 +1918,7 @@ format_loop_windows(struct format_expand_state *es, const char *fmt)
 		active = NULL;
 	}
 
-	value = xcalloc(1, 1);
+	value = (char*) xcalloc(1, 1);
 	valuelen = 1;
 
 	RB_FOREACH(wl, winlinks, &ft->s->windows) {
@@ -1934,7 +1936,7 @@ format_loop_windows(struct format_expand_state *es, const char *fmt)
 		format_free(nft);
 
 		valuelen += strlen(expanded);
-		value = xrealloc(value, valuelen);
+		value = (char*) xrealloc(value, valuelen);
 
 		strlcat(value, expanded, valuelen);
 		free(expanded);
@@ -1969,7 +1971,7 @@ format_loop_panes(struct format_expand_state *es, const char *fmt)
 		active = NULL;
 	}
 
-	value = xcalloc(1, 1);
+	value = (char*) xcalloc(1, 1);
 	valuelen = 1;
 
 	TAILQ_FOREACH(wp, &ft->w->panes, entry) {
@@ -1986,7 +1988,7 @@ format_loop_panes(struct format_expand_state *es, const char *fmt)
 		format_free(nft);
 
 		valuelen += strlen(expanded);
-		value = xrealloc(value, valuelen);
+		value = (char*) xrealloc(value, valuelen);
 
 		strlcat(value, expanded, valuelen);
 		free(expanded);
