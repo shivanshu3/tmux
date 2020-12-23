@@ -2188,7 +2188,7 @@ format_replace(struct format_expand_state *es, const char *key, size_t keylen,
 			case 's':
 				if (fm->argc < 2)
 					break;
-				sub = xreallocarray (sub, nsub + 1,
+				sub = (struct format_modifier**) xreallocarray (sub, nsub + 1,
 				    sizeof *sub);
 				sub[nsub++] = fm;
 				break;
@@ -2505,7 +2505,7 @@ done:
 	/* Expand the buffer and copy in the value. */
 	valuelen = strlen(value);
 	while (*len - *off < valuelen + 1) {
-		*buf = xreallocarray(*buf, 2, *len);
+		*buf = (char*) xreallocarray(*buf, 2, *len);
 		*len *= 2;
 	}
 	memcpy(*buf + *off, value, valuelen);
@@ -2563,13 +2563,13 @@ format_expand1(struct format_expand_state *es, const char *fmt)
 	}
 
 	len = 64;
-	buf = xmalloc(len);
+	buf = (char*) xmalloc(len);
 	off = 0;
 
 	while (*fmt != '\0') {
 		if (*fmt != '#') {
 			while (len - off < 2) {
-				buf = xreallocarray(buf, 2, len);
+				buf = (char*) xreallocarray(buf, 2, len);
 				len *= 2;
 			}
 			buf[off++] = *fmt++;
@@ -2606,7 +2606,7 @@ format_expand1(struct format_expand_state *es, const char *fmt)
 
 			outlen = strlen(out);
 			while (len - off < outlen + 1) {
-				buf = xreallocarray(buf, 2, len);
+				buf = (char*) xreallocarray(buf, 2, len);
 				len *= 2;
 			}
 			memcpy(buf + off, out, outlen);
@@ -2641,7 +2641,7 @@ format_expand1(struct format_expand_state *es, const char *fmt)
 			if (*ptr == '[') {
 				format_log(es, "found #*%zu[", n);
 				while (len - off < n + 2) {
-					buf = xreallocarray(buf, 2, len);
+					buf = (char*) xreallocarray(buf, 2, len);
 					len *= 2;
 				}
 				memcpy(buf + off, fmt - 2, n + 1);
@@ -2654,7 +2654,7 @@ format_expand1(struct format_expand_state *es, const char *fmt)
 		case ',':
 			format_log(es, "found #%c", ch);
 			while (len - off < 2) {
-				buf = xreallocarray(buf, 2, len);
+				buf = (char*) xreallocarray(buf, 2, len);
 				len *= 2;
 			}
 			buf[off++] = ch;
@@ -2667,7 +2667,7 @@ format_expand1(struct format_expand_state *es, const char *fmt)
 				s = format_lower[ch - 'a'];
 			if (s == NULL) {
 				while (len - off < 3) {
-					buf = xreallocarray(buf, 2, len);
+					buf = (char*) xreallocarray(buf, 2, len);
 					len *= 2;
 				}
 				buf[off++] = '#';
