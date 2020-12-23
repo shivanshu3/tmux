@@ -85,7 +85,7 @@ cmd_paste_buffer_exec(struct cmd *self, struct cmdq_item *item)
 		bufend = bufdata + bufsize;
 
 		for (;;) {
-			line = memchr(bufdata, '\n', bufend - bufdata);
+			line = (const char*) memchr(bufdata, '\n', bufend - bufdata);
 			if (line == NULL)
 				break;
 

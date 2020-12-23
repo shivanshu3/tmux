@@ -124,7 +124,7 @@ cmdq_new(void)
 {
 	struct cmdq_list	*queue;
 
-	queue = xcalloc (1, sizeof *queue);
+	queue = (struct cmdq_list*) xcalloc (1, sizeof *queue);
 	TAILQ_INIT (&queue->list);
 	return (queue);
 }
@@ -208,7 +208,7 @@ cmdq_new_state(struct cmd_find_state *current, struct key_event *event,
 {
 	struct cmdq_state	*state;
 
-	state = xcalloc(1, sizeof *state);
+	state = (struct cmdq_state*) xcalloc(1, sizeof *state);
 	state->references = 1;
 	state->flags = flags;
 

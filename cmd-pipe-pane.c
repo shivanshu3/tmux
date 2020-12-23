@@ -182,7 +182,7 @@ cmd_pipe_pane_exec(struct cmd *self, struct cmdq_item *item)
 static void
 cmd_pipe_pane_read_callback(__unused struct bufferevent *bufev, void *data)
 {
-	struct window_pane	*wp = data;
+	struct window_pane	*wp = (struct window_pane*) data;
 	struct evbuffer		*evb = wp->pipe_event->input;
 	size_t			 available;
 
@@ -199,7 +199,7 @@ cmd_pipe_pane_read_callback(__unused struct bufferevent *bufev, void *data)
 static void
 cmd_pipe_pane_write_callback(__unused struct bufferevent *bufev, void *data)
 {
-	struct window_pane	*wp = data;
+	struct window_pane	*wp = (struct window_pane*) data;
 
 	log_debug("%%%u pipe empty", wp->id);
 
@@ -211,7 +211,7 @@ static void
 cmd_pipe_pane_error_callback(__unused struct bufferevent *bufev,
     __unused short what, void *data)
 {
-	struct window_pane	*wp = data;
+	struct window_pane	*wp = (struct window_pane*) data;
 
 	log_debug("%%%u pipe error", wp->id);
 

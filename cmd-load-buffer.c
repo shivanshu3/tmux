@@ -54,7 +54,7 @@ static void
 cmd_load_buffer_done(__unused struct client *c, const char *path, int error,
     int closed, struct evbuffer *buffer, void *data)
 {
-	struct cmd_load_buffer_data	*cdata = data;
+	struct cmd_load_buffer_data	*cdata = (struct cmd_load_buffer_data*) data;
 	struct client			*tc = cdata->client;
 	struct cmdq_item		*item = cdata->item;
 	void				*bdata = EVBUFFER_DATA(buffer);
@@ -70,14 +70,14 @@ cmd_load_buffer_done(__unused struct client *c, const char *path, int error,
 	else if (bsize != 0) {
 		copy = xmalloc(bsize);
 		memcpy(copy, bdata, bsize);
-		if (paste_set(copy, bsize, cdata->name, &cause) != 0) {
+		if (paste_set((char*)copy, bsize, cdata->name, &cause) != 0) {
 			cmdq_error(item, "%s", cause);
 			free(cause);
 			free(copy);
 		} else if (tc != NULL &&
 		    tc->session != NULL &&
 		    (~tc->flags & CLIENT_DEAD))
-			tty_set_selection(&tc->tty, copy, bsize);
+			tty_set_selection(&tc->tty, (const char*)copy, bsize);
 		if (tc != NULL)
 			server_client_unref(tc);
 	}
@@ -96,7 +96,7 @@ cmd_load_buffer_exec(struct cmd *self, struct cmdq_item *item)
 	const char			*bufname = args_get(args, 'b');
 	char				*path;
 
-	cdata = xcalloc(1, sizeof *cdata);
+	cdata = (struct cmd_load_buffer_data*) xcalloc(1, sizeof *cdata);
 	cdata->item = item;
 	if (bufname != NULL)
 		cdata->name = xstrdup(bufname);
