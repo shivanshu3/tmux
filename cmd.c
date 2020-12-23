@@ -252,7 +252,7 @@ cmd_prepend_argv(int *argc, char ***argv, char *arg)
 	char	**new_argv;
 	int	  i;
 
-	new_argv = xreallocarray(NULL, (*argc) + 1, sizeof *new_argv);
+	new_argv = (char**) xreallocarray(NULL, (*argc) + 1, sizeof *new_argv);
 	new_argv[0] = xstrdup(arg);
 	for (i = 0; i < *argc; i++)
 		new_argv[1 + i] = (*argv)[i];
@@ -266,7 +266,7 @@ cmd_prepend_argv(int *argc, char ***argv, char *arg)
 void
 cmd_append_argv(int *argc, char ***argv, char *arg)
 {
-	*argv = xreallocarray(*argv, (*argc) + 1, sizeof **argv);
+	*argv = (char**) xreallocarray(*argv, (*argc) + 1, sizeof **argv);
 	(*argv)[(*argc)++] = xstrdup(arg);
 }
 
@@ -302,7 +302,7 @@ cmd_unpack_argv(char *buf, size_t len, int argc, char ***argv)
 
 	if (argc == 0)
 		return (0);
-	*argv = xcalloc(argc, sizeof **argv);
+	*argv = (char**) xcalloc(argc, sizeof **argv);
 
 	buf[len - 1] = '\0';
 	for (i = 0; i < argc; i++) {
@@ -331,7 +331,7 @@ cmd_copy_argv(int argc, char **argv)
 
 	if (argc == 0)
 		return (NULL);
-	new_argv = xcalloc(argc + 1, sizeof *new_argv);
+	new_argv = (char**) xcalloc(argc + 1, sizeof *new_argv);
 	for (i = 0; i < argc; i++) {
 		if (argv[i] != NULL)
 			new_argv[i] = xstrdup(argv[i]);
@@ -368,7 +368,7 @@ cmd_stringify_argv(int argc, char **argv)
 		log_debug("%s: %u %s = %s", __func__, i, argv[i], s);
 
 		len += strlen(s) + 1;
-		buf = xrealloc(buf, len);
+		buf = (char*) xrealloc(buf, len);
 
 		if (i == 0)
 			*buf = '\0';
@@ -521,7 +521,7 @@ cmd_parse(int argc, char **argv, const char *file, u_int line, char **cause)
 	if (entry->args.upper != -1 && args->argc > entry->args.upper)
 		goto usage;
 
-	cmd = xcalloc(1, sizeof *cmd);
+	cmd = (struct cmd*) xcalloc(1, sizeof *cmd);
 	cmd->entry = entry;
 	cmd->args = args;
 
@@ -577,10 +577,10 @@ cmd_list_new(void)
 {
 	struct cmd_list	*cmdlist;
 
-	cmdlist = xcalloc(1, sizeof *cmdlist);
+	cmdlist = (struct cmd_list*) xcalloc(1, sizeof *cmdlist);
 	cmdlist->references = 1;
 	cmdlist->group = cmd_list_next_group++;
-	cmdlist->list = xcalloc(1, sizeof *cmdlist->list);
+	cmdlist->list = (struct cmds*) xcalloc(1, sizeof *cmdlist->list);
 	TAILQ_INIT(cmdlist->list);
 	return (cmdlist);
 }
@@ -627,13 +627,13 @@ cmd_list_print(struct cmd_list *cmdlist, int escaped)
 	size_t		 len;
 
 	len = 1;
-	buf = xcalloc(1, len);
+	buf = (char*) xcalloc(1, len);
 
 	TAILQ_FOREACH(cmd, cmdlist->list, qentry) {
 		this_ = cmd_print(cmd);
 
 		len += strlen(this_) + 6;
-		buf = xrealloc(buf, len);
+		buf = (char*) xrealloc(buf, len);
 
 		strlcat(buf, this_, len);
 
@@ -785,7 +785,7 @@ cmd_template_replace(const char *template_, const char *s, int idx)
 	if (strchr(template_, '%') == NULL)
 		return (xstrdup(template_));
 
-	buf = xmalloc(1);
+	buf = (char*) xmalloc(1);
 	*buf = '\0';
 	len = 0;
 	replaced = 0;
@@ -805,7 +805,7 @@ cmd_template_replace(const char *template_, const char *s, int idx)
 			if (quoted)
 				ptr++;
 
-			buf = xrealloc(buf, len + (strlen(s) * 3) + 1);
+			buf = (char*) xrealloc(buf, len + (strlen(s) * 3) + 1);
 			for (cp = s; *cp != '\0'; cp++) {
 				if (quoted && strchr(quote, *cp) != NULL)
 					buf[len++] = '\\';
@@ -814,7 +814,7 @@ cmd_template_replace(const char *template_, const char *s, int idx)
 			buf[len] = '\0';
 			continue;
 		}
-		buf = xrealloc(buf, len + 2);
+		buf = (char*) xrealloc(buf, len + 2);
 		buf[len++] = ch;
 		buf[len] = '\0';
 	}

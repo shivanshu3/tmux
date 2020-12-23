@@ -252,7 +252,7 @@ control_add_pane(struct client *c, struct window_pane *wp)
 	if (cp != NULL)
 		return (cp);
 
-	cp = xcalloc(1, sizeof *cp);
+	cp = (struct control_pane*) xcalloc(1, sizeof *cp);
 	cp->pane = wp->id;
 	RB_INSERT(control_panes, &cs->panes, cp);
 
@@ -418,7 +418,7 @@ control_write(struct client *c, const char *fmt, ...)
 		return;
 	}
 
-	cb = xcalloc(1, sizeof *cb);
+	cb = (struct control_block*) xcalloc(1, sizeof *cb);
 	xvasprintf(&cb->line, fmt, ap);
 	TAILQ_INSERT_TAIL(&cs->all_blocks, cb, all_entry);
 	cb->t = get_timer();
@@ -493,7 +493,7 @@ control_write_output(struct client *c, struct window_pane *wp)
 		return;
 	window_pane_update_used_data(wp, &cp->queued, new_size);
 
-	cb = xcalloc(1, sizeof *cb);
+	cb = (struct control_block*) xcalloc(1, sizeof *cb);
 	cb->size = new_size;
 	TAILQ_INSERT_TAIL(&cs->all_blocks, cb, all_entry);
 	cb->t = get_timer();
@@ -523,7 +523,7 @@ static enum cmd_retval
 control_error(struct cmdq_item *item, void *data)
 {
 	struct client	*c = cmdq_get_client(item);
-	char		*error = data;
+	char		*error = (char*) data;
 
 	cmdq_guard(item, "begin", 1);
 	control_write(c, "parse error: %s", error);
@@ -538,7 +538,7 @@ static void
 control_error_callback(__unused struct bufferevent *bufev,
     __unused short what, void *data)
 {
-	struct client	*c = data;
+	struct client	*c = (struct client*) data;
 
 	c->flags |= CLIENT_EXIT;
 }
@@ -547,7 +547,7 @@ control_error_callback(__unused struct bufferevent *bufev,
 static void
 control_read_callback(__unused struct bufferevent *bufev, void *data)
 {
-	struct client		*c = data;
+	struct client		*c = (struct client*) data;
 	struct control_state	*cs = c->control_state;
 	struct evbuffer		*buffer = cs->read_event->input;
 	char			*line, *error;
@@ -626,7 +626,7 @@ control_append_data(struct client *c, struct control_pane *cp, uint64_t age,
 			evbuffer_add_printf(message, "%%output %%%u ", wp->id);
 	}
 
-	new_data = window_pane_get_new_data(wp, &cp->offset, &new_size);
+	new_data = (u_char*) window_pane_get_new_data(wp, &cp->offset, &new_size);
 	if (new_size < size)
 		fatalx("not enough data: %zu < %zu", new_size, size);
 	for (i = 0; i < size; i++) {
@@ -722,7 +722,7 @@ control_write_pending(struct client *c, struct control_pane *cp, size_t limit)
 static void
 control_write_callback(__unused struct bufferevent *bufev, void *data)
 {
-	struct client		*c = data;
+	struct client		*c = (struct client*) data;
 	struct control_state	*cs = c->control_state;
 	struct control_pane	*cp, *cp1;
 	struct evbuffer		*evb = cs->write_event->output;
@@ -768,7 +768,7 @@ control_start(struct client *c)
 		setblocking(c->out_fd, 0);
 	setblocking(c->fd, 0);
 
-	cs = c->control_state = xcalloc(1, sizeof *cs);
+	cs = c->control_state = (struct control_state*) xcalloc(1, sizeof *cs);
 	RB_INIT(&cs->panes);
 	TAILQ_INIT(&cs->pending_list);
 	TAILQ_INIT(&cs->all_blocks);
@@ -882,7 +882,7 @@ control_check_subs_pane(struct client *c, struct control_sub *csub)
 
 		csp = RB_FIND(control_sub_panes, &csub->panes, &find);
 		if (csp == NULL) {
-			csp = xcalloc(1, sizeof *csp);
+			csp = (struct control_sub_pane*) xcalloc(1, sizeof *csp);
 			csp->pane = wp->id;
 			csp->idx = wl->idx;
 			RB_INSERT(control_sub_panes, &csub->panes, csp);
@@ -924,7 +924,7 @@ control_check_subs_all_panes(struct client *c, struct control_sub *csub)
 
 			csp = RB_FIND(control_sub_panes, &csub->panes, &find);
 			if (csp == NULL) {
-				csp = xcalloc(1, sizeof *csp);
+				csp = (struct control_sub_pane*) xcalloc(1, sizeof *csp);
 				csp->pane = wp->id;
 				csp->idx = wl->idx;
 				RB_INSERT(control_sub_panes, &csub->panes, csp);
@@ -972,7 +972,7 @@ control_check_subs_window(struct client *c, struct control_sub *csub)
 
 		csw = RB_FIND(control_sub_windows, &csub->windows, &find);
 		if (csw == NULL) {
-			csw = xcalloc(1, sizeof *csw);
+			csw = (struct control_sub_window*) xcalloc(1, sizeof *csw);
 			csw->window = w->id;
 			csw->idx = wl->idx;
 			RB_INSERT(control_sub_windows, &csub->windows, csw);
@@ -1013,7 +1013,7 @@ control_check_subs_all_windows(struct client *c, struct control_sub *csub)
 
 		csw = RB_FIND(control_sub_windows, &csub->windows, &find);
 		if (csw == NULL) {
-			csw = xcalloc(1, sizeof *csw);
+			csw = (struct control_sub_window*) xcalloc(1, sizeof *csw);
 			csw->window = w->id;
 			csw->idx = wl->idx;
 			RB_INSERT(control_sub_windows, &csub->windows, csw);
@@ -1035,7 +1035,7 @@ control_check_subs_all_windows(struct client *c, struct control_sub *csub)
 static void
 control_check_subs_timer(__unused int fd, __unused short events, void *data)
 {
-	struct client		*c = data;
+	struct client		*c = (struct client*) data;
 	struct control_state	*cs = c->control_state;
 	struct control_sub	*csub, *csub1;
 	struct timeval		 tv = { .tv_sec = 1 };
@@ -1077,7 +1077,7 @@ control_add_sub(struct client *c, const char *name, enum control_sub_type type,
 	if ((csub = RB_FIND(control_subs, &cs->subs, &find)) != NULL)
 		control_free_sub(cs, csub);
 
-	csub = xcalloc(1, sizeof *csub);
+	csub = (struct control_sub*) xcalloc(1, sizeof *csub);
 	csub->name = xstrdup(name);
 	csub->type = type;
 	csub->id = id;
