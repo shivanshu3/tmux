@@ -4,6 +4,8 @@ project(tmux)
 add_compile_definitions(TMUX_VERSION="4.0-win32")
 add_compile_definitions(HAVE_STRNLEN)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 if (MSVC)
     add_compile_options(/WX)
 else()
