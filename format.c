@@ -2020,31 +2020,31 @@ format_replace_expression(struct format_modifier *mexp,
 	       GREATER_THAN,
 	       GREATER_THAN_EQUAL,
 	       LESS_THAN,
-	       LESS_THAN_EQUAL } operator;
+	       LESS_THAN_EQUAL } operator_;
 
 	if (strcmp(mexp->argv[0], "+") == 0)
-		operator = ADD;
+		operator_ = ADD;
 	else if (strcmp(mexp->argv[0], "-") == 0)
-		operator = SUBTRACT;
+		operator_ = SUBTRACT;
 	else if (strcmp(mexp->argv[0], "*") == 0)
-		operator = MULTIPLY;
+		operator_ = MULTIPLY;
 	else if (strcmp(mexp->argv[0], "/") == 0)
-		operator = DIVIDE;
+		operator_ = DIVIDE;
 	else if (strcmp(mexp->argv[0], "%") == 0 ||
 	    strcmp(mexp->argv[0], "m") == 0)
-		operator = MODULUS;
+		operator_ = MODULUS;
 	else if (strcmp(mexp->argv[0], "==") == 0)
-		operator = EQUAL;
+		operator_ = EQUAL;
 	else if (strcmp(mexp->argv[0], "!=") == 0)
-		operator = NOT_EQUAL;
+		operator_ = NOT_EQUAL;
 	else if (strcmp(mexp->argv[0], ">") == 0)
-		operator = GREATER_THAN;
+		operator_ = GREATER_THAN;
 	else if (strcmp(mexp->argv[0], "<") == 0)
-		operator = LESS_THAN;
+		operator_ = LESS_THAN;
 	else if (strcmp(mexp->argv[0], ">=") == 0)
-		operator = GREATER_THAN_EQUAL;
+		operator_ = GREATER_THAN_EQUAL;
 	else if (strcmp(mexp->argv[0], "<=") == 0)
-		operator = LESS_THAN_EQUAL;
+		operator_ = LESS_THAN_EQUAL;
 	else {
 		format_log(es, "expression has no valid operator: '%s'",
 		    mexp->argv[0]);
@@ -2091,7 +2091,7 @@ format_replace_expression(struct format_modifier *mexp,
 	format_log(es, "expression left side is: %.*f", prec, mleft);
 	format_log(es, "expression right side is:  %.*f", prec, mright);
 
-	switch (operator) {
+	switch (operator_) {
 	case ADD:
 		result = mleft + mright;
 		break;
