@@ -1064,21 +1064,21 @@ window_pane_reset_palette(struct window_pane *wp)
 int
 window_pane_get_palette(struct window_pane *wp, int c)
 {
-	int	new;
+	int	new_;
 
 	if (wp == NULL || wp->palette == NULL)
 		return (-1);
 
-	new = -1;
+	new_ = -1;
 	if (c < 8)
-		new = wp->palette[c];
+		new_ = wp->palette[c];
 	else if (c >= 90 && c <= 97)
-		new = wp->palette[8 + c - 90];
+		new_ = wp->palette[8 + c - 90];
 	else if (c & COLOUR_FLAG_256)
-		new = wp->palette[c & ~COLOUR_FLAG_256];
-	if (new == 0)
+		new_ = wp->palette[c & ~COLOUR_FLAG_256];
+	if (new_ == 0)
 		return (-1);
-	return (new);
+	return (new_);
 }
 
 int
@@ -1209,7 +1209,7 @@ window_pane_search(struct window_pane *wp, const char *term, int regex,
 {
 	struct screen	*s = &wp->base;
 	regex_t		 r;
-	char		*new = NULL, *line;
+	char		*new_ = NULL, *line;
 	u_int		 i;
 	int		 flags = 0, found;
 	size_t		 n;
@@ -1217,7 +1217,7 @@ window_pane_search(struct window_pane *wp, const char *term, int regex,
 	if (!regex) {
 		if (ignore)
 			flags |= FNM_CASEFOLD;
-		xasprintf(&new, "*%s*", term);
+		xasprintf(&new_, "*%s*", term);
 	} else {
 		if (ignore)
 			flags |= REG_ICASE;
@@ -1234,7 +1234,7 @@ window_pane_search(struct window_pane *wp, const char *term, int regex,
 		}
 		log_debug("%s: %s", __func__, line);
 		if (!regex)
-			found = (fnmatch(new, line, flags) == 0);
+			found = (fnmatch(new_, line, flags) == 0);
 		else
 			found = (regexec(&r, line, 0, NULL, 0) == 0);
 		free(line);
@@ -1242,7 +1242,7 @@ window_pane_search(struct window_pane *wp, const char *term, int regex,
 			break;
 	}
 	if (!regex)
-		free(new);
+		free(new_);
 	else
 		regfree(&r);
 
