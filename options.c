@@ -60,9 +60,11 @@ struct options_entry {
 	RB_ENTRY(options_entry)			 entry;
 };
 
+RB_HEAD(options_tree, options_entry);
+
 struct options {
-	RB_HEAD(options_tree, options_entry)	 tree;
 	struct options				*parent;
+	struct options_tree tree;
 };
 
 static struct options_entry	*options_add(struct options *, const char *);
@@ -173,7 +175,7 @@ options_create(struct options *parent)
 {
 	struct options	*oo;
 
-	oo = xcalloc(1, sizeof *oo);
+	oo = (struct options *) xcalloc(1, sizeof *oo);
 	RB_INIT(&oo->tree);
 	oo->parent = parent;
 	return (oo);
@@ -324,7 +326,7 @@ options_add(struct options *oo, const char *name)
 	if (o != NULL)
 		options_remove(o);
 
-	o = xcalloc(1, sizeof *o);
+	o = (struct options_entry *) xcalloc(1, sizeof *o);
 	o->owner = oo;
 	o->name = xstrdup(name);
 
@@ -378,7 +380,7 @@ options_array_new(struct options_entry *o, u_int idx)
 {
 	struct options_array_item	*a;
 
-	a = xcalloc(1, sizeof *a);
+	a = (struct options_array_item *) xcalloc(1, sizeof *a);
 	a->index = idx;
 	RB_INSERT(options_array, &o->value.array, a);
 	return (a);

@@ -13,12 +13,20 @@ else()
 endif()
 
 if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_C_COMPILER_ID STREQUAL "Clang"))
-	message("Compiling with Clang")
+	set(TMUX_USING_CLANG 1)
+endif()
+
+if (TMUX_USING_CLANG)
 	add_compile_options(-Wno-pointer-sign)
-	# Clang doesn't like it when we compile .c files as C++
 	if (TMUX_USE_CXX)
+		# Clang doesn't like it when we compile .c files as C++
 		add_compile_options(-Wno-deprecated)
+		add_compile_options(-Wno-reorder-init-list)
 	endif()
+endif()
+
+if (TMUX_USING_CLANG)
+	message("Compiling with Clang")
 elseif(MSVC)
 	message("Compiling with MSVC")
 else()
