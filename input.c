@@ -1178,7 +1178,7 @@ input_input(struct input_ctx *ictx)
 			ictx->flags |= INPUT_DISCARD;
 			return (0);
 		}
-		ictx->input_buf = xrealloc(ictx->input_buf, available);
+		ictx->input_buf = (u_char *) xrealloc(ictx->input_buf, available);
 		ictx->input_space = available;
 	}
 	ictx->input_buf[ictx->input_len++] = ictx->ch;
@@ -1259,7 +1259,7 @@ input_esc_dispatch(struct input_ctx *ictx)
 		return (0);
 	log_debug("%s: '%c', %s", __func__, ictx->ch, ictx->interm_buf);
 
-	entry = bsearch(ictx, input_esc_table, nitems(input_esc_table),
+	entry = (struct input_table_entry *) bsearch(ictx, input_esc_table, nitems(input_esc_table),
 	    sizeof input_esc_table[0], input_table_compare);
 	if (entry == NULL) {
 		log_debug("%s: unknown '%c'", __func__, ictx->ch);
@@ -1342,7 +1342,7 @@ input_csi_dispatch(struct input_ctx *ictx)
 	if (input_split(ictx) != 0)
 		return (0);
 
-	entry = bsearch(ictx, input_csi_table, nitems(input_csi_table),
+	entry = (struct input_table_entry *) bsearch(ictx, input_csi_table, nitems(input_csi_table),
 	    sizeof input_csi_table[0], input_table_compare);
 	if (entry == NULL) {
 		log_debug("%s: unknown '%c'", __func__, ictx->ch);
@@ -2278,11 +2278,11 @@ input_exit_osc(struct input_ctx *ictx)
 		}
 		break;
 	case 4:
-		input_osc_4(ictx, p);
+		input_osc_4(ictx, (const char*)p);
 		break;
 	case 7:
-		if (utf8_isvalid(p)) {
-			screen_set_path(sctx->s, p);
+		if (utf8_isvalid((const char*)p)) {
+			screen_set_path(sctx->s, (const char*)p);
 			if (wp != NULL) {
 				server_redraw_window_borders(wp->window);
 				server_status_window(wp->window);
@@ -2290,20 +2290,20 @@ input_exit_osc(struct input_ctx *ictx)
 		}
 		break;
 	case 10:
-		input_osc_10(ictx, p);
+		input_osc_10(ictx, (const char*)p);
 		break;
 	case 11:
-		input_osc_11(ictx, p);
+		input_osc_11(ictx, (const char*)p);
 		break;
 	case 12:
-		if (utf8_isvalid(p) && *p != '?') /* ? is colour request */
-			screen_set_cursor_colour(sctx->s, p);
+		if (utf8_isvalid((const char*)p) && *p != '?') /* ? is colour request */
+			screen_set_cursor_colour(sctx->s, (const char*)p);
 		break;
 	case 52:
-		input_osc_52(ictx, p);
+		input_osc_52(ictx, (const char*)p);
 		break;
 	case 104:
-		input_osc_104(ictx, p);
+		input_osc_104(ictx, (const char*)p);
 		break;
 	case 112:
 		if (*p == '\0') /* no arguments allowed */
@@ -2337,7 +2337,7 @@ input_exit_apc(struct input_ctx *ictx)
 		return;
 	log_debug("%s: \"%s\"", __func__, ictx->input_buf);
 
-	if (screen_set_title(sctx->s, ictx->input_buf) && wp != NULL) {
+	if (screen_set_title(sctx->s, (const char*)ictx->input_buf) && wp != NULL) {
 		notify_pane("pane-title-changed", wp);
 		server_redraw_window_borders(wp->window);
 		server_status_window(wp->window);
@@ -2370,7 +2370,7 @@ input_exit_rename(struct input_ctx *ictx)
 		return;
 	log_debug("%s: \"%s\"", __func__, ictx->input_buf);
 
-	if (!utf8_isvalid(ictx->input_buf))
+	if (!utf8_isvalid((const char*)ictx->input_buf))
 		return;
 
 	if (ictx->input_len == 0) {
@@ -2379,7 +2379,7 @@ input_exit_rename(struct input_ctx *ictx)
 			options_remove_or_default(o, -1, NULL);
 		return;
 	}
-	window_set_name(wp->window, ictx->input_buf);
+	window_set_name(wp->window, (const char*)ictx->input_buf);
 	options_set_number(wp->window->options, "automatic-rename", 0);
 	server_redraw_window_borders(wp->window);
 	server_status_window(wp->window);
@@ -2480,7 +2480,7 @@ input_osc_colour_reply(struct input_ctx *ictx, u_int n, int c)
 	    return;
     colour_split_rgb(c, &r, &g, &b);
 
-    if (ictx->input_end == INPUT_END_BEL)
+    if (ictx->input_end == QUALIFIED_MEMBER(input_ctx, INPUT_END_BEL))
 	    end = "\007";
     else
 	    end = "\033\\";
@@ -2600,7 +2600,7 @@ input_osc_52(struct input_ctx *ictx, const char *p)
 	if (state != 2)
 		return;
 
-	if ((end = strchr(p, ';')) == NULL)
+	if ((end = (char *) strchr(p, ';')) == NULL)
 		return;
 	end++;
 	if (*end == '\0')
@@ -2611,8 +2611,8 @@ input_osc_52(struct input_ctx *ictx, const char *p)
 		if ((pb = paste_get_top(NULL)) != NULL) {
 			buf = paste_buffer_data(pb, &len);
 			outlen = 4 * ((len + 2) / 3) + 1;
-			out = xmalloc(outlen);
-			if ((outlen = b64_ntop(buf, len, out, outlen)) == -1) {
+			out = (u_char *) xmalloc(outlen);
+			if ((outlen = b64_ntop((const unsigned char*)buf, len, (char*)out, outlen)) == -1) {
 				free(out);
 				return;
 			}
@@ -2623,7 +2623,7 @@ input_osc_52(struct input_ctx *ictx, const char *p)
 		bufferevent_write(ictx->event, "\033]52;;", 6);
 		if (outlen != 0)
 			bufferevent_write(ictx->event, out, outlen);
-		if (ictx->input_end == INPUT_END_BEL)
+		if (ictx->input_end == QUALIFIED_MEMBER(input_ctx, INPUT_END_BEL))
 			bufferevent_write(ictx->event, "\007", 1);
 		else
 			bufferevent_write(ictx->event, "\033\\", 2);
@@ -2635,7 +2635,7 @@ input_osc_52(struct input_ctx *ictx, const char *p)
 	if (len == 0)
 		return;
 
-	out = xmalloc(len);
+	out = (u_char *) xmalloc(len);
 	if ((outlen = b64_pton(end, out, len)) == -1) {
 		free(out);
 		return;
@@ -2646,7 +2646,7 @@ input_osc_52(struct input_ctx *ictx, const char *p)
 	screen_write_stop(&ctx);
 	notify_pane("pane-set-clipboard", wp);
 
-	paste_add(NULL, out, outlen);
+	paste_add(NULL, (char*)out, outlen);
 }
 
 /* Handle the OSC 104 sequence for unsetting (multiple) palette entries. */
