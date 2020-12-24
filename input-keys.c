@@ -381,7 +381,7 @@ input_key_split2(u_int c, u_char *dst)
 void
 input_key_build(void)
 {
-	struct input_key_entry	*ike, *new;
+	struct input_key_entry	*ike, *new_;
 	u_int			 i, j;
 	char			*data;
 	key_code		 key;
@@ -398,10 +398,10 @@ input_key_build(void)
 			data = xstrdup(ike->data);
 			data[strcspn(data, "_")] = '0' + j;
 
-			new = xcalloc(1, sizeof *new);
-			new->key = key|input_key_modifiers[j];
-			new->data = data;
-			RB_INSERT(input_key_tree, &input_key_tree, new);
+			new_ = xcalloc(1, sizeof *new_);
+			new_->key = key|input_key_modifiers[j];
+			new_->data = data;
+			RB_INSERT(input_key_tree, &input_key_tree, new_);
 		}
 	}
 
