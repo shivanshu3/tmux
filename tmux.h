@@ -2162,7 +2162,7 @@ void	tty_default_colours(struct grid_cell *, struct window_pane *);
 
 /* tty-term.c */
 extern struct tty_terms tty_terms;
-u_int		 tty_term_ncodes(void);
+EXTERN_C u_int		 tty_term_ncodes(void);
 void		 tty_term_apply(struct tty_term *, const char *, int);
 void		 tty_term_apply_overrides(struct tty_term *);
 struct tty_term *tty_term_create(struct tty *, char *, int *, int, char **);
