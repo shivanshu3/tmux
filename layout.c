@@ -52,7 +52,7 @@ layout_create_cell(struct layout_cell *lcparent)
 {
 	struct layout_cell	*lc;
 
-	lc = xmalloc(sizeof *lc);
+	lc = (struct layout_cell *) xmalloc(sizeof *lc);
 	lc->type = LAYOUT_WINDOWPANE;
 	lc->parent = lcparent;
 

@@ -64,7 +64,7 @@ menu_add_item(struct menu *menu, const struct menu_item *item,
 	if (line && menu->count == 0)
 		return;
 
-	menu->items = xreallocarray(menu->items, menu->count + 1,
+	menu->items = (struct menu_item *) xreallocarray(menu->items, menu->count + 1,
 	    sizeof *menu->items);
 	new_item = &menu->items[menu->count++];
 	memset(new_item, 0, sizeof *new_item);
@@ -109,7 +109,7 @@ menu_create(const char *title)
 {
 	struct menu	*menu;
 
-	menu = xcalloc(1, sizeof *menu);
+	menu = (struct menu *) xcalloc(1, sizeof *menu);
 	menu->title = xstrdup(title);
 	menu->width = format_width(title);
 
@@ -134,7 +134,7 @@ menu_free(struct menu *menu)
 static struct screen *
 menu_mode_cb(struct client *c, __unused u_int *cx, __unused u_int *cy)
 {
-	struct menu_data	*md = c->overlay_data;
+	struct menu_data	*md = (struct menu_data*) c->overlay_data;
 
 	return (&md->s);
 }
@@ -142,7 +142,7 @@ menu_mode_cb(struct client *c, __unused u_int *cx, __unused u_int *cy)
 static void
 menu_draw_cb(struct client *c, __unused struct screen_redraw_ctx *ctx0)
 {
-	struct menu_data	*md = c->overlay_data;
+	struct menu_data	*md = (struct menu_data*) c->overlay_data;
 	struct tty		*tty = &c->tty;
 	struct screen		*s = &md->s;
 	struct menu		*menu = md->menu;
@@ -166,7 +166,7 @@ menu_draw_cb(struct client *c, __unused struct screen_redraw_ctx *ctx0)
 static void
 menu_free_cb(struct client *c)
 {
-	struct menu_data	*md = c->overlay_data;
+	struct menu_data	*md = (struct menu_data*) c->overlay_data;
 
 	if (md->item != NULL)
 		cmdq_continue(md->item);
@@ -182,7 +182,7 @@ menu_free_cb(struct client *c)
 static int
 menu_key_cb(struct client *c, struct key_event *event)
 {
-	struct menu_data		*md = c->overlay_data;
+	struct menu_data		*md = (struct menu_data*) c->overlay_data;
 	struct menu			*menu = md->menu;
 	struct mouse_event		*m = &event->m;
 	u_int				 i;
@@ -358,7 +358,7 @@ menu_display(struct menu *menu, int flags, struct cmdq_item *item, u_int px,
 	if (py + menu->count + 2 > c->tty.sy)
 		py = c->tty.sy - menu->count - 2;
 
-	md = xcalloc(1, sizeof *md);
+	md = (struct menu_data *) xcalloc(1, sizeof *md);
 	md->item = item;
 	md->flags = flags;
 
