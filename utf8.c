@@ -109,7 +109,7 @@ utf8_put_item(const char *data, size_t size, u_int *index)
 	if (utf8_next_index == 0xffffff + 1)
 		return (-1);
 
-	ui = xcalloc(1, sizeof *ui);
+	ui = (struct utf8_item *) xcalloc(1, sizeof *ui);
 	ui->index = utf8_next_index++;
 	RB_INSERT(utf8_index_tree, &utf8_index_tree, ui);
 
@@ -137,7 +137,7 @@ utf8_from_data(const struct utf8_data *ud, utf8_char *uc)
 		index = (((utf8_char)ud->data[2] << 16)|
 		          ((utf8_char)ud->data[1] << 8)|
 		          ((utf8_char)ud->data[0]));
-	} else if (utf8_put_item(ud->data, ud->size, &index) != 0)
+	} else if (utf8_put_item((const char*)ud->data, ud->size, &index) != 0)
 		goto fail;
 	*uc = UTF8_SET_SIZE(ud->size)|UTF8_SET_WIDTH(ud->width)|index;
 	log_debug("%s: (%d %d %.*s) -> %08x", __func__, ud->width, ud->size,
@@ -216,7 +216,7 @@ utf8_width(struct utf8_data *ud, int *width)
 {
 	wchar_t	wc;
 
-	switch (mbtowc(&wc, ud->data, ud->size)) {
+	switch (mbtowc(&wc, (const char*)ud->data, ud->size)) {
 	case -1:
 		log_debug("UTF-8 %.*s, mbtowc() %d", (int)ud->size, ud->data,
 		    errno);
@@ -346,10 +346,10 @@ utf8_stravis(char **dst, const char *src, int flag)
 	char	*buf;
 	int	 len;
 
-	buf = xreallocarray(NULL, 4, strlen(src) + 1);
+	buf = (char *) xreallocarray(NULL, 4, strlen(src) + 1);
 	len = utf8_strvis(buf, src, strlen(src), flag);
 
-	*dst = xrealloc(buf, len + 1);
+	*dst = (char *) xrealloc(buf, len + 1);
 	return (len);
 }
 
@@ -360,10 +360,10 @@ utf8_stravisx(char **dst, const char *src, size_t srclen, int flag)
 	char	*buf;
 	int	 len;
 
-	buf = xreallocarray(NULL, 4, srclen + 1);
+	buf = (char *) xreallocarray(NULL, 4, srclen + 1);
 	len = utf8_strvis(buf, src, srclen, flag);
 
-	*dst = xrealloc(buf, len + 1);
+	*dst = (char *) xrealloc(buf, len + 1);
 	return (len);
 }
 
@@ -406,12 +406,12 @@ utf8_sanitize(const char *src)
 	u_int		 i;
 
 	while (*src != '\0') {
-		dst = xreallocarray(dst, n + 1, sizeof *dst);
+		dst = (char *) xreallocarray(dst, n + 1, sizeof *dst);
 		if ((more = utf8_open(&ud, *src)) == UTF8_MORE) {
 			while (*++src != '\0' && more == UTF8_MORE)
 				more = utf8_append(&ud, *src);
 			if (more == UTF8_DONE) {
-				dst = xreallocarray(dst, n + ud.width,
+				dst = (char *) xreallocarray(dst, n + ud.width,
 				    sizeof *dst);
 				for (i = 0; i < ud.width; i++)
 					dst[n++] = '_';
@@ -425,7 +425,7 @@ utf8_sanitize(const char *src)
 			dst[n++] = '_';
 		src++;
 	}
-	dst = xreallocarray(dst, n + 1, sizeof *dst);
+	dst = (char *) xreallocarray(dst, n + 1, sizeof *dst);
 	dst[n] = '\0';
 	return (dst);
 }
@@ -468,7 +468,7 @@ utf8_fromcstr(const char *src)
 	enum utf8_state		 more;
 
 	while (*src != '\0') {
-		dst = xreallocarray(dst, n + 1, sizeof *dst);
+		dst = (struct utf8_data *) xreallocarray(dst, n + 1, sizeof *dst);
 		if ((more = utf8_open(&dst[n], *src)) == UTF8_MORE) {
 			while (*++src != '\0' && more == UTF8_MORE)
 				more = utf8_append(&dst[n], *src);
@@ -482,7 +482,7 @@ utf8_fromcstr(const char *src)
 		n++;
 		src++;
 	}
-	dst = xreallocarray(dst, n + 1, sizeof *dst);
+	dst = (struct utf8_data *) xreallocarray(dst, n + 1, sizeof *dst);
 	dst[n].size = 0;
 	return (dst);
 }
@@ -495,11 +495,11 @@ utf8_tocstr(struct utf8_data *src)
 	size_t	 n = 0;
 
 	for(; src->size != 0; src++) {
-		dst = xreallocarray(dst, n + src->size, 1);
+		dst = (char *) xreallocarray(dst, n + src->size, 1);
 		memcpy(dst + n, src->data, src->size);
 		n += src->size;
 	}
-	dst = xreallocarray(dst, n + 1, 1);
+	dst = (char *) xreallocarray(dst, n + 1, 1);
 	dst[n] = '\0';
 	return (dst);
 }
@@ -543,7 +543,7 @@ utf8_padcstr(const char *s, u_int width)
 		return (xstrdup(s));
 
 	slen = strlen(s);
-	out = xmalloc(slen + 1 + (width - n));
+	out = (char *) xmalloc(slen + 1 + (width - n));
 	memcpy(out, s, slen);
 	for (i = n; i < width; i++)
 		out[slen++] = ' ';
@@ -564,7 +564,7 @@ utf8_rpadcstr(const char *s, u_int width)
 		return (xstrdup(s));
 
 	slen = strlen(s);
-	out = xmalloc(slen + 1 + (width - n));
+	out = (char *) xmalloc(slen + 1 + (width - n));
 	for (i = 0; i < width - n; i++)
 		out[i] = ' ';
 	memcpy(out + i, s, slen);
