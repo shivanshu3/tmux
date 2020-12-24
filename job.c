@@ -28,6 +28,7 @@
 #include <unistd.h>
 
 #include "tmux.h"
+#include "extern-c.h"
 
 /*
  * Job scheduling. Run queued commands in the background and record their
@@ -146,8 +147,8 @@ job_run(const char *cmd, struct session *s, const char *cwd,
 	sigprocmask(SIG_SETMASK, &oldset, NULL);
 	environ_free(env);
 
-	job = xmalloc(sizeof *job);
-	job->state = JOB_RUNNING;
+	job = (struct job*) xmalloc(sizeof *job);
+	job->state = QUALIFIED_MEMBER(job, JOB_RUNNING);
 	job->flags = flags;
 
 	job->cmd = xstrdup(cmd);
@@ -227,7 +228,7 @@ job_resize(struct job *job, u_int sx, u_int sy)
 static void
 job_read_callback(__unused struct bufferevent *bufev, void *data)
 {
-	struct job	*job = data;
+	struct job	*job = (struct job*) data;
 
 	if (job->updatecb != NULL)
 		job->updatecb(job);
@@ -241,7 +242,7 @@ job_read_callback(__unused struct bufferevent *bufev, void *data)
 static void
 job_write_callback(__unused struct bufferevent *bufev, void *data)
 {
-	struct job	*job = data;
+	struct job	*job = (struct job*) data;
 	size_t		 len = EVBUFFER_LENGTH(EVBUFFER_OUTPUT(job->event));
 
 	log_debug("job write %p: %s, pid %ld, output left %zu", job, job->cmd,
@@ -258,17 +259,17 @@ static void
 job_error_callback(__unused struct bufferevent *bufev, __unused short events,
     void *data)
 {
-	struct job	*job = data;
+	struct job	*job = (struct job*) data;
 
 	log_debug("job error %p: %s, pid %ld", job, job->cmd, (long) job->pid);
 
-	if (job->state == JOB_DEAD) {
+	if (job->state == QUALIFIED_MEMBER(job, JOB_DEAD)) {
 		if (job->completecb != NULL)
 			job->completecb(job);
 		job_free(job);
 	} else {
 		bufferevent_disable(job->event, EV_READ);
-		job->state = JOB_CLOSED;
+		job->state = QUALIFIED_MEMBER(job, JOB_CLOSED);
 	}
 }
 
@@ -294,13 +295,13 @@ job_check_died(pid_t pid, int status)
 
 	job->status = status;
 
-	if (job->state == JOB_CLOSED) {
+	if (job->state == QUALIFIED_MEMBER(job, JOB_CLOSED)) {
 		if (job->completecb != NULL)
 			job->completecb(job);
 		job_free(job);
 	} else {
 		job->pid = -1;
-		job->state = JOB_DEAD;
+		job->state = QUALIFIED_MEMBER(job, JOB_DEAD);
 	}
 }
 
@@ -344,7 +345,7 @@ job_still_running(void)
 	struct job	*job;
 
 	LIST_FOREACH(job, &all_jobs, entry) {
-		if ((~job->flags & JOB_NOWAIT) && job->state == JOB_RUNNING)
+		if ((~job->flags & JOB_NOWAIT) && job->state == QUALIFIED_MEMBER(job, JOB_RUNNING))
 			return (1);
 	}
 	return (0);
