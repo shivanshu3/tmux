@@ -109,9 +109,9 @@ window_buffer_add_item(struct window_buffer_modedata *data)
 {
 	struct window_buffer_itemdata	*item;
 
-	data->item_list = xreallocarray(data->item_list, data->item_size + 1,
+	data->item_list = (struct window_buffer_itemdata **) xreallocarray(data->item_list, data->item_size + 1,
 	    sizeof *data->item_list);
-	item = data->item_list[data->item_size++] = xcalloc(1, sizeof *item);
+	item = data->item_list[data->item_size++] = (struct window_buffer_itemdata *) xcalloc(1, sizeof *item);
 	return (item);
 }
 
@@ -125,8 +125,8 @@ window_buffer_free_item(struct window_buffer_itemdata *item)
 static int
 window_buffer_cmp(const void *a0, const void *b0)
 {
-	const struct window_buffer_itemdata *const	*a = a0;
-	const struct window_buffer_itemdata *const	*b = b0;
+	const struct window_buffer_itemdata *const	*a = (const struct window_buffer_itemdata* const*) a0;
+	const struct window_buffer_itemdata *const	*b = (const struct window_buffer_itemdata* const*) b0;
 	int						 result = 0;
 
 	if (window_buffer_sort->field == WINDOW_BUFFER_BY_TIME)
@@ -147,7 +147,7 @@ static void
 window_buffer_build(void *modedata, struct mode_tree_sort_criteria *sort_crit,
     __unused uint64_t *tag, const char *filter)
 {
-	struct window_buffer_modedata	*data = modedata;
+	struct window_buffer_modedata	*data = (struct window_buffer_modedata*) modedata;
 	struct window_buffer_itemdata	*item;
 	u_int				 i;
 	struct paste_buffer		*pb;
@@ -215,7 +215,7 @@ static void
 window_buffer_draw(__unused void *modedata, void *itemdata,
     struct screen_write_ctx *ctx, u_int sx, u_int sy)
 {
-	struct window_buffer_itemdata	*item = itemdata;
+	struct window_buffer_itemdata	*item = (struct window_buffer_itemdata*) itemdata;
 	struct paste_buffer		*pb;
 	const char			*pdata, *start, *end;
 	char				*buf = NULL;
@@ -231,7 +231,7 @@ window_buffer_draw(__unused void *modedata, void *itemdata,
 		start = end;
 		while (end != pdata + psize && *end != '\n')
 			end++;
-		buf = xreallocarray(buf, 4, end - start + 1);
+		buf = (char *) xreallocarray(buf, 4, end - start + 1);
 		utf8_strvis(buf, start, end - start, VIS_OCTAL|VIS_CSTYLE|VIS_TAB);
 		if (*buf != '\0') {
 			screen_write_cursormove(ctx, cx, cy + i, 0);
@@ -249,7 +249,7 @@ window_buffer_draw(__unused void *modedata, void *itemdata,
 static int
 window_buffer_search(__unused void *modedata, void *itemdata, const char *ss)
 {
-	struct window_buffer_itemdata	*item = itemdata;
+	struct window_buffer_itemdata	*item = (struct window_buffer_itemdata*) itemdata;
 	struct paste_buffer		*pb;
 	const char			*bufdata;
 	size_t				 bufsize;
@@ -265,7 +265,7 @@ window_buffer_search(__unused void *modedata, void *itemdata, const char *ss)
 static void
 window_buffer_menu(void *modedata, struct client *c, key_code key)
 {
-	struct window_buffer_modedata	*data = modedata;
+	struct window_buffer_modedata	*data = (struct window_buffer_modedata*) modedata;
 	struct window_pane		*wp = data->wp;
 	struct window_mode_entry	*wme;
 
@@ -283,7 +283,7 @@ window_buffer_init(struct window_mode_entry *wme, struct cmd_find_state *fs,
 	struct window_buffer_modedata	*data;
 	struct screen			*s;
 
-	wme->data = data = xcalloc(1, sizeof *data);
+	wme->data = data = (struct window_buffer_modedata *) xcalloc(1, sizeof *data);
 	data->wp = wp;
 	cmd_find_copy_state(&data->fs, fs);
 
@@ -311,7 +311,7 @@ window_buffer_init(struct window_mode_entry *wme, struct cmd_find_state *fs,
 static void
 window_buffer_free(struct window_mode_entry *wme)
 {
-	struct window_buffer_modedata	*data = wme->data;
+	struct window_buffer_modedata	*data = (struct window_buffer_modedata*) wme->data;
 	u_int				 i;
 
 	if (data == NULL)
@@ -332,7 +332,7 @@ window_buffer_free(struct window_mode_entry *wme)
 static void
 window_buffer_resize(struct window_mode_entry *wme, u_int sx, u_int sy)
 {
-	struct window_buffer_modedata	*data = wme->data;
+	struct window_buffer_modedata	*data = (struct window_buffer_modedata*) wme->data;
 
 	mode_tree_resize(data->data, sx, sy);
 }
@@ -340,7 +340,7 @@ window_buffer_resize(struct window_mode_entry *wme, u_int sx, u_int sy)
 static void
 window_buffer_update(struct window_mode_entry *wme)
 {
-	struct window_buffer_modedata	*data = wme->data;
+	struct window_buffer_modedata	*data = (struct window_buffer_modedata*) wme->data;
 
 	mode_tree_build(data->data);
 	mode_tree_draw(data->data);
@@ -351,8 +351,8 @@ static void
 window_buffer_do_delete(void *modedata, void *itemdata,
     __unused struct client *c, __unused key_code key)
 {
-	struct window_buffer_modedata	*data = modedata;
-	struct window_buffer_itemdata	*item = itemdata;
+	struct window_buffer_modedata	*data = (struct window_buffer_modedata*) modedata;
+	struct window_buffer_itemdata	*item = (struct window_buffer_itemdata*) itemdata;
 	struct paste_buffer		*pb;
 
 	if (item == mode_tree_get_current(data->data))
@@ -365,8 +365,8 @@ static void
 window_buffer_do_paste(void *modedata, void *itemdata, struct client *c,
     __unused key_code key)
 {
-	struct window_buffer_modedata	*data = modedata;
-	struct window_buffer_itemdata	*item = itemdata;
+	struct window_buffer_modedata	*data = (struct window_buffer_modedata*) modedata;
+	struct window_buffer_itemdata	*item = (struct window_buffer_itemdata*) itemdata;
 
 	if (paste_get_name(item->name) != NULL)
 		mode_tree_run_command(c, NULL, data->command, item->name);
@@ -382,7 +382,7 @@ window_buffer_finish_edit(struct window_buffer_editdata *ed)
 static void
 window_buffer_edit_close_cb(char *buf, size_t len, void *arg)
 {
-	struct window_buffer_editdata	*ed = arg;
+	struct window_buffer_editdata	*ed = (struct window_buffer_editdata*) arg;
 	size_t				 oldlen;
 	const char			*oldbuf;
 	struct paste_buffer		*pb;
@@ -413,7 +413,7 @@ window_buffer_edit_close_cb(char *buf, size_t len, void *arg)
 	if (wp != NULL) {
 		wme = TAILQ_FIRST(&wp->modes);
 		if (wme->mode == &window_buffer_mode) {
-			data = wme->data;
+			data = (struct window_buffer_modedata *) wme->data;
 			mode_tree_build(data->data);
 			mode_tree_draw(data->data);
 		}
@@ -435,7 +435,7 @@ window_buffer_start_edit(struct window_buffer_modedata *data,
 		return;
 	buf = paste_buffer_data(pb, &len);
 
-	ed = xcalloc(1, sizeof *ed);
+	ed = (struct window_buffer_editdata *) xcalloc(1, sizeof *ed);
 	ed->wp_id = data->wp->id;
 	ed->name = xstrdup(paste_buffer_name(pb));
 	ed->pb = pb;
@@ -450,7 +450,7 @@ window_buffer_key(struct window_mode_entry *wme, struct client *c,
     struct mouse_event *m)
 {
 	struct window_pane		*wp = wme->wp;
-	struct window_buffer_modedata	*data = wme->data;
+	struct window_buffer_modedata	*data = (struct window_buffer_modedata*) wme->data;
 	struct mode_tree_data		*mtd = data->data;
 	struct window_buffer_itemdata	*item;
 	int				 finished;
@@ -458,11 +458,11 @@ window_buffer_key(struct window_mode_entry *wme, struct client *c,
 	finished = mode_tree_key(mtd, c, &key, m, NULL, NULL);
 	switch (key) {
 	case 'e':
-		item = mode_tree_get_current(mtd);
+		item = (struct window_buffer_itemdata *) mode_tree_get_current(mtd);
 		window_buffer_start_edit(data, item, c);
 		break;
 	case 'd':
-		item = mode_tree_get_current(mtd);
+		item = (struct window_buffer_itemdata *) mode_tree_get_current(mtd);
 		window_buffer_do_delete(data, item, c, key);
 		mode_tree_build(mtd);
 		break;
@@ -476,7 +476,7 @@ window_buffer_key(struct window_mode_entry *wme, struct client *c,
 		break;
 	case 'p':
 	case '\r':
-		item = mode_tree_get_current(mtd);
+		item = (struct window_buffer_itemdata *) mode_tree_get_current(mtd);
 		window_buffer_do_paste(data, item, c, key);
 		finished = 1;
 		break;
