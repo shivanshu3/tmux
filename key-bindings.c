@@ -106,7 +106,7 @@ key_bindings_get_table(const char *name, int create)
 	if (table != NULL || !create)
 		return (table);
 
-	table = xmalloc(sizeof *table);
+	table = (struct key_table *) xmalloc(sizeof *table);
 	table->name = xstrdup(name);
 	RB_INIT(&table->key_bindings);
 	RB_INIT(&table->default_key_bindings);
@@ -206,7 +206,7 @@ key_bindings_add(const char *name, key_code key, const char *note, int repeat,
 		key_bindings_free(bd);
 	}
 
-	bd = xcalloc(1, sizeof *bd);
+	bd = (struct key_binding *) xcalloc(1, sizeof *bd);
 	bd->key = (key & ~KEYC_MASK_FLAGS);
 	if (note != NULL)
 		bd->note = xstrdup(note);
@@ -315,7 +315,7 @@ key_bindings_init_done(__unused struct cmdq_item *item, __unused void *data)
 
 	RB_FOREACH(table, key_tables, &key_tables) {
 		RB_FOREACH(bd, key_bindings, &table->key_bindings) {
-			new_bd = xcalloc(1, sizeof *bd);
+			new_bd = (struct key_binding *) xcalloc(1, sizeof *bd);
 			new_bd->key = bd->key;
 			if (bd->note != NULL)
 				new_bd->note = xstrdup(bd->note);
