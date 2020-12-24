@@ -216,9 +216,9 @@ window_customize_add_item(struct window_customize_modedata *data)
 {
 	struct window_customize_itemdata	*item;
 
-	data->item_list = xreallocarray(data->item_list, data->item_size + 1,
+	data->item_list = (struct window_customize_itemdata **) xreallocarray(data->item_list, data->item_size + 1,
 	    sizeof *data->item_list);
-	item = data->item_list[data->item_size++] = xcalloc(1, sizeof *item);
+	item = data->item_list[data->item_size++] = (struct window_customize_itemdata *) xcalloc(1, sizeof *item);
 	return (item);
 }
 
@@ -364,7 +364,7 @@ window_customize_find_user_options(struct options *oo, const char ***list,
 			o = options_next(o);
 			continue;
 		}
-		*list = xreallocarray(*list, (*size) + 1, sizeof **list);
+		*list = (const char **) xreallocarray(*list, (*size) + 1, sizeof **list);
 		(*list)[(*size)++] = name;
 
 		o = options_next(o);
@@ -531,7 +531,7 @@ window_customize_build(void *modedata,
     __unused struct mode_tree_sort_criteria *sort_crit, __unused uint64_t *tag,
     const char *filter)
 {
-	struct window_customize_modedata	*data = modedata;
+	struct window_customize_modedata	*data = (struct window_customize_modedata *) modedata;
 	struct cmd_find_state			 fs;
 	struct format_tree			*ft;
 	u_int					 i;
@@ -842,8 +842,8 @@ static void
 window_customize_draw(void *modedata, void *itemdata,
     struct screen_write_ctx *ctx, u_int sx, u_int sy)
 {
-	struct window_customize_modedata	*data = modedata;
-	struct window_customize_itemdata	*item = itemdata;
+	struct window_customize_modedata	*data = (struct window_customize_modedata *) modedata;
+	struct window_customize_itemdata	*item = (struct window_customize_itemdata *) itemdata;
 
 	if (item == NULL)
 		return;
@@ -857,7 +857,7 @@ window_customize_draw(void *modedata, void *itemdata,
 static void
 window_customize_menu(void *modedata, struct client *c, key_code key)
 {
-	struct window_customize_modedata	*data = modedata;
+	struct window_customize_modedata	*data = (struct window_customize_modedata *) modedata;
 	struct window_pane			*wp = data->wp;
 	struct window_mode_entry		*wme;
 
@@ -881,7 +881,7 @@ window_customize_init(struct window_mode_entry *wme, struct cmd_find_state *fs,
 	struct window_customize_modedata	*data;
 	struct screen				*s;
 
-	wme->data = data = xcalloc(1, sizeof *data);
+	wme->data = data = (struct window_customize_modedata *) xcalloc(1, sizeof *data);
 	data->wp = wp;
 	data->references = 1;
 
@@ -924,7 +924,7 @@ window_customize_destroy(struct window_customize_modedata *data)
 static void
 window_customize_free(struct window_mode_entry *wme)
 {
-	struct window_customize_modedata *data = wme->data;
+	struct window_customize_modedata *data = (struct window_customize_modedata *) wme->data;
 
 	if (data == NULL)
 		return;
@@ -937,7 +937,7 @@ window_customize_free(struct window_mode_entry *wme)
 static void
 window_customize_resize(struct window_mode_entry *wme, u_int sx, u_int sy)
 {
-	struct window_customize_modedata	*data = wme->data;
+	struct window_customize_modedata	*data = (struct window_customize_modedata *) wme->data;
 
 	mode_tree_resize(data->data, sx, sy);
 }
@@ -945,13 +945,13 @@ window_customize_resize(struct window_mode_entry *wme, u_int sx, u_int sy)
 static void
 window_customize_free_callback(void *modedata)
 {
-	window_customize_destroy(modedata);
+	window_customize_destroy((struct window_customize_modedata *)modedata);
 }
 
 static void
 window_customize_free_item_callback(void *itemdata)
 {
-	struct window_customize_itemdata	*item = itemdata;
+	struct window_customize_itemdata	*item = (struct window_customize_itemdata *) itemdata;
 	struct window_customize_modedata	*data = item->data;
 
 	window_customize_free_item(item);
@@ -962,7 +962,7 @@ static int
 window_customize_set_option_callback(struct client *c, void *itemdata,
     const char *s, __unused int done)
 {
-	struct window_customize_itemdata	*item = itemdata;
+	struct window_customize_itemdata	*item = (struct window_customize_itemdata *) itemdata;
 	struct window_customize_modedata	*data = item->data;
 	struct options_entry			*o;
 	const struct options_table_entry	*oe;
@@ -1116,7 +1116,7 @@ window_customize_set_option(struct client *c,
 
 		value = options_to_string(o, idx, 0);
 
-		new_item = xcalloc(1, sizeof *new_item);
+		new_item = (struct window_customize_itemdata *) xcalloc(1, sizeof *new_item);
 		new_item->data = data;
 		new_item->scope = scope;
 		new_item->oo = oo;
@@ -1176,7 +1176,7 @@ static int
 window_customize_set_command_callback(struct client *c, void *itemdata,
     const char *s, __unused int done)
 {
-	struct window_customize_itemdata	*item = itemdata;
+	struct window_customize_itemdata	*item = (struct window_customize_itemdata *) itemdata;
 	struct window_customize_modedata	*data = item->data;
 	struct key_binding			*bd;
 	struct cmd_parse_result			*pr;
@@ -1218,7 +1218,7 @@ static int
 window_customize_set_note_callback(__unused struct client *c, void *itemdata,
     const char *s, __unused int done)
 {
-	struct window_customize_itemdata	*item = itemdata;
+	struct window_customize_itemdata	*item = (struct window_customize_itemdata *) itemdata;
 	struct window_customize_modedata	*data = item->data;
 	struct key_binding			*bd;
 
@@ -1258,7 +1258,7 @@ window_customize_set_key(struct client *c,
 		xasprintf(&prompt, "(%s) ", key_string_lookup_key(key, 0));
 		value = cmd_list_print(bd->cmdlist, 0);
 
-		new_item = xcalloc(1, sizeof *new_item);
+		new_item = (struct window_customize_itemdata *) xcalloc(1, sizeof *new_item);
 		new_item->data = data;
 		new_item->scope = item->scope;
 		new_item->table = xstrdup(item->table);
@@ -1274,7 +1274,7 @@ window_customize_set_key(struct client *c,
 	} else if (strcmp(s, "Note") == 0) {
 		xasprintf(&prompt, "(%s) ", key_string_lookup_key(key, 0));
 
-		new_item = xcalloc(1, sizeof *new_item);
+		new_item = (struct window_customize_itemdata *) xcalloc(1, sizeof *new_item);
 		new_item->data = data;
 		new_item->scope = item->scope;
 		new_item->table = xstrdup(item->table);
@@ -1331,8 +1331,8 @@ static void
 window_customize_change_each(void *modedata, void *itemdata,
     __unused struct client *c, __unused key_code key)
 {
-	struct window_customize_modedata	*data = modedata;
-	struct window_customize_itemdata	*item = itemdata;
+	struct window_customize_modedata	*data = (struct window_customize_modedata *) modedata;
+	struct window_customize_itemdata	*item = (struct window_customize_itemdata *) itemdata;
 
 	switch (data->change) {
 	case WINDOW_CUSTOMIZE_UNSET:
@@ -1356,7 +1356,7 @@ static int
 window_customize_change_current_callback(__unused struct client *c,
     void *modedata, const char *s, __unused int done)
 {
-	struct window_customize_modedata	*data = modedata;
+	struct window_customize_modedata	*data = (struct window_customize_modedata *) modedata;
 	struct window_customize_itemdata	*item;
 
 	if (s == NULL || *s == '\0' || data->dead)
@@ -1364,7 +1364,7 @@ window_customize_change_current_callback(__unused struct client *c,
 	if (tolower((u_char) s[0]) != 'y' || s[1] != '\0')
 		return (0);
 
-	item = mode_tree_get_current(data->data);
+	item = (struct window_customize_itemdata *) mode_tree_get_current(data->data);
 	switch (data->change) {
 	case WINDOW_CUSTOMIZE_UNSET:
 		if (item->scope == WINDOW_CUSTOMIZE_KEY)
@@ -1392,7 +1392,7 @@ static int
 window_customize_change_tagged_callback(struct client *c, void *modedata,
     const char *s, __unused int done)
 {
-	struct window_customize_modedata	*data = modedata;
+	struct window_customize_modedata	*data = (struct window_customize_modedata *) modedata;
 
 	if (s == NULL || *s == '\0' || data->dead)
 		return (0);
@@ -1414,15 +1414,15 @@ window_customize_key(struct window_mode_entry *wme, struct client *c,
     struct mouse_event *m)
 {
 	struct window_pane			*wp = wme->wp;
-	struct window_customize_modedata	*data = wme->data;
+	struct window_customize_modedata	*data = (struct window_customize_modedata *) wme->data;
 	struct window_customize_itemdata	*item, *new_item;
 	int					 finished, idx;
 	char					*prompt;
 	u_int					 tagged;
 
-	item = mode_tree_get_current(data->data);
+	item = (struct window_customize_itemdata *) mode_tree_get_current(data->data);
 	finished = mode_tree_key(data->data, c, &key, m, NULL, NULL);
-	if (item != (new_item = mode_tree_get_current(data->data)))
+	if (item != (new_item = (struct window_customize_itemdata *) mode_tree_get_current(data->data)))
 		item = new_item;
 
 	switch (key) {
