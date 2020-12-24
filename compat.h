@@ -88,10 +88,10 @@ typedef int TMUX_SOCKET;
 #ifdef HAVE_ERR_H
 #include <err.h>
 #else
-void	err(int, const char *, ...);
-void	errx(int, const char *, ...);
-void	warn(const char *, ...);
-void	warnx(const char *, ...);
+EXTERN_C void	err(int, const char *, ...);
+EXTERN_C void	errx(int, const char *, ...);
+EXTERN_C void	warn(const char *, ...);
+EXTERN_C void	warnx(const char *, ...);
 #endif
 
 #ifdef HAVE_PATHS_H
@@ -342,13 +342,13 @@ void		 setproctitle(const char *, ...);
 #ifndef HAVE_FDFORKPTY
 /* fdforkpty.c */
 int		 getptmfd(void);
-pid_t		 fdforkpty(int, int *, char *, struct termios *,
+EXTERN_C pid_t		 fdforkpty(int, int *, char *, struct termios *,
 		     struct winsize *);
 #endif
 
 #ifndef HAVE_FORKPTY
 /* forkpty.c */
-pid_t		 forkpty(int *, char *, struct termios *, struct winsize *);
+EXTERN_C pid_t		 forkpty(int *, char *, struct termios *, struct winsize *);
 #endif
 
 #ifndef HAVE_ASPRINTF

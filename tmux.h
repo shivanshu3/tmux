@@ -35,6 +35,7 @@
 #include "compat.h"
 #include "xmalloc.h"
 #include "osdep.h"
+#include "base64.h"
 
 extern char   **environ;
 
