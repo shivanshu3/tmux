@@ -107,7 +107,7 @@ notify_insert_hook(struct cmdq_item *item, struct notify_entry *ne)
 static enum cmd_retval
 notify_callback(struct cmdq_item *item, void *data)
 {
-	struct notify_entry	*ne = data;
+	struct notify_entry	*ne = (struct notify_entry*) data;
 
 	log_debug("%s: %s", __func__, ne->name);
 
@@ -163,7 +163,7 @@ notify_add(const char *name, struct cmd_find_state *fs, struct client *c,
 	if (item != NULL && (cmdq_get_flags(item) & CMDQ_STATE_NOHOOKS))
 		return;
 
-	ne = xcalloc(1, sizeof *ne);
+	ne = (struct notify_entry *) xcalloc(1, sizeof *ne);
 	ne->name = xstrdup(name);
 
 	ne->client = c;

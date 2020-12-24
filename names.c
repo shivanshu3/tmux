@@ -33,7 +33,7 @@ static char	*format_window_name(struct window *);
 static void
 name_time_callback(__unused int fd, __unused short events, void *arg)
 {
-	struct window	*w = arg;
+	struct window	*w = (struct window*) arg;
 
 	/* The event loop will call check_window_name for us on the way out. */
 	log_debug("@%u name timer expired", w->id);

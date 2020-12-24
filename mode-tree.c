@@ -180,7 +180,7 @@ mode_tree_build_lines(struct mode_tree_data *mtd,
 
 	mtd->depth = depth;
 	TAILQ_FOREACH(mti, mtl, entry) {
-		mtd->line_list = xreallocarray(mtd->line_list,
+		mtd->line_list = (struct mode_tree_line *) xreallocarray(mtd->line_list,
 		    mtd->line_size + 1, sizeof *mtd->line_list);
 
 		line = &mtd->line_list[mtd->line_size++];
@@ -371,7 +371,7 @@ mode_tree_start(struct window_pane *wp, struct args *args,
 	const char		*sort;
 	u_int			 i;
 
-	mtd = xcalloc(1, sizeof *mtd);
+	mtd = (struct mode_tree_data *) xcalloc(1, sizeof *mtd);
 	mtd->references = 1;
 
 	mtd->wp = wp;
@@ -532,7 +532,7 @@ mode_tree_add(struct mode_tree_data *mtd, struct mode_tree_item *parent,
 	log_debug("%s: %llu, %s %s", __func__, (unsigned long long)tag,
 	    name, (text == NULL ? "" : text));
 
-	mti = xcalloc(1, sizeof *mti);
+	mti = (struct mode_tree_item *) xcalloc(1, sizeof *mti);
 	mti->parent = parent;
 	mti->itemdata = itemdata;
 
@@ -651,7 +651,7 @@ mode_tree_draw(struct mode_tree_data *mtd)
 		else {
 			size = (4 * line->depth) + 32;
 
-			start = xcalloc(1, size);
+			start = (char *) xcalloc(1, size);
 			for (j = 1; j < line->depth; j++) {
 				if (mti->parent != NULL &&
 				    mtd->line_list[mti->parent->line].last)
@@ -824,7 +824,7 @@ static int
 mode_tree_search_callback(__unused struct client *c, void *data, const char *s,
     __unused int done)
 {
-	struct mode_tree_data	*mtd = data;
+	struct mode_tree_data	*mtd = (struct mode_tree_data*) data;
 
 	if (mtd->dead)
 		return (0);
@@ -843,14 +843,14 @@ mode_tree_search_callback(__unused struct client *c, void *data, const char *s,
 static void
 mode_tree_search_free(void *data)
 {
-	mode_tree_remove_ref(data);
+	mode_tree_remove_ref((struct mode_tree_data *)data);
 }
 
 static int
 mode_tree_filter_callback(__unused struct client *c, void *data, const char *s,
     __unused int done)
 {
-	struct mode_tree_data	*mtd = data;
+	struct mode_tree_data	*mtd = (struct mode_tree_data*) data;
 
 	if (mtd->dead)
 		return (0);
@@ -872,14 +872,14 @@ mode_tree_filter_callback(__unused struct client *c, void *data, const char *s,
 static void
 mode_tree_filter_free(void *data)
 {
-	mode_tree_remove_ref(data);
+	mode_tree_remove_ref((struct mode_tree_data *)data);
 }
 
 static void
 mode_tree_menu_callback(__unused struct menu *menu, __unused u_int idx,
     key_code key, void *data)
 {
-	struct mode_tree_menu		*mtm = data;
+	struct mode_tree_menu		*mtm = (struct mode_tree_menu*) data;
 	struct mode_tree_data		*mtd = mtm->data;
 	struct mode_tree_item		*mti;
 
@@ -927,7 +927,7 @@ mode_tree_display_menu(struct mode_tree_data *mtd, struct client *c, u_int x,
 	menu_add_items(menu, items, NULL, NULL, NULL);
 	free(title);
 
-	mtm = xmalloc(sizeof *mtm);
+	mtm = (struct mode_tree_menu *) xmalloc(sizeof *mtm);
 	mtm->data = mtd;
 	mtm->c = c;
 	mtm->line = line;
