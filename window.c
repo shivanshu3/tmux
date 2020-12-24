@@ -181,7 +181,7 @@ winlink_add(struct winlinks *wwl, int idx)
 	} else if (winlink_find_by_index(wwl, idx) != NULL)
 		return (NULL);
 
-	wl = xcalloc(1, sizeof *wl);
+	wl = (struct winlink *) xcalloc(1, sizeof *wl);
 	wl->idx = idx;
 	RB_INSERT(winlinks, wwl, wl);
 
@@ -315,7 +315,7 @@ window_create(u_int sx, u_int sy, u_int xpixel, u_int ypixel)
 	if (ypixel == 0)
 		ypixel = DEFAULT_YPIXEL;
 
-	w = xcalloc(1, sizeof *w);
+	w = (struct window *) xcalloc(1, sizeof *w);
 	w->name = xstrdup("");
 	w->flags = 0;
 
@@ -865,7 +865,7 @@ window_pane_create(struct window *w, u_int sx, u_int sy, u_int hlimit)
 	struct window_pane	*wp;
 	char			 host[HOST_NAME_MAX + 1];
 
-	wp = xcalloc(1, sizeof *wp);
+	wp = (struct window_pane *) xcalloc(1, sizeof *wp);
 	wp->window = w;
 	wp->options = options_create(w->options);
 	wp->flags = PANE_STYLECHANGED;
@@ -951,7 +951,7 @@ window_pane_destroy(struct window_pane *wp)
 static void
 window_pane_read_callback(__unused struct bufferevent *bufev, void *data)
 {
-	struct window_pane		*wp = data;
+	struct window_pane		*wp = (struct window_pane *) data;
 	struct evbuffer			*evb = wp->event->input;
 	struct window_pane_offset	*wpo = &wp->pipe_offset;
 	size_t				 size = EVBUFFER_LENGTH(evb);
@@ -960,7 +960,7 @@ window_pane_read_callback(__unused struct bufferevent *bufev, void *data)
 	struct client			*c;
 
 	if (wp->pipe_fd != -1) {
-		new_data = window_pane_get_new_data(wp, wpo, &new_size);
+		new_data = (char*) window_pane_get_new_data(wp, wpo, &new_size);
 		if (new_size > 0) {
 			bufferevent_write(wp->pipe_event, new_data, new_size);
 			window_pane_update_used_data(wp, wpo, new_size);
@@ -980,7 +980,7 @@ static void
 window_pane_error_callback(__unused struct bufferevent *bufev,
     __unused short what, void *data)
 {
-	struct window_pane *wp = data;
+	struct window_pane *wp = (struct window_pane *) data;
 
 	log_debug("%%%u error", wp->id);
 	wp->flags |= PANE_EXITED;
@@ -1034,7 +1034,7 @@ window_pane_set_palette(struct window_pane *wp, u_int n, int colour)
 		return;
 
 	if (wp->palette == NULL)
-		wp->palette = xcalloc(0x100, sizeof *wp->palette);
+		wp->palette = (int *) xcalloc(0x100, sizeof *wp->palette);
 
 	wp->palette[n] = colour;
 	wp->flags |= PANE_REDRAW;
@@ -1099,7 +1099,7 @@ window_pane_set_mode(struct window_pane *wp, struct window_pane *swp,
 		TAILQ_REMOVE(&wp->modes, wme, entry);
 		TAILQ_INSERT_HEAD(&wp->modes, wme, entry);
 	} else {
-		wme = xcalloc(1, sizeof *wme);
+		wme = (struct window_mode_entry *) xcalloc(1, sizeof *wme);
 		wme->wp = wp;
 		wme->swp = swp;
 		wme->mode = mode;
@@ -1321,7 +1321,7 @@ window_pane_find_up(struct window_pane *wp)
 			found = 1;
 		if (!found)
 			continue;
-		list = xreallocarray(list, size + 1, sizeof *list);
+		list = (struct window_pane **) xreallocarray(list, size + 1, sizeof *list);
 		list[size++] = next;
 	}
 
@@ -1378,7 +1378,7 @@ window_pane_find_down(struct window_pane *wp)
 			found = 1;
 		if (!found)
 			continue;
-		list = xreallocarray(list, size + 1, sizeof *list);
+		list = (struct window_pane **) xreallocarray(list, size + 1, sizeof *list);
 		list[size++] = next;
 	}
 
@@ -1426,7 +1426,7 @@ window_pane_find_left(struct window_pane *wp)
 			found = 1;
 		if (!found)
 			continue;
-		list = xreallocarray(list, size + 1, sizeof *list);
+		list = (struct window_pane **) xreallocarray(list, size + 1, sizeof *list);
 		list[size++] = next;
 	}
 
@@ -1474,7 +1474,7 @@ window_pane_find_right(struct window_pane *wp)
 			found = 1;
 		if (!found)
 			continue;
-		list = xreallocarray(list, size + 1, sizeof *list);
+		list = (struct window_pane **) xreallocarray(list, size + 1, sizeof *list);
 		list[size++] = next;
 	}
 
@@ -1534,7 +1534,7 @@ static void
 window_pane_input_callback(struct client *c, __unused const char *path,
     int error, int closed, struct evbuffer *buffer, void *data)
 {
-	struct window_pane_input_data	*cdata = data;
+	struct window_pane_input_data	*cdata = (struct window_pane_input_data *) data;
 	struct window_pane		*wp;
 	u_char				*buf = EVBUFFER_DATA(buffer);
 	size_t				 len = EVBUFFER_LENGTH(buffer);
@@ -1567,7 +1567,7 @@ window_pane_start_input(struct window_pane *wp, struct cmdq_item *item,
 		return (-1);
 	}
 
-	cdata = xmalloc(sizeof *cdata);
+	cdata = (struct window_pane_input_data *) xmalloc(sizeof *cdata);
 	cdata->item = item;
 	cdata->wp = wp->id;
 
