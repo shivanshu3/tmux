@@ -1,3 +1,5 @@
+#define TMUX_TTY_TERM_CODES
+
 #include "tty-term.h"
 
 const struct tty_term_code_entry tty_term_codes[] = {

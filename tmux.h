@@ -168,7 +168,14 @@ struct winlink;
 typedef unsigned long long key_code;
 
 /* Special key codes. */
-enum {
+// Note: MSVC's enum doesn't automatically expand to 8 bytes. It has to be explicitly
+// set. That's why this hackery is needed.
+#ifndef TMUX_TTY_TERM_CODES
+enum
+#ifdef _WIN32
+: uint64_t
+#endif // _WIN32
+{
 	/* Focus events. */
 	KEYC_FOCUS_IN = KEYC_BASE,
 	KEYC_FOCUS_OUT,
@@ -257,6 +264,7 @@ enum {
 	KEYC_KP_ZERO,
 	KEYC_KP_PERIOD,
 };
+#endif // TMUX_TTY_TERM_CODES
 
 /* Termcap codes. */
 enum tty_code_code {
