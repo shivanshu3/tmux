@@ -100,7 +100,7 @@ grid_get_extended_cell(struct grid_line *gl, struct grid_cell_entry *gce,
 {
 	u_int at = gl->extdsize + 1;
 
-	gl->extddata = xreallocarray(gl->extddata, at, sizeof *gl->extddata);
+	gl->extddata = (struct grid_extd_entry *) xreallocarray(gl->extddata, at, sizeof *gl->extddata);
 	gl->extdsize = at;
 
 	gce->offset = at - 1;
@@ -159,7 +159,7 @@ grid_compact_line(struct grid_line *gl)
 		gl->extdsize = 0;
 		return;
 	}
-	new_extddata = xreallocarray(NULL, new_extdsize, sizeof *gl->extddata);
+	new_extddata = (struct grid_extd_entry *) xreallocarray(NULL, new_extdsize, sizeof *gl->extddata);
 
 	idx = 0;
 	for (px = 0; px < gl->cellsize; px++) {
@@ -187,7 +187,7 @@ grid_get_line(struct grid *gd, u_int line)
 void
 grid_adjust_lines(struct grid *gd, u_int lines)
 {
-	gd->linedata = xreallocarray(gd->linedata, lines, sizeof *gd->linedata);
+	gd->linedata = (struct grid_line *) xreallocarray(gd->linedata, lines, sizeof *gd->linedata);
 }
 
 /* Copy default into a cell. */
@@ -276,7 +276,7 @@ grid_create(u_int sx, u_int sy, u_int hlimit)
 {
 	struct grid	*gd;
 
-	gd = xmalloc(sizeof *gd);
+	gd = (struct grid *) xmalloc(sizeof *gd);
 	gd->sx = sx;
 	gd->sy = sy;
 
@@ -290,7 +290,7 @@ grid_create(u_int sx, u_int sy, u_int hlimit)
 	gd->hlimit = hlimit;
 
 	if (gd->sy != 0)
-		gd->linedata = xcalloc(gd->sy, sizeof *gd->linedata);
+		gd->linedata = (struct grid_line *) xcalloc(gd->sy, sizeof *gd->linedata);
 	else
 		gd->linedata = NULL;
 
@@ -396,7 +396,7 @@ grid_scroll_history(struct grid *gd, u_int bg)
 	u_int	yy;
 
 	yy = gd->hsize + gd->sy;
-	gd->linedata = xreallocarray(gd->linedata, yy + 1,
+	gd->linedata = (struct grid_line *) xreallocarray(gd->linedata, yy + 1,
 	    sizeof *gd->linedata);
 	grid_empty_line(gd, yy, bg);
 
@@ -414,7 +414,7 @@ grid_clear_history(struct grid *gd)
 	gd->hscrolled = 0;
 	gd->hsize = 0;
 
-	gd->linedata = xreallocarray(gd->linedata, gd->sy,
+	gd->linedata = (struct grid_line *) xreallocarray(gd->linedata, gd->sy,
 	    sizeof *gd->linedata);
 }
 
@@ -427,7 +427,7 @@ grid_scroll_history_region(struct grid *gd, u_int upper, u_int lower, u_int bg)
 
 	/* Create a space for a new line. */
 	yy = gd->hsize + gd->sy;
-	gd->linedata = xreallocarray(gd->linedata, yy + 1,
+	gd->linedata = (struct grid_line *) xreallocarray(gd->linedata, yy + 1,
 	    sizeof *gd->linedata);
 
 	/* Move the entire screen down to free a space for this line. */
@@ -469,7 +469,7 @@ grid_expand_line(struct grid *gd, u_int py, u_int sx, u_int bg)
 	else if (gd->sx > sx)
 		sx = gd->sx;
 
-	gl->celldata = xreallocarray(gl->celldata, sx, sizeof *gl->celldata);
+	gl->celldata = (struct grid_cell_entry *) xreallocarray(gl->celldata, sx, sizeof *gl->celldata);
 	for (xx = gl->cellsize; xx < sx; xx++)
 		grid_clear_cell(gd, xx, py, bg);
 	gl->cellsize = sx;
@@ -972,7 +972,7 @@ grid_string_cells(struct grid *gd, u_int px, u_int py, u_int nx,
 	}
 
 	len = 128;
-	buf = xmalloc(len);
+	buf = (char *) xmalloc(len);
 	off = 0;
 
 	gl = grid_peek_line(gd, py);
@@ -991,7 +991,7 @@ grid_string_cells(struct grid *gd, u_int px, u_int py, u_int nx,
 		} else
 			codelen = 0;
 
-		data = gc.data.data;
+		data = (const char *) gc.data.data;
 		size = gc.data.size;
 		if (escape_c0 && size == 1 && *data == '\\') {
 			data = "\\\\";
@@ -999,7 +999,7 @@ grid_string_cells(struct grid *gd, u_int px, u_int py, u_int nx,
 		}
 
 		while (len < off + size + codelen + 1) {
-			buf = xreallocarray(buf, 2, len);
+			buf = (char *) xreallocarray(buf, 2, len);
 			len *= 2;
 		}
 
@@ -1043,7 +1043,7 @@ grid_duplicate_lines(struct grid *dst, u_int dy, struct grid *src, u_int sy,
 
 		memcpy(dstl, srcl, sizeof *dstl);
 		if (srcl->cellsize != 0) {
-			dstl->celldata = xreallocarray(NULL,
+			dstl->celldata = (struct grid_cell_entry *) xreallocarray(NULL,
 			    srcl->cellsize, sizeof *dstl->celldata);
 			memcpy(dstl->celldata, srcl->celldata,
 			    srcl->cellsize * sizeof *dstl->celldata);
@@ -1052,7 +1052,7 @@ grid_duplicate_lines(struct grid *dst, u_int dy, struct grid *src, u_int sy,
 
 		if (srcl->extdsize != 0) {
 			dstl->extdsize = srcl->extdsize;
-			dstl->extddata = xreallocarray(NULL, dstl->extdsize,
+			dstl->extddata = (struct grid_extd_entry *) xreallocarray(NULL, dstl->extdsize,
 			    sizeof *dstl->extddata);
 			memcpy(dstl->extddata, srcl->extddata, dstl->extdsize *
 			    sizeof *dstl->extddata);
@@ -1078,7 +1078,7 @@ grid_reflow_add(struct grid *gd, u_int n)
 	struct grid_line	*gl;
 	u_int			 sy = gd->sy + n;
 
-	gd->linedata = xreallocarray(gd->linedata, sy, sizeof *gd->linedata);
+	gd->linedata = (struct grid_line *) xreallocarray(gd->linedata, sy, sizeof *gd->linedata);
 	gl = &gd->linedata[gd->sy];
 	memset(gl, 0, n * (sizeof *gl));
 	gd->sy = sy;
