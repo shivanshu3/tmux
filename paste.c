@@ -178,7 +178,7 @@ paste_add(const char *prefix, char *data, size_t size)
 			paste_free(pb);
 	}
 
-	pb = xmalloc(sizeof *pb);
+	pb = (struct paste_buffer *) xmalloc(sizeof *pb);
 
 	pb->name = NULL;
 	do {
@@ -275,7 +275,7 @@ paste_set(char *data, size_t size, const char *name, char **cause)
 		return (-1);
 	}
 
-	pb = xmalloc(sizeof *pb);
+	pb = (struct paste_buffer *) xmalloc(sizeof *pb);
 
 	pb->name = xstrdup(name);
 
@@ -317,7 +317,7 @@ paste_make_sample(struct paste_buffer *pb)
 	len = pb->size;
 	if (len > width)
 		len = width;
-	buf = xreallocarray(NULL, len, 4 + 4);
+	buf = (char *) xreallocarray(NULL, len, 4 + 4);
 
 	used = utf8_strvis(buf, pb->data, len, flags);
 	if (pb->size > width || used > width)

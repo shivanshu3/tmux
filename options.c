@@ -424,7 +424,7 @@ options_array_set(struct options_entry *o, u_int idx, const char *value,
     int append, char **cause)
 {
 	struct options_array_item	*a;
-	char				*new;
+	char				*new_;
 	struct cmd_parse_result		*pr;
 
 	if (!OPTIONS_IS_ARRAY(o)) {
@@ -469,14 +469,14 @@ options_array_set(struct options_entry *o, u_int idx, const char *value,
 	if (OPTIONS_IS_STRING(o)) {
 		a = options_array_item(o, idx);
 		if (a != NULL && append)
-			xasprintf(&new, "%s%s", a->value.string, value);
+			xasprintf(&new_, "%s%s", a->value.string, value);
 		else
-			new = xstrdup(value);
+			new_ = xstrdup(value);
 		if (a == NULL)
 			a = options_array_new(o, idx);
 		else
 			options_value_free(o, &a->value);
-		a->value.string = new;
+		a->value.string = new_;
 		return (0);
 	}
 
@@ -1012,7 +1012,7 @@ options_from_string(struct options *oo, const struct options_table_entry *oe,
 {
 	enum options_table_type	 type;
 	long long		 number;
-	const char		*errstr, *new;
+	const char		*errstr, *new_;
 	char			*old;
 	key_code		 key;
 
@@ -1037,8 +1037,8 @@ options_from_string(struct options *oo, const struct options_table_entry *oe,
 		old = xstrdup(options_get_string(oo, name));
 		options_set_string(oo, name, append, "%s", value);
 
-		new = options_get_string(oo, name);
-		if (options_from_string_check(oe, new, cause) != 0) {
+		new_ = options_get_string(oo, name);
+		if (options_from_string_check(oe, new_, cause) != 0) {
 			options_set_string(oo, name, 0, "%s", old);
 			free(old);
 			return (-1);
