@@ -88,7 +88,7 @@ server_client_how_many(void)
 static void
 server_client_overlay_timer(__unused int fd, __unused short events, void *data)
 {
-	server_client_clear_overlay(data);
+	server_client_clear_overlay((struct client*)data);
 }
 
 /* Set an overlay on client. */
@@ -210,7 +210,7 @@ server_client_create(int fd)
 
 	setblocking(fd, 0);
 
-	c = xcalloc(1, sizeof *c);
+	c = (struct client *) xcalloc(1, sizeof *c);
 	c->references = 1;
 	c->peer = proc_add_peer(server_proc, fd, server_client_dispatch, c);
 
@@ -366,7 +366,7 @@ server_client_unref(struct client *c)
 static void
 server_client_free(__unused int fd, __unused short events, void *arg)
 {
-	struct client	*c = arg;
+	struct client	*c = (struct client*) arg;
 
 	log_debug("free client %p (%d references)", c, c->references);
 
@@ -403,7 +403,7 @@ server_client_detach(struct client *c, enum msgtype msgtype)
 
 	c->flags |= CLIENT_EXIT;
 
-	c->exit_type = CLIENT_EXIT_DETACH;
+	c->exit_type = QUALIFIED_MEMBER(client, CLIENT_EXIT_DETACH);
 	c->exit_msgtype = msgtype;
 	c->exit_session = xstrdup(s->name);
 }
@@ -429,7 +429,7 @@ server_client_exec(struct client *c, const char *cmd)
 		shell = _PATH_BSHELL;
 	shellsize = strlen(shell) + 1;
 
-	msg = xmalloc(cmdsize + shellsize);
+	msg = (char *) xmalloc(cmdsize + shellsize);
 	memcpy(msg, cmd, cmdsize);
 	memcpy(msg + cmdsize, shell, shellsize);
 
@@ -1099,7 +1099,7 @@ static enum cmd_retval
 server_client_key_callback(struct cmdq_item *item, void *data)
 {
 	struct client			*c = cmdq_get_client(item);
-	struct key_event		*event = data;
+	struct key_event		*event = (struct key_event*) data;
 	key_code			 key = event->key;
 	struct mouse_event		*m = &event->m;
 	struct session			*s = c->session;
@@ -1403,7 +1403,7 @@ server_client_check_window_resize(struct window *w)
 static void
 server_client_resize_timer(__unused int fd, __unused short events, void *data)
 {
-	struct window_pane	*wp = data;
+	struct window_pane	*wp = (struct window_pane*) data;
 
 	log_debug("%s: %%%u resize timer expired", __func__, wp->id);
 	evtimer_del(&wp->resize_timer);
@@ -1423,7 +1423,7 @@ server_client_start_resize_timer(struct window_pane *wp)
 static void
 server_client_force_timer(__unused int fd, __unused short events, void *data)
 {
-	struct window_pane	*wp = data;
+	struct window_pane	*wp = (struct window_pane*) data;
 
 	log_debug("%s: %%%u force timer expired", __func__, wp->id);
 	evtimer_del(&wp->force_timer);
@@ -1717,7 +1717,7 @@ server_client_reset_state(struct client *c)
 static void
 server_client_repeat_timer(__unused int fd, __unused short events, void *data)
 {
-	struct client	*c = data;
+	struct client	*c = (struct client*) data;
 
 	if (c->flags & CLIENT_REPEAT) {
 		server_client_set_key_table(c, NULL);
@@ -1730,7 +1730,7 @@ server_client_repeat_timer(__unused int fd, __unused short events, void *data)
 static void
 server_client_click_timer(__unused int fd, __unused short events, void *data)
 {
-	struct client		*c = data;
+	struct client		*c = (struct client*) data;
 	struct key_event	*event;
 
 	log_debug("click timer expired");
@@ -1740,7 +1740,7 @@ server_client_click_timer(__unused int fd, __unused short events, void *data)
 		 * Waiting for a third click that hasn't happened, so this must
 		 * have been a double click.
 		 */
-		event = xmalloc(sizeof *event);
+		event = (struct key_event *) xmalloc(sizeof *event);
 		event->key = KEYC_DOUBLECLICK;
 		memcpy(&event->m, &c->click_event, sizeof event->m);
 		if (!server_client_handle_key(c, event))
@@ -1778,23 +1778,23 @@ server_client_check_exit(struct client *c)
 	c->flags |= CLIENT_EXITED;
 
 	switch (c->exit_type) {
-	case CLIENT_EXIT_RETURN:
+	case QUALIFIED_MEMBER(client, CLIENT_EXIT_RETURN):
 		if (c->exit_message != NULL) {
 			msize = strlen(c->exit_message) + 1;
 			size = (sizeof c->retval) + msize;
 		} else
 			size = (sizeof c->retval);
-		data = xmalloc(size);
+		data = (char *) xmalloc(size);
 		memcpy(data, &c->retval, sizeof c->retval);
 		if (c->exit_message != NULL)
 			memcpy(data + sizeof c->retval, c->exit_message, msize);
 		proc_send(c->peer, MSG_EXIT, -1, data, size);
 		free(data);
 		break;
-	case CLIENT_EXIT_SHUTDOWN:
+	case QUALIFIED_MEMBER(client, CLIENT_EXIT_SHUTDOWN):
 		proc_send(c->peer, MSG_SHUTDOWN, -1, NULL, 0);
 		break;
-	case CLIENT_EXIT_DETACH:
+	case QUALIFIED_MEMBER(client, CLIENT_EXIT_DETACH):
 		proc_send(c->peer, c->exit_msgtype, -1, name, strlen(name) + 1);
 		break;
 	}
@@ -1986,7 +1986,7 @@ server_client_set_title(struct client *c)
 static void
 server_client_dispatch(struct imsg *imsg, void *arg)
 {
-	struct client	*c = arg;
+	struct client	*c = (struct client*) arg;
 	ssize_t		 datalen;
 	struct session	*s;
 
@@ -2123,7 +2123,7 @@ server_client_dispatch_command(struct client *c, struct imsg *imsg)
 
 	if (argc == 0) {
 		argc = 1;
-		argv = xcalloc(1, sizeof *argv);
+		argv = (char **) xcalloc(1, sizeof *argv);
 		*argv = xstrdup("new-session");
 	}
 
@@ -2168,7 +2168,7 @@ server_client_dispatch_identify(struct client *c, struct imsg *imsg)
 	if (c->flags & CLIENT_IDENTIFIED)
 		fatalx("out-of-order identify message");
 
-	data = imsg->data;
+	data = (const char*) imsg->data;
 	datalen = imsg->hdr.len - IMSG_HEADER_SIZE;
 
 	switch (imsg->hdr.type)	{
@@ -2308,7 +2308,7 @@ server_client_dispatch_shell(struct client *c)
 static void
 server_client_dispatch_write_ready(struct client *c, struct imsg *imsg)
 {
-	struct msg_write_ready	*msg = imsg->data;
+	struct msg_write_ready	*msg = (struct msg_write_ready*) imsg->data;
 	size_t			 msglen = imsg->hdr.len - IMSG_HEADER_SIZE;
 	struct client_file	 find, *cf;
 
@@ -2328,7 +2328,7 @@ server_client_dispatch_write_ready(struct client *c, struct imsg *imsg)
 static void
 server_client_dispatch_read_data(struct client *c, struct imsg *imsg)
 {
-	struct msg_read_data	*msg = imsg->data;
+	struct msg_read_data	*msg = (struct msg_read_data*) imsg->data;
 	size_t			 msglen = imsg->hdr.len - IMSG_HEADER_SIZE;
 	struct client_file	 find, *cf;
 	void			*bdata = msg + 1;
@@ -2354,7 +2354,7 @@ server_client_dispatch_read_data(struct client *c, struct imsg *imsg)
 static void
 server_client_dispatch_read_done(struct client *c, struct imsg *imsg)
 {
-	struct msg_read_done	*msg = imsg->data;
+	struct msg_read_done	*msg = (struct msg_read_done*) imsg->data;
 	size_t			 msglen = imsg->hdr.len - IMSG_HEADER_SIZE;
 	struct client_file	 find, *cf;
 
@@ -2413,12 +2413,12 @@ server_client_set_flags(struct client *c, const char *flags)
 {
 	char	*s, *copy, *next;
 	uint64_t flag;
-	int	 not;
+	int	 not_;
 
 	s = copy = xstrdup (flags);
 	while ((next = strsep(&s, ",")) != NULL) {
-		not = (*next == '!');
-		if (not)
+		not_ = (*next == '!');
+		if (not_)
 			next++;
 
 		if (c->flags & CLIENT_CONTROL)
@@ -2435,7 +2435,7 @@ server_client_set_flags(struct client *c, const char *flags)
 			continue;
 
 		log_debug("client %s set flag %s", c->name, next);
-		if (not)
+		if (not_)
 			c->flags &= ~flag;
 		else
 			c->flags |= flag;
@@ -2521,7 +2521,7 @@ server_client_set_pane(struct client *c, struct window_pane *wp)
 
 	cw = server_client_get_client_window(c, s->curw->window->id);
 	if (cw == NULL) {
-		cw = xcalloc(1, sizeof *cw);
+		cw = (struct client_window *) xcalloc(1, sizeof *cw);
 		cw->window = s->curw->window->id;
 		RB_INSERT(client_windows, &c->windows, cw);
 	}
