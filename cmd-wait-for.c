@@ -30,7 +30,7 @@
 
 static enum cmd_retval cmd_wait_for_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_wait_for_entry = {
+struct cmd_entry cmd_wait_for_entry = {
 	.name = "wait-for",
 	.alias = "wait",
 

@@ -29,7 +29,7 @@
 
 static enum cmd_retval	cmd_bind_key_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_bind_key_entry = {
+struct cmd_entry cmd_bind_key_entry = {
 	.name = "bind-key",
 	.alias = "bind",
 

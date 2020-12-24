@@ -35,7 +35,7 @@ static int	cmd_confirm_before_callback(struct client *, void *,
 		    const char *, int);
 static void	cmd_confirm_before_free(void *);
 
-const struct cmd_entry cmd_confirm_before_entry = {
+struct cmd_entry cmd_confirm_before_entry = {
 	.name = "confirm-before",
 	.alias = "confirm",
 

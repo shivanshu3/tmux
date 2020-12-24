@@ -29,7 +29,7 @@
 
 static enum cmd_retval	cmd_select_pane_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_select_pane_entry = {
+struct cmd_entry cmd_select_pane_entry = {
 	.name = "select-pane",
 	.alias = "selectp",
 
@@ -42,7 +42,7 @@ const struct cmd_entry cmd_select_pane_entry = {
 	.exec = cmd_select_pane_exec
 };
 
-const struct cmd_entry cmd_last_pane_entry = {
+struct cmd_entry cmd_last_pane_entry = {
 	.name = "last-pane",
 	.alias = "lastp",
 

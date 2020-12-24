@@ -34,7 +34,7 @@ static void	cmd_list_panes_session(struct cmd *, struct session *,
 static void	cmd_list_panes_window(struct cmd *, struct session *,
 		    struct winlink *, struct cmdq_item *, int);
 
-const struct cmd_entry cmd_list_panes_entry = {
+struct cmd_entry cmd_list_panes_entry = {
 	.name = "list-panes",
 	.alias = "lsp",
 

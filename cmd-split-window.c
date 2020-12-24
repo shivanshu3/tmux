@@ -35,7 +35,7 @@
 static enum cmd_retval	cmd_split_window_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_split_window_entry = {
+struct cmd_entry cmd_split_window_entry = {
 	.name = "split-window",
 	.alias = "splitw",
 

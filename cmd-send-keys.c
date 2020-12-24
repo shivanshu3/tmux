@@ -29,7 +29,7 @@
 
 static enum cmd_retval	cmd_send_keys_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_send_keys_entry = {
+struct cmd_entry cmd_send_keys_entry = {
 	.name = "send-keys",
 	.alias = "send",
 
@@ -43,7 +43,7 @@ const struct cmd_entry cmd_send_keys_entry = {
 	.exec = cmd_send_keys_exec
 };
 
-const struct cmd_entry cmd_send_prefix_entry = {
+struct cmd_entry cmd_send_prefix_entry = {
 	.name = "send-prefix",
 	.alias = NULL,
 

@@ -38,7 +38,7 @@
 static enum cmd_retval	cmd_list_sessions_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_list_sessions_entry = {
+struct cmd_entry cmd_list_sessions_entry = {
 	.name = "list-sessions",
 	.alias = "ls",
 

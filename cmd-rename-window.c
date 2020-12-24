@@ -29,7 +29,7 @@
 static enum cmd_retval	cmd_rename_window_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_rename_window_entry = {
+struct cmd_entry cmd_rename_window_entry = {
 	.name = "rename-window",
 	.alias = "renamew",
 

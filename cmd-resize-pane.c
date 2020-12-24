@@ -32,7 +32,7 @@ static enum cmd_retval	cmd_resize_pane_exec(struct cmd *, struct cmdq_item *);
 static void	cmd_resize_pane_mouse_update(struct client *,
 		    struct mouse_event *);
 
-const struct cmd_entry cmd_resize_pane_entry = {
+struct cmd_entry cmd_resize_pane_entry = {
 	.name = "resize-pane",
 	.alias = "resizep",
 

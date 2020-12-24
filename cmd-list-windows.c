@@ -45,7 +45,7 @@ static void	cmd_list_windows_server(struct cmd *, struct cmdq_item *);
 static void	cmd_list_windows_session(struct cmd *, struct session *,
 		    struct cmdq_item *, int);
 
-const struct cmd_entry cmd_list_windows_entry = {
+struct cmd_entry cmd_list_windows_entry = {
 	.name = "list-windows",
 	.alias = "lsw",
 

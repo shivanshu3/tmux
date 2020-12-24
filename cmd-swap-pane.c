@@ -28,7 +28,7 @@
 
 static enum cmd_retval	cmd_swap_pane_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_swap_pane_entry = {
+struct cmd_entry cmd_swap_pane_entry = {
 	.name = "swap-pane",
 	.alias = "swapp",
 

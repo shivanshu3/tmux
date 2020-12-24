@@ -28,7 +28,7 @@
 
 static enum cmd_retval	cmd_move_window_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_move_window_entry = {
+struct cmd_entry cmd_move_window_entry = {
 	.name = "move-window",
 	.alias = "movew",
 
@@ -42,7 +42,7 @@ const struct cmd_entry cmd_move_window_entry = {
 	.exec = cmd_move_window_exec
 };
 
-const struct cmd_entry cmd_link_window_entry = {
+struct cmd_entry cmd_link_window_entry = {
 	.name = "link-window",
 	.alias = "linkw",
 

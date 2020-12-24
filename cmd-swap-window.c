@@ -28,7 +28,7 @@
 
 static enum cmd_retval	cmd_swap_window_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_swap_window_entry = {
+struct cmd_entry cmd_swap_window_entry = {
 	.name = "swap-window",
 	.alias = "swapw",
 

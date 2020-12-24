@@ -32,7 +32,7 @@ static enum cmd_retval	cmd_list_keys_exec(struct cmd *, struct cmdq_item *);
 static enum cmd_retval	cmd_list_keys_commands(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_list_keys_entry = {
+struct cmd_entry cmd_list_keys_entry = {
 	.name = "list-keys",
 	.alias = "lsk",
 
@@ -43,7 +43,7 @@ const struct cmd_entry cmd_list_keys_entry = {
 	.exec = cmd_list_keys_exec
 };
 
-const struct cmd_entry cmd_list_commands_entry = {
+struct cmd_entry cmd_list_commands_entry = {
 	.name = "list-commands",
 	.alias = "lscm",
 

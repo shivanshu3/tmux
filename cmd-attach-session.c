@@ -33,7 +33,7 @@
 static enum cmd_retval	cmd_attach_session_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_attach_session_entry = {
+struct cmd_entry cmd_attach_session_entry = {
 	.name = "attach-session",
 	.alias = "attach",
 

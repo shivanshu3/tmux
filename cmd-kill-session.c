@@ -29,7 +29,7 @@
 
 static enum cmd_retval	cmd_kill_session_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_kill_session_entry = {
+struct cmd_entry cmd_kill_session_entry = {
 	.name = "kill-session",
 	.alias = NULL,
 

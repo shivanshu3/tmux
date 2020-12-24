@@ -34,7 +34,7 @@ static void		cmd_show_options_print(struct cmd *, struct cmdq_item *,
 static enum cmd_retval	cmd_show_options_all(struct cmd *, struct cmdq_item *,
 			    int, struct options *);
 
-const struct cmd_entry cmd_show_options_entry = {
+struct cmd_entry cmd_show_options_entry = {
 	.name = "show-options",
 	.alias = "show",
 
@@ -47,7 +47,7 @@ const struct cmd_entry cmd_show_options_entry = {
 	.exec = cmd_show_options_exec
 };
 
-const struct cmd_entry cmd_show_window_options_entry = {
+struct cmd_entry cmd_show_window_options_entry = {
 	.name = "show-window-options",
 	.alias = "showw",
 
@@ -60,7 +60,7 @@ const struct cmd_entry cmd_show_window_options_entry = {
 	.exec = cmd_show_options_exec
 };
 
-const struct cmd_entry cmd_show_hooks_entry = {
+struct cmd_entry cmd_show_hooks_entry = {
 	.name = "show-hooks",
 	.alias = NULL,
 

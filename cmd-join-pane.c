@@ -31,7 +31,7 @@
 
 static enum cmd_retval	cmd_join_pane_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_join_pane_entry = {
+struct cmd_entry cmd_join_pane_entry = {
 	.name = "join-pane",
 	.alias = "joinp",
 
@@ -45,7 +45,7 @@ const struct cmd_entry cmd_join_pane_entry = {
 	.exec = cmd_join_pane_exec
 };
 
-const struct cmd_entry cmd_move_pane_entry = {
+struct cmd_entry cmd_move_pane_entry = {
 	.name = "move-pane",
 	.alias = "movep",
 

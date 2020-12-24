@@ -30,7 +30,7 @@
 static enum cmd_retval	cmd_respawn_window_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_respawn_window_entry = {
+struct cmd_entry cmd_respawn_window_entry = {
 	.name = "respawn-window",
 	.alias = "respawnw",
 

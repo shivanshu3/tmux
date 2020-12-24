@@ -29,7 +29,7 @@
 static enum cmd_retval	cmd_resize_window_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_resize_window_entry = {
+struct cmd_entry cmd_resize_window_entry = {
 	.name = "resize-window",
 	.alias = "resizew",
 

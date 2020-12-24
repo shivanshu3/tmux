@@ -30,7 +30,7 @@
 
 static enum cmd_retval	cmd_break_pane_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_break_pane_entry = {
+struct cmd_entry cmd_break_pane_entry = {
 	.name = "break-pane",
 	.alias = "breakp",
 

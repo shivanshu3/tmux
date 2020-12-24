@@ -35,7 +35,7 @@
 
 static enum cmd_retval	cmd_new_session_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_new_session_entry = {
+struct cmd_entry cmd_new_session_entry = {
 	.name = "new-session",
 	.alias = "new",
 
@@ -50,7 +50,7 @@ const struct cmd_entry cmd_new_session_entry = {
 	.exec = cmd_new_session_exec
 };
 
-const struct cmd_entry cmd_has_session_entry = {
+struct cmd_entry cmd_has_session_entry = {
 	.name = "has-session",
 	.alias = "has",
 

@@ -29,7 +29,7 @@
 
 static enum cmd_retval	cmd_kill_server_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_kill_server_entry = {
+struct cmd_entry cmd_kill_server_entry = {
 	.name = "kill-server",
 	.alias = NULL,
 
@@ -40,7 +40,7 @@ const struct cmd_entry cmd_kill_server_entry = {
 	.exec = cmd_kill_server_exec
 };
 
-const struct cmd_entry cmd_start_server_entry = {
+struct cmd_entry cmd_start_server_entry = {
 	.name = "start-server",
 	.alias = "start",
 

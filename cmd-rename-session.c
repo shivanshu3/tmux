@@ -30,7 +30,7 @@
 static enum cmd_retval	cmd_rename_session_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_rename_session_entry = {
+struct cmd_entry cmd_rename_session_entry = {
 	.name = "rename-session",
 	.alias = "rename",
 

@@ -33,7 +33,7 @@
 
 static enum cmd_retval	cmd_save_buffer_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_save_buffer_entry = {
+struct cmd_entry cmd_save_buffer_entry = {
 	.name = "save-buffer",
 	.alias = "saveb",
 
@@ -44,7 +44,7 @@ const struct cmd_entry cmd_save_buffer_entry = {
 	.exec = cmd_save_buffer_exec
 };
 
-const struct cmd_entry cmd_show_buffer_entry = {
+struct cmd_entry cmd_show_buffer_entry = {
 	.name = "show-buffer",
 	.alias = "showb",
 

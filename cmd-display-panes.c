@@ -30,7 +30,7 @@
 static enum cmd_retval	cmd_display_panes_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_display_panes_entry = {
+struct cmd_entry cmd_display_panes_entry = {
 	.name = "display-panes",
 	.alias = "displayp",
 

@@ -34,7 +34,7 @@ static enum cmd_retval	cmd_if_shell_exec(struct cmd *, struct cmdq_item *);
 static void		cmd_if_shell_callback(struct job *);
 static void		cmd_if_shell_free(void *);
 
-const struct cmd_entry cmd_if_shell_entry = {
+struct cmd_entry cmd_if_shell_entry = {
 	.name = "if-shell",
 	.alias = "if",
 

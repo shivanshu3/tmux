@@ -29,7 +29,7 @@
 
 static enum cmd_retval	cmd_set_option_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_set_option_entry = {
+struct cmd_entry cmd_set_option_entry = {
 	.name = "set-option",
 	.alias = "set",
 
@@ -42,7 +42,7 @@ const struct cmd_entry cmd_set_option_entry = {
 	.exec = cmd_set_option_exec
 };
 
-const struct cmd_entry cmd_set_window_option_entry = {
+struct cmd_entry cmd_set_window_option_entry = {
 	.name = "set-window-option",
 	.alias = "setw",
 
@@ -55,7 +55,7 @@ const struct cmd_entry cmd_set_window_option_entry = {
 	.exec = cmd_set_option_exec
 };
 
-const struct cmd_entry cmd_set_hook_entry = {
+struct cmd_entry cmd_set_hook_entry = {
 	.name = "set-hook",
 	.alias = NULL,
 

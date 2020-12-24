@@ -30,7 +30,7 @@
 static enum cmd_retval	cmd_set_environment_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_set_environment_entry = {
+struct cmd_entry cmd_set_environment_entry = {
 	.name = "set-environment",
 	.alias = "setenv",
 

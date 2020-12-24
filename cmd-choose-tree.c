@@ -26,7 +26,7 @@
 
 static enum cmd_retval	cmd_choose_tree_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_choose_tree_entry = {
+struct cmd_entry cmd_choose_tree_entry = {
 	.name = "choose-tree",
 	.alias = NULL,
 
@@ -40,7 +40,7 @@ const struct cmd_entry cmd_choose_tree_entry = {
 	.exec = cmd_choose_tree_exec
 };
 
-const struct cmd_entry cmd_choose_client_entry = {
+struct cmd_entry cmd_choose_client_entry = {
 	.name = "choose-client",
 	.alias = NULL,
 
@@ -54,7 +54,7 @@ const struct cmd_entry cmd_choose_client_entry = {
 	.exec = cmd_choose_tree_exec
 };
 
-const struct cmd_entry cmd_choose_buffer_entry = {
+struct cmd_entry cmd_choose_buffer_entry = {
 	.name = "choose-buffer",
 	.alias = NULL,
 
@@ -68,7 +68,7 @@ const struct cmd_entry cmd_choose_buffer_entry = {
 	.exec = cmd_choose_tree_exec
 };
 
-const struct cmd_entry cmd_customize_mode_entry = {
+struct cmd_entry cmd_customize_mode_entry = {
 	.name = "customize-mode",
 	.alias = NULL,
 

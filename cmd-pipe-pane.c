@@ -39,7 +39,7 @@ static void cmd_pipe_pane_read_callback(struct bufferevent *, void *);
 static void cmd_pipe_pane_write_callback(struct bufferevent *, void *);
 static void cmd_pipe_pane_error_callback(struct bufferevent *, short, void *);
 
-const struct cmd_entry cmd_pipe_pane_entry = {
+struct cmd_entry cmd_pipe_pane_entry = {
 	.name = "pipe-pane",
 	.alias = "pipep",
 

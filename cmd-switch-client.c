@@ -30,7 +30,7 @@
 static enum cmd_retval	cmd_switch_client_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_switch_client_entry = {
+struct cmd_entry cmd_switch_client_entry = {
 	.name = "switch-client",
 	.alias = "switchc",
 

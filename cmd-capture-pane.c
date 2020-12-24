@@ -35,7 +35,7 @@ static char	*cmd_capture_pane_pending(struct args *, struct window_pane *,
 static char	*cmd_capture_pane_history(struct args *, struct cmdq_item *,
 		     struct window_pane *, size_t *);
 
-const struct cmd_entry cmd_capture_pane_entry = {
+struct cmd_entry cmd_capture_pane_entry = {
 	.name = "capture-pane",
 	.alias = "capturep",
 
@@ -49,7 +49,7 @@ const struct cmd_entry cmd_capture_pane_entry = {
 	.exec = cmd_capture_pane_exec
 };
 
-const struct cmd_entry cmd_clear_history_entry = {
+struct cmd_entry cmd_clear_history_entry = {
 	.name = "clear-history",
 	.alias = "clearhist",
 

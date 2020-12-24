@@ -34,7 +34,7 @@
 static enum cmd_retval	cmd_show_messages_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_show_messages_entry = {
+struct cmd_entry cmd_show_messages_entry = {
 	.name = "show-messages",
 	.alias = "showmsgs",
 

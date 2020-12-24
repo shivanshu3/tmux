@@ -34,7 +34,7 @@ static char	*cmd_show_environment_escape(struct environ_entry *);
 static void	 cmd_show_environment_print(struct cmd *, struct cmdq_item *,
 		     struct environ_entry *);
 
-const struct cmd_entry cmd_show_environment_entry = {
+struct cmd_entry cmd_show_environment_entry = {
 	.name = "show-environment",
 	.alias = "showenv",
 

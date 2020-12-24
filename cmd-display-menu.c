@@ -32,7 +32,7 @@ static enum cmd_retval	cmd_display_menu_exec(struct cmd *,
 static enum cmd_retval	cmd_display_popup_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_display_menu_entry = {
+struct cmd_entry cmd_display_menu_entry = {
 	.name = "display-menu",
 	.alias = "menu",
 
@@ -46,7 +46,7 @@ const struct cmd_entry cmd_display_menu_entry = {
 	.exec = cmd_display_menu_exec
 };
 
-const struct cmd_entry cmd_display_popup_entry = {
+struct cmd_entry cmd_display_popup_entry = {
 	.name = "display-popup",
 	.alias = "popup",
 

@@ -29,7 +29,7 @@
 static enum cmd_retval	cmd_select_layout_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_select_layout_entry = {
+struct cmd_entry cmd_select_layout_entry = {
 	.name = "select-layout",
 	.alias = "selectl",
 
@@ -42,7 +42,7 @@ const struct cmd_entry cmd_select_layout_entry = {
 	.exec = cmd_select_layout_exec
 };
 
-const struct cmd_entry cmd_next_layout_entry = {
+struct cmd_entry cmd_next_layout_entry = {
 	.name = "next-layout",
 	.alias = "nextl",
 
@@ -55,7 +55,7 @@ const struct cmd_entry cmd_next_layout_entry = {
 	.exec = cmd_select_layout_exec
 };
 
-const struct cmd_entry cmd_previous_layout_entry = {
+struct cmd_entry cmd_previous_layout_entry = {
 	.name = "previous-layout",
 	.alias = "prevl",
 

@@ -36,7 +36,7 @@ static void	cmd_run_shell_callback(struct job *);
 static void	cmd_run_shell_free(void *);
 static void	cmd_run_shell_print(struct job *, const char *);
 
-const struct cmd_entry cmd_run_shell_entry = {
+struct cmd_entry cmd_run_shell_entry = {
 	.name = "run-shell",
 	.alias = "run",
 

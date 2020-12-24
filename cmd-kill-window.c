@@ -26,7 +26,7 @@
 
 static enum cmd_retval	cmd_kill_window_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_kill_window_entry = {
+struct cmd_entry cmd_kill_window_entry = {
 	.name = "kill-window",
 	.alias = "killw",
 
@@ -39,7 +39,7 @@ const struct cmd_entry cmd_kill_window_entry = {
 	.exec = cmd_kill_window_exec
 };
 
-const struct cmd_entry cmd_unlink_window_entry = {
+struct cmd_entry cmd_unlink_window_entry = {
 	.name = "unlink-window",
 	.alias = "unlinkw",
 

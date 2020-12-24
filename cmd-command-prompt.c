@@ -36,7 +36,7 @@ static int	cmd_command_prompt_callback(struct client *, void *,
 		    const char *, int);
 static void	cmd_command_prompt_free(void *);
 
-const struct cmd_entry cmd_command_prompt_entry = {
+struct cmd_entry cmd_command_prompt_entry = {
 	.name = "command-prompt",
 	.alias = NULL,
 

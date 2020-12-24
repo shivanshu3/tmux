@@ -26,7 +26,7 @@
 
 static enum cmd_retval	cmd_lock_server_exec(struct cmd *, struct cmdq_item *);
 
-const struct cmd_entry cmd_lock_server_entry = {
+struct cmd_entry cmd_lock_server_entry = {
 	.name = "lock-server",
 	.alias = "lock",
 
@@ -37,7 +37,7 @@ const struct cmd_entry cmd_lock_server_entry = {
 	.exec = cmd_lock_server_exec
 };
 
-const struct cmd_entry cmd_lock_session_entry = {
+struct cmd_entry cmd_lock_session_entry = {
 	.name = "lock-session",
 	.alias = "locks",
 
@@ -50,7 +50,7 @@ const struct cmd_entry cmd_lock_session_entry = {
 	.exec = cmd_lock_server_exec
 };
 
-const struct cmd_entry cmd_lock_client_entry = {
+struct cmd_entry cmd_lock_client_entry = {
 	.name = "lock-client",
 	.alias = "lockc",
 

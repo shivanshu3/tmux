@@ -29,7 +29,7 @@
 static enum cmd_retval	cmd_detach_client_exec(struct cmd *,
 			    struct cmdq_item *);
 
-const struct cmd_entry cmd_detach_client_entry = {
+struct cmd_entry cmd_detach_client_entry = {
 	.name = "detach-client",
 	.alias = "detach",
 
@@ -43,7 +43,7 @@ const struct cmd_entry cmd_detach_client_entry = {
 	.exec = cmd_detach_client_exec
 };
 
-const struct cmd_entry cmd_suspend_client_entry = {
+struct cmd_entry cmd_suspend_client_entry = {
 	.name = "suspend-client",
 	.alias = "suspendc",
 
