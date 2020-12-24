@@ -207,7 +207,7 @@ b64_pton
 		if (ch == Pad64)
 			break;
 
-		pos = strchr(Base64, ch);
+		pos = (char*) strchr(Base64, ch);
 		if (pos == 0) 		/* A non-base64 character. */
 			return (-1);
 

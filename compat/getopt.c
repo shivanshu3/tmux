@@ -73,7 +73,7 @@ BSDgetopt(int nargc, char *const *nargv, const char *ostr)
 		}
 	}					/* option letter okay? */
 	if ((BSDoptopt = (int)*place++) == (int)':' ||
-	    !(oli = strchr(ostr, BSDoptopt))) {
+	    !(oli = (char*) strchr(ostr, BSDoptopt))) {
 		/*
 		 * if the user didn't specify '-' as an option,
 		 * assume it means -1.

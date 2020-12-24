@@ -38,14 +38,14 @@ fgetln(FILE *fp, size_t *len)
 		return NULL;
 	}
 	if (!buf) {
-		if (!(buf = calloc(1, BUFSIZ)))
+		if (!(buf = (char*) calloc(1, BUFSIZ)))
 			return NULL;
 		bufsz = BUFSIZ;
 	}
 	while ((c = getc(fp)) != EOF) {
 		buf[r++] = c;
 		if (r == bufsz) {
-			if (!(p = reallocarray(buf, 2, bufsz))) {
+			if (!(p = (char*) reallocarray(buf, 2, bufsz))) {
 				e = errno;
 				free(buf);
 				errno = e;

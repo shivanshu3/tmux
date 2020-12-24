@@ -271,7 +271,7 @@ void	warnx(const char *, ...);
 
 #ifndef HAVE_EXPLICIT_BZERO
 /* explicit_bzero.c */
-void		 explicit_bzero(void *, size_t);
+EXTERN_C void		 explicit_bzero(void *, size_t) __THROW;
 #endif
 
 #ifndef HAVE_GETDTABLECOUNT
@@ -291,7 +291,7 @@ EXTERN_CPP const char *strcasestr(const char *, const char *) __THROW;
 
 #ifndef HAVE_STRSEP
 /* strsep.c */
-char		*strsep(char **, const char *);
+EXTERN_C char		*strsep(char **, const char *) __THROW;
 #endif
 
 #ifndef HAVE_STRTONUM
@@ -316,12 +316,12 @@ size_t		 strnlen(const char *, size_t);
 
 #ifndef HAVE_STRNDUP
 /* strndup.c */
-char		*strndup(const char *, size_t);
+EXTERN_C char		*strndup(const char *, size_t) __THROW;
 #endif
 
 #ifndef HAVE_MEMMEM
 /* memmem.c */
-void		*memmem(const void *, size_t, const void *, size_t);
+EXTERN_C void		*memmem(const void *, size_t, const void *, size_t) __THROW;
 #endif
 
 #ifndef HAVE_DAEMON
@@ -369,8 +369,8 @@ ssize_t		 getline(char **, size_t *, FILE *);
 
 #ifndef HAVE_SETENV
 /* setenv.c */
-int		 setenv(const char *, const char *, int);
-int		 unsetenv(const char *);
+EXTERN_C int		 setenv(const char *, const char *, int) __THROW;
+EXTERN_C int		 unsetenv(const char *) __THROW;
 #endif
 
 #ifndef HAVE_CFMAKERAW
@@ -385,7 +385,7 @@ void		 freezero(void *, size_t);
 
 #ifndef HAVE_REALLOCARRAY
 /* reallocarray.c */
-void		*reallocarray(void *, size_t, size_t);
+EXTERN_C void		*reallocarray(void *, size_t, size_t) __THROW;
 #endif
 
 #ifndef HAVE_RECALLOCARRAY

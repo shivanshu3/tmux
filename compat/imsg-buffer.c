@@ -27,7 +27,9 @@
 #include "imsg.h"
 
 // Not sure why this is needed?
+#ifndef IOV_MAX
 #define IOV_MAX 1024
+#endif
 
 static int	ibuf_realloc(struct ibuf *, size_t);
 static void	ibuf_enqueue(struct msgbuf *, struct ibuf *);
@@ -38,9 +40,9 @@ ibuf_open(size_t len)
 {
 	struct ibuf	*buf;
 
-	if ((buf = calloc(1, sizeof(struct ibuf))) == NULL)
+	if ((buf = (struct ibuf *) calloc(1, sizeof(struct ibuf))) == NULL)
 		return (NULL);
-	if ((buf->buf = malloc(len)) == NULL) {
+	if ((buf->buf = (unsigned char *) malloc(len)) == NULL) {
 		free(buf);
 		return (NULL);
 	}
@@ -78,7 +80,7 @@ ibuf_realloc(struct ibuf *buf, size_t len)
 		return (-1);
 	}
 
-	b = recallocarray(buf->buf, buf->size, buf->wpos + len, 1);
+	b = (unsigned char *) recallocarray(buf->buf, buf->size, buf->wpos + len, 1);
 	if (b == NULL)
 		return (-1);
 	buf->buf = b;

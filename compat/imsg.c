@@ -91,7 +91,7 @@ imsg_read(struct imsgbuf *ibuf)
 	msg.msg_controllen = sizeof(cmsgbuf.buf);
 #endif
 
-	if ((ifd = calloc(1, sizeof(struct imsg_fd))) == NULL)
+	if ((ifd = (struct imsg_fd *) calloc(1, sizeof(struct imsg_fd))) == NULL)
 		return (-1);
 
 again:
