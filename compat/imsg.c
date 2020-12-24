@@ -76,7 +76,7 @@ imsg_read(struct imsgbuf *ibuf)
 	void* buffer_base = ibuf->r.buf + ibuf->r.wpos;
 	size_t buffer_len = sizeof(ibuf->r.buf) - ibuf->r.wpos;
 #ifdef _WIN32
-	iov.buf = buffer_base;
+	iov.buf = (char*)buffer_base;
 	iov.len = (ULONG)buffer_len;
 	msg.lpBuffers = &iov;
 	msg.dwBufferCount = 1;

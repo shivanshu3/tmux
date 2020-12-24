@@ -167,7 +167,7 @@ ibuf_write(struct msgbuf *msgbuf)
 		void* buffer_base = buf->buf + buf->rpos;
 		size_t buffer_len = buf->wpos - buf->rpos;
 #ifdef _WIN32
-		iov[i].buf = buffer_base;
+		iov[i].buf = (char*)buffer_base;
 		iov[i].len = (ULONG)buffer_len;
 #else
 		iov[i].iov_base = buffer_base;
@@ -294,7 +294,7 @@ msgbuf_write(struct msgbuf *msgbuf)
 		void* buffer_base = buf->buf + buf->rpos;
 		size_t buffer_len = buf->wpos - buf->rpos;
 #ifdef _WIN32
-		iov[i].buf = buffer_base;
+		iov[i].buf = (char*)buffer_base;
 		iov[i].len = (ULONG)buffer_len;
 #else
 		iov[i].iov_base = buffer_base;
