@@ -441,7 +441,7 @@ tty_keys_add1(struct tty_key **tkp, const char *s, key_code key)
 	/* Allocate a tree entry if there isn't one already. */
 	tk = *tkp;
 	if (tk == NULL) {
-		tk = *tkp = xcalloc(1, sizeof *tk);
+		tk = *tkp = (struct tty_key *) xcalloc(1, sizeof *tk);
 		tk->ch = *s;
 		tk->key = KEYC_UNKNOWN;
 	}
@@ -659,7 +659,7 @@ tty_keys_next(struct tty *tty)
 	struct key_event	*event;
 
 	/* Get key buffer. */
-	buf = EVBUFFER_DATA(tty->in);
+	buf = (const char *) EVBUFFER_DATA(tty->in);
 	len = EVBUFFER_LENGTH(tty->in);
 	if (len == 0)
 		return (0);
@@ -826,7 +826,7 @@ complete_key:
 
 	/* Fire the key. */
 	if (key != KEYC_UNKNOWN) {
-		event = xmalloc(sizeof *event);
+		event = (struct key_event *) xmalloc(sizeof *event);
 		event->key = key;
 		memcpy(&event->m, &m, sizeof event->m);
 		if (!server_client_handle_key(c, event))
@@ -848,7 +848,7 @@ discard_key:
 static void
 tty_keys_callback(__unused int fd, __unused short events, void *data)
 {
-	struct tty	*tty = data;
+	struct tty	*tty = (struct tty*) data;
 
 	if (tty->flags & TTY_TIMER) {
 		while (tty_keys_next(tty))
@@ -1160,14 +1160,14 @@ tty_keys_clipboard(__unused struct tty *tty, const char *buf, size_t len,
 	end--;
 
 	/* It has to be a string so copy it. */
-	copy = xmalloc(end + 1);
+	copy = (char *) xmalloc(end + 1);
 	memcpy(copy, buf, end);
 	copy[end] = '\0';
 
 	/* Convert from base64. */
 	needed = (end / 4) * 3;
-	out = xmalloc(needed);
-	if ((outlen = b64_pton(copy, out, len)) == -1) {
+	out = (char *) xmalloc(needed);
+	if ((outlen = b64_pton(copy, (unsigned char*)out, len)) == -1) {
 		free(out);
 		free(copy);
 		return (0);

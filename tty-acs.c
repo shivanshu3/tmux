@@ -113,7 +113,7 @@ static const struct tty_acs_reverse_entry tty_acs_reverse3[] = {
 static int
 tty_acs_cmp(const void *key, const void *value)
 {
-	const struct tty_acs_entry	*entry = value;
+	const struct tty_acs_entry	*entry = (const struct tty_acs_entry*) value;
 	int				 test = *(u_char *)key;
 
 	return (test - entry->key);
@@ -122,8 +122,8 @@ tty_acs_cmp(const void *key, const void *value)
 static int
 tty_acs_reverse_cmp(const void *key, const void *value)
 {
-	const struct tty_acs_reverse_entry	*entry = value;
-	const char				*test = key;
+	const struct tty_acs_reverse_entry	*entry = (const struct tty_acs_reverse_entry*) value;
+	const char				*test = (const char*) key;
 
 	return (strcmp(test, entry->string));
 }
@@ -168,7 +168,7 @@ tty_acs_get(struct tty *tty, u_char ch)
 	}
 
 	/* Otherwise look up the UTF-8 translation. */
-	entry = bsearch(&ch, tty_acs_table, nitems(tty_acs_table),
+	entry = (const struct tty_acs_entry *) bsearch(&ch, tty_acs_table, nitems(tty_acs_table),
 	    sizeof tty_acs_table[0], tty_acs_cmp);
 	if (entry == NULL)
 		return (NULL);
@@ -190,7 +190,7 @@ tty_acs_reverse_get(__unused struct tty *tty, const char *s, size_t slen)
 		items = nitems(tty_acs_reverse3);
 	} else
 		return (-1);
-	entry = bsearch(s, table, items, sizeof table[0], tty_acs_reverse_cmp);
+	entry = (const struct tty_acs_reverse_entry *) bsearch(s, table, items, sizeof table[0], tty_acs_reverse_cmp);
 	if (entry == NULL)
 		return (-1);
 	return (entry->key);
