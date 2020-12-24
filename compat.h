@@ -88,10 +88,10 @@ typedef int TMUX_SOCKET;
 #ifdef HAVE_ERR_H
 #include <err.h>
 #else
-EXTERN_C void	err(int, const char *, ...);
-EXTERN_C void	errx(int, const char *, ...);
-EXTERN_C void	warn(const char *, ...);
-EXTERN_C void	warnx(const char *, ...);
+TMUX_EXTERN_C void	err(int, const char *, ...);
+TMUX_EXTERN_C void	errx(int, const char *, ...);
+TMUX_EXTERN_C void	warn(const char *, ...);
+TMUX_EXTERN_C void	warnx(const char *, ...);
 #endif
 
 #ifdef HAVE_PATHS_H
@@ -271,7 +271,7 @@ EXTERN_C void	warnx(const char *, ...);
 
 #ifndef HAVE_EXPLICIT_BZERO
 /* explicit_bzero.c */
-EXTERN_C void		 explicit_bzero(void *, size_t) TMUX_THROW;
+TMUX_EXTERN_C void		 explicit_bzero(void *, size_t) TMUX_THROW;
 #endif
 
 #ifndef HAVE_GETDTABLECOUNT
@@ -286,12 +286,12 @@ void		 closefrom(int);
 
 #ifndef HAVE_STRCASESTR
 /* strcasestr.c */
-EXTERN_CPP const char *strcasestr(const char *, const char *) TMUX_THROW;
+TMUX_EXTERN_CPP const char *strcasestr(const char *, const char *) TMUX_THROW;
 #endif
 
 #ifndef HAVE_STRSEP
 /* strsep.c */
-EXTERN_C char		*strsep(char **, const char *) TMUX_THROW;
+TMUX_EXTERN_C char		*strsep(char **, const char *) TMUX_THROW;
 #endif
 
 #ifndef HAVE_STRTONUM
@@ -316,12 +316,12 @@ size_t		 strnlen(const char *, size_t);
 
 #ifndef HAVE_STRNDUP
 /* strndup.c */
-EXTERN_C char		*strndup(const char *, size_t) TMUX_THROW;
+TMUX_EXTERN_C char		*strndup(const char *, size_t) TMUX_THROW;
 #endif
 
 #ifndef HAVE_MEMMEM
 /* memmem.c */
-EXTERN_C void		*memmem(const void *, size_t, const void *, size_t) TMUX_THROW;
+TMUX_EXTERN_C void		*memmem(const void *, size_t, const void *, size_t) TMUX_THROW;
 #endif
 
 #ifndef HAVE_DAEMON
@@ -342,13 +342,13 @@ void		 setproctitle(const char *, ...);
 #ifndef HAVE_FDFORKPTY
 /* fdforkpty.c */
 int		 getptmfd(void);
-EXTERN_C pid_t		 fdforkpty(int, int *, char *, struct termios *,
+TMUX_EXTERN_C pid_t		 fdforkpty(int, int *, char *, struct termios *,
 		     struct winsize *);
 #endif
 
 #ifndef HAVE_FORKPTY
 /* forkpty.c */
-EXTERN_C pid_t		 forkpty(int *, char *, struct termios *, struct winsize *);
+TMUX_EXTERN_C pid_t		 forkpty(int *, char *, struct termios *, struct winsize *);
 #endif
 
 #ifndef HAVE_ASPRINTF
@@ -369,8 +369,8 @@ ssize_t		 getline(char **, size_t *, FILE *);
 
 #ifndef HAVE_SETENV
 /* setenv.c */
-EXTERN_C int		 setenv(const char *, const char *, int) TMUX_THROW;
-EXTERN_C int		 unsetenv(const char *) TMUX_THROW;
+TMUX_EXTERN_C int		 setenv(const char *, const char *, int) TMUX_THROW;
+TMUX_EXTERN_C int		 unsetenv(const char *) TMUX_THROW;
 #endif
 
 #ifndef HAVE_CFMAKERAW
@@ -385,7 +385,7 @@ void		 freezero(void *, size_t);
 
 #ifndef HAVE_REALLOCARRAY
 /* reallocarray.c */
-EXTERN_C void		*reallocarray(void *, size_t, size_t) TMUX_THROW;
+TMUX_EXTERN_C void		*reallocarray(void *, size_t, size_t) TMUX_THROW;
 #endif
 
 #ifndef HAVE_RECALLOCARRAY
