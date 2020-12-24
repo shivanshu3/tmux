@@ -90,13 +90,10 @@ else()
 	target_sources(tmux_misc PUBLIC osdep-linux.c)
 endif()
 
-# There is a bug with enum sizes with MSVC C compiler, which is why
-# we have to use C++ on that platform.
-if (TMUX_USE_CXX OR MSVC)
-	file(GLOB_RECURSE SOURCE_FILES_C *.c)
-	list(APPEND SOURCE_FILES_C ${CMD_PARSE_C})
-	set_source_files_properties(${SOURCE_FILES_C} PROPERTIES LANGUAGE CXX)
-endif()
+# This file contains array designators which is not available in C++
+# The files which are compiled in the main tmux target can be C++, which is
+# why we need a separate target for this file which will always be C.
+add_library(tmux_tty_term_codes STATIC tty-term-codes.c)
 
 add_executable(tmux
 	${CMD_PARSE_C}
@@ -225,6 +222,7 @@ add_executable(tmux
 
 target_link_libraries(tmux tmux_compat)
 target_link_libraries(tmux tmux_misc)
+target_link_libraries(tmux tmux_tty_term_codes)
 target_link_libraries(tmux ${CURSES_LIB})
 target_link_libraries(tmux ${EVENT_LIB})
 
@@ -234,3 +232,15 @@ else()
 	target_link_libraries(tmux ${UTIL_LIB})
 	target_link_libraries(tmux ${M_LIB})
 endif()
+
+# There is a bug with enum sizes with MSVC C compiler, which is why
+# we have to use C++ on that platform.
+if (TMUX_USE_CXX OR MSVC)
+	get_target_property(SOURCE_FILES_C_TMUX tmux SOURCES)
+	get_target_property(SOURCE_FILES_C_TMUX_COMPAT tmux_compat SOURCES)
+	get_target_property(SOURCE_FILES_C_TMUX_MISC tmux_misc SOURCES)
+	set_source_files_properties(${SOURCE_FILES_C_TMUX} PROPERTIES LANGUAGE CXX)
+	set_source_files_properties(${SOURCE_FILES_C_TMUX_COMPAT} PROPERTIES LANGUAGE CXX)
+	set_source_files_properties(${SOURCE_FILES_C_TMUX_MISC} PROPERTIES LANGUAGE CXX)
+endif()
+
