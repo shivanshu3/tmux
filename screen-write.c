@@ -59,7 +59,7 @@ struct screen_write_collect_line {
 static void
 screen_write_offset_timer(__unused int fd, __unused short events, void *data)
 {
-	struct window	*w = data;
+	struct window	*w = (struct window*) data;
 
 	tty_update_window_offset(w);
 }
@@ -101,7 +101,7 @@ screen_write_set_cursor(struct screen_write_ctx *ctx, int cx, int cy)
 static void
 screen_write_redraw_cb(const struct tty_ctx *ttyctx)
 {
-	struct window_pane	*wp = ttyctx->arg;
+	struct window_pane	*wp = (struct window_pane*) ttyctx->arg;
 
 	if (wp != NULL)
 		wp->flags |= PANE_REDRAW;
@@ -111,7 +111,7 @@ screen_write_redraw_cb(const struct tty_ctx *ttyctx)
 static int
 screen_write_set_client_cb(struct tty_ctx *ttyctx, struct client *c)
 {
-	struct window_pane	*wp = ttyctx->arg;
+	struct window_pane	*wp = (struct window_pane*) ttyctx->arg;
 
 	if (c->session->curw->window != wp->window)
 		return (0);
@@ -194,7 +194,7 @@ screen_write_make_list(struct screen *s)
 {
 	u_int	y;
 
-	s->write_list = xcalloc(screen_size_y(s), sizeof *s->write_list);
+	s->write_list = (struct screen_write_collect_line *) xcalloc(screen_size_y(s), sizeof *s->write_list);
 	for (y = 0; y < screen_size_y(s); y++)
 		TAILQ_INIT(&s->write_list[y].items);
 }
@@ -220,7 +220,7 @@ screen_write_init(struct screen_write_ctx *ctx, struct screen *s)
 
 	if (ctx->s->write_list == NULL)
 		screen_write_make_list(ctx->s);
-	ctx->item = xcalloc(1, sizeof *ctx->item);
+	ctx->item = (struct screen_write_collect_item *) xcalloc(1, sizeof *ctx->item);
 
 	ctx->scrolled = 0;
 	ctx->bg = 8;
@@ -332,12 +332,12 @@ screen_write_strlen(const char *fmt, ...)
 	xvasprintf(&msg, fmt, ap);
 	va_end(ap);
 
-	ptr = msg;
+	ptr = (u_char *) msg;
 	while (*ptr != '\0') {
 		if (*ptr > 0x7f && utf8_open(&ud, *ptr) == UTF8_MORE) {
 			ptr++;
 
-			left = strlen(ptr);
+			left = strlen((const char*)ptr);
 			if (left < (size_t)ud.size - 1)
 				break;
 			while ((more = utf8_append(&ud, *ptr)) == UTF8_MORE)
@@ -485,12 +485,12 @@ screen_write_vnputs(struct screen_write_ctx *ctx, ssize_t maxlen,
 	memcpy(&gc, gcp, sizeof gc);
 	xvasprintf(&msg, fmt, ap);
 
-	ptr = msg;
+	ptr = (u_char *) msg;
 	while (*ptr != '\0') {
 		if (*ptr > 0x7f && utf8_open(ud, *ptr) == UTF8_MORE) {
 			ptr++;
 
-			left = strlen(ptr);
+			left = strlen((const char*)ptr);
 			if (left < (size_t)ud->size - 1)
 				break;
 			while ((more = utf8_append(ud, *ptr)) == UTF8_MORE)
@@ -1132,10 +1132,10 @@ screen_write_clearendofline(struct screen_write_ctx *ctx, u_int bg)
 
  	screen_write_collect_clear_end(ctx, s->cy, s->cx);
 	ci->x = s->cx;
-	ci->type = CLEAR_END;
+	ci->type = QUALIFIED_MEMBER(screen_write_collect_item, CLEAR_END);
 	ci->bg = bg;
 	TAILQ_INSERT_TAIL(&ctx->s->write_list[s->cy].items, ci, entry);
-	ctx->item = xcalloc(1, sizeof *ctx->item);
+	ctx->item = (struct screen_write_collect_item *) xcalloc(1, sizeof *ctx->item);
 }
 
 /* Clear to start of line from cursor. */
@@ -1158,10 +1158,10 @@ screen_write_clearstartofline(struct screen_write_ctx *ctx, u_int bg)
 
 	screen_write_collect_clear_start(ctx, s->cy, s->cx);
 	ci->x = s->cx;
-	ci->type = CLEAR_START;
+	ci->type = QUALIFIED_MEMBER(screen_write_collect_item, CLEAR_START);
 	ci->bg = bg;
 	TAILQ_INSERT_TAIL(&ctx->s->write_list[s->cy].items, ci, entry);
-	ctx->item = xcalloc(1, sizeof *ctx->item);
+	ctx->item = (struct screen_write_collect_item *) xcalloc(1, sizeof *ctx->item);
 }
 
 /* Move cursor to px,py. */
@@ -1403,13 +1403,13 @@ screen_write_collect_clear_start(struct screen_write_ctx *ctx, u_int y, u_int x)
 		return;
 	TAILQ_FOREACH_SAFE(ci, &ctx->s->write_list[y].items, entry, tmp) {
 		switch (ci->type) {
-		case CLEAR_START:
+		case QUALIFIED_MEMBER(screen_write_collect_item, CLEAR_START):
 			break;
-		case CLEAR_END:
+		case QUALIFIED_MEMBER(screen_write_collect_item, CLEAR_END):
 			if (ci->x <= x)
 				ci->x = x;
 			continue;
-		case TEXT:
+		case QUALIFIED_MEMBER(screen_write_collect_item, TEXT):
 			if (ci->x > x)
 				continue;
 			break;
@@ -1436,13 +1436,13 @@ screen_write_collect_clear_end(struct screen_write_ctx *ctx, u_int y, u_int x)
 		return;
 	TAILQ_FOREACH_SAFE(ci, &ctx->s->write_list[y].items, entry, tmp) {
 		switch (ci->type) {
-		case CLEAR_START:
+		case QUALIFIED_MEMBER(screen_write_collect_item, CLEAR_START):
 			if (ci->x >= x)
 				ci->x = x;
 			continue;
-		case CLEAR_END:
+		case QUALIFIED_MEMBER(screen_write_collect_item, CLEAR_END):
 			break;
-		case TEXT:
+		case QUALIFIED_MEMBER(screen_write_collect_item, TEXT):
 			if (ci->x < x)
 				continue;
 			break;
@@ -1548,11 +1548,11 @@ screen_write_collect_flush(struct screen_write_ctx *ctx, int scroll_only,
 		}
 		TAILQ_FOREACH_SAFE(ci, &cl->items, entry, tmp) {
 			screen_write_set_cursor(ctx, ci->x, y);
-			if (ci->type == CLEAR_END) {
+			if (ci->type == QUALIFIED_MEMBER(screen_write_collect_item, CLEAR_END)) {
 				screen_write_initctx(ctx, &ttyctx, 1);
 				ttyctx.bg = ci->bg;
 				tty_write(tty_cmd_clearendofline, &ttyctx);
-			} else if (ci->type == CLEAR_START) {
+			} else if (ci->type == QUALIFIED_MEMBER(screen_write_collect_item, CLEAR_START)) {
 				screen_write_initctx(ctx, &ttyctx, 1);
 				ttyctx.bg = ci->bg;
 				tty_write(tty_cmd_clearstartofline, &ttyctx);
@@ -1595,7 +1595,7 @@ screen_write_collect_end(struct screen_write_ctx *ctx)
 
 	ci->x = s->cx;
 	TAILQ_INSERT_TAIL(&cl->items, ci, entry);
-	ctx->item = xcalloc(1, sizeof *ctx->item);
+	ctx->item = (struct screen_write_collect_item *) xcalloc(1, sizeof *ctx->item);
 
 	log_debug("%s: %u %.*s (at %u,%u)", __func__, ci->used,
 	    (int)ci->used, cl->data + ci->x, s->cx, s->cy);
@@ -1675,7 +1675,7 @@ screen_write_collect_add(struct screen_write_ctx *ctx,
 	if (ci->used == 0)
 		memcpy(&ci->gc, gc, sizeof ci->gc);
 	if (ctx->s->write_list[s->cy].data == NULL)
-		ctx->s->write_list[s->cy].data = xmalloc(screen_size_x(ctx->s));
+		ctx->s->write_list[s->cy].data = (char *) xmalloc(screen_size_x(ctx->s));
 	ctx->s->write_list[s->cy].data[s->cx + ci->used++] = gc->data.data[0];
 }
 

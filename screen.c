@@ -191,10 +191,10 @@ screen_push_title(struct screen *s)
 	struct screen_title_entry *title_entry;
 
 	if (s->titles == NULL) {
-		s->titles = xmalloc(sizeof *s->titles);
+		s->titles = (struct screen_titles *) xmalloc(sizeof *s->titles);
 		TAILQ_INIT(s->titles);
 	}
-	title_entry = xmalloc(sizeof *title_entry);
+	title_entry = (struct screen_title_entry *) xmalloc(sizeof *title_entry);
 	title_entry->text = xstrdup(s->title);
 	TAILQ_INSERT_HEAD(s->titles, title_entry, entry);
 }
@@ -366,7 +366,7 @@ screen_set_selection(struct screen *s, u_int sx, u_int sy,
     u_int ex, u_int ey, u_int rectangle, int modekeys, struct grid_cell *gc)
 {
 	if (s->sel == NULL)
-		s->sel = xcalloc(1, sizeof *s->sel);
+		s->sel = (struct screen_sel *) xcalloc(1, sizeof *s->sel);
 
 	memcpy(&s->sel->cell, gc, sizeof s->sel->cell);
 	s->sel->hidden = 0;
