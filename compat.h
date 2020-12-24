@@ -271,7 +271,7 @@ EXTERN_C void	warnx(const char *, ...);
 
 #ifndef HAVE_EXPLICIT_BZERO
 /* explicit_bzero.c */
-EXTERN_C void		 explicit_bzero(void *, size_t) __THROW;
+EXTERN_C void		 explicit_bzero(void *, size_t) TMUX_THROW;
 #endif
 
 #ifndef HAVE_GETDTABLECOUNT
@@ -286,12 +286,12 @@ void		 closefrom(int);
 
 #ifndef HAVE_STRCASESTR
 /* strcasestr.c */
-EXTERN_CPP const char *strcasestr(const char *, const char *) __THROW;
+EXTERN_CPP const char *strcasestr(const char *, const char *) TMUX_THROW;
 #endif
 
 #ifndef HAVE_STRSEP
 /* strsep.c */
-EXTERN_C char		*strsep(char **, const char *) __THROW;
+EXTERN_C char		*strsep(char **, const char *) TMUX_THROW;
 #endif
 
 #ifndef HAVE_STRTONUM
@@ -316,12 +316,12 @@ size_t		 strnlen(const char *, size_t);
 
 #ifndef HAVE_STRNDUP
 /* strndup.c */
-EXTERN_C char		*strndup(const char *, size_t) __THROW;
+EXTERN_C char		*strndup(const char *, size_t) TMUX_THROW;
 #endif
 
 #ifndef HAVE_MEMMEM
 /* memmem.c */
-EXTERN_C void		*memmem(const void *, size_t, const void *, size_t) __THROW;
+EXTERN_C void		*memmem(const void *, size_t, const void *, size_t) TMUX_THROW;
 #endif
 
 #ifndef HAVE_DAEMON
@@ -369,8 +369,8 @@ ssize_t		 getline(char **, size_t *, FILE *);
 
 #ifndef HAVE_SETENV
 /* setenv.c */
-EXTERN_C int		 setenv(const char *, const char *, int) __THROW;
-EXTERN_C int		 unsetenv(const char *) __THROW;
+EXTERN_C int		 setenv(const char *, const char *, int) TMUX_THROW;
+EXTERN_C int		 unsetenv(const char *) TMUX_THROW;
 #endif
 
 #ifndef HAVE_CFMAKERAW
@@ -385,7 +385,7 @@ void		 freezero(void *, size_t);
 
 #ifndef HAVE_REALLOCARRAY
 /* reallocarray.c */
-EXTERN_C void		*reallocarray(void *, size_t, size_t) __THROW;
+EXTERN_C void		*reallocarray(void *, size_t, size_t) TMUX_THROW;
 #endif
 
 #ifndef HAVE_RECALLOCARRAY
