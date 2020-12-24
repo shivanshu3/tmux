@@ -68,7 +68,7 @@ static void	proc_update_event(struct tmuxpeer *);
 static void
 proc_event_cb(__unused int fd, short events, void *arg)
 {
-	struct tmuxpeer	*peer = arg;
+	struct tmuxpeer	*peer = (struct tmuxpeer*) arg;
 	ssize_t		 n;
 	struct imsg	 imsg;
 
@@ -117,7 +117,7 @@ proc_event_cb(__unused int fd, short events, void *arg)
 static void
 proc_signal_cb(int signo, __unused short events, void *arg)
 {
-	struct tmuxproc	*tp = arg;
+	struct tmuxproc	*tp = (struct tmuxproc*) arg;
 
 	tp->signalcb(signo);
 }
@@ -201,7 +201,7 @@ proc_start(const char *name)
 #endif
 	);
 
-	tp = xcalloc(1, sizeof *tp);
+	tp = (struct tmuxproc *) xcalloc(1, sizeof *tp);
 	tp->name = xstrdup(name);
 
 	return (tp);
@@ -300,7 +300,7 @@ proc_add_peer(struct tmuxproc *tp, int fd,
 {
 	struct tmuxpeer	*peer;
 
-	peer = xcalloc(1, sizeof *peer);
+	peer = (struct tmuxpeer *) xcalloc(1, sizeof *peer);
 	peer->parent = tp;
 
 	peer->dispatchcb = dispatchcb;
