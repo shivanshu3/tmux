@@ -28,7 +28,7 @@ regsub_copy(char **buf, size_t *len, const char *text, size_t start, size_t end)
 {
 	size_t	add = end - start;
 
-	*buf = xrealloc(*buf, (*len) + add + 1);
+	*buf = (char *) xrealloc(*buf, (*len) + add + 1);
 	memcpy((*buf) + *len, text + start, add);
 	(*len) += add;
 }
@@ -52,7 +52,7 @@ regsub_expand(char **buf, size_t *len, const char *with, const char *text,
 				}
 			}
 		}
-		*buf = xrealloc(*buf, (*len) + 2);
+		*buf = (char *) xrealloc(*buf, (*len) + 2);
 		(*buf)[(*len)++] = *cp;
 	}
 }
@@ -77,7 +77,7 @@ regsub(const char *pattern, const char *with, const char *text, int flags)
 
 	while (start <= end) {
 		if (regexec(&r, text + start, nitems(m), m, 0) != 0) {
-			regsub_copy(&buf, &len, text, start, end);
+			regsub_copy(&buf, (size_t*)&len, text, start, end);
 			break;
 		}
 
@@ -85,7 +85,7 @@ regsub(const char *pattern, const char *with, const char *text, int flags)
 		 * Append any text not part of this match (from the end of the
 		 * last match).
 		 */
-		regsub_copy(&buf, &len, text, last, m[0].rm_so + start);
+		regsub_copy(&buf, (size_t*)&len, text, last, m[0].rm_so + start);
 
 		/*
 		 * If the last match was empty and this one isn't (it is either
@@ -95,7 +95,7 @@ regsub(const char *pattern, const char *with, const char *text, int flags)
 		if (empty ||
 		    start + m[0].rm_so != last ||
 		    m[0].rm_so != m[0].rm_eo) {
-			regsub_expand(&buf, &len, with, text + start, m,
+			regsub_expand(&buf, (size_t*)&len, with, text + start, m,
 			    nitems(m));
 
 			last = start + m[0].rm_eo;
@@ -109,7 +109,7 @@ regsub(const char *pattern, const char *with, const char *text, int flags)
 
 		/* Stop now if anchored to start. */
 		if (*pattern == '^') {
-			regsub_copy(&buf, &len, text, start, end);
+			regsub_copy(&buf, (size_t*)&len, text, start, end);
 			break;
 		}
 	}
