@@ -175,7 +175,7 @@ expand_paths(const char *s, char ***paths, u_int *n)
 			log_debug("%s: duplicate path: %s", __func__, resolved);
 			continue;
 		}
-		*paths = xreallocarray(*paths, (*n) + 1, sizeof *paths);
+		*paths = (char **) xreallocarray(*paths, (*n) + 1, sizeof *paths);
 		(*paths)[(*n)++] = xstrdup(resolved);
 	}
 	free(copy);
