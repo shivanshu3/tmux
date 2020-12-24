@@ -126,9 +126,9 @@ const char window_clock_table[14][5][5] = {
 static void
 window_clock_timer_callback(__unused int fd, __unused short events, void *arg)
 {
-	struct window_mode_entry	*wme = arg;
+	struct window_mode_entry	*wme = (struct window_mode_entry*) arg;
 	struct window_pane		*wp = wme->wp;
-	struct window_clock_mode_data	*data = wme->data;
+	struct window_clock_mode_data	*data = (struct window_clock_mode_data*) wme->data;
 	struct tm			 now, then;
 	time_t				 t;
 	struct timeval			 tv = { .tv_sec = 1 };
@@ -159,7 +159,7 @@ window_clock_init(struct window_mode_entry *wme,
 	struct screen			*s;
 	struct timeval			 tv = { .tv_sec = 1 };
 
-	wme->data = data = xmalloc(sizeof *data);
+	wme->data = data = (struct window_clock_mode_data*) xmalloc(sizeof *data);
 	data->tim = time(NULL);
 
 	evtimer_set(&data->timer, window_clock_timer_callback, wme);
@@ -177,7 +177,7 @@ window_clock_init(struct window_mode_entry *wme,
 static void
 window_clock_free(struct window_mode_entry *wme)
 {
-	struct window_clock_mode_data	*data = wme->data;
+	struct window_clock_mode_data	*data = (struct window_clock_mode_data*) wme->data;
 
 	evtimer_del(&data->timer);
 	screen_free(&data->screen);
@@ -187,7 +187,7 @@ window_clock_free(struct window_mode_entry *wme)
 static void
 window_clock_resize(struct window_mode_entry *wme, u_int sx, u_int sy)
 {
-	struct window_clock_mode_data	*data = wme->data;
+	struct window_clock_mode_data	*data = (struct window_clock_mode_data*) wme->data;
 	struct screen			*s = &data->screen;
 
 	screen_resize(s, sx, sy, 0);
@@ -206,7 +206,7 @@ static void
 window_clock_draw_screen(struct window_mode_entry *wme)
 {
 	struct window_pane		*wp = wme->wp;
-	struct window_clock_mode_data	*data = wme->data;
+	struct window_clock_mode_data	*data = (struct window_clock_mode_data*) wme->data;
 	struct screen_write_ctx	 	 ctx;
 	int				 colour, style;
 	struct screen			*s = &data->screen;

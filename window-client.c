@@ -98,9 +98,9 @@ window_client_add_item(struct window_client_modedata *data)
 {
 	struct window_client_itemdata	*item;
 
-	data->item_list = xreallocarray(data->item_list, data->item_size + 1,
+	data->item_list = (struct window_client_itemdata **) xreallocarray(data->item_list, data->item_size + 1,
 	    sizeof *data->item_list);
-	item = data->item_list[data->item_size++] = xcalloc(1, sizeof *item);
+	item = data->item_list[data->item_size++] = (struct window_client_itemdata *) xcalloc(1, sizeof *item);
 	return (item);
 }
 
@@ -114,8 +114,8 @@ window_client_free_item(struct window_client_itemdata *item)
 static int
 window_client_cmp(const void *a0, const void *b0)
 {
-	const struct window_client_itemdata *const	*a = a0;
-	const struct window_client_itemdata *const	*b = b0;
+	const struct window_client_itemdata *const	*a = (const struct window_client_itemdata* const*) a0;
+	const struct window_client_itemdata *const	*b = (const struct window_client_itemdata* const*) b0;
 	const struct window_client_itemdata		*itema = *a;
 	const struct window_client_itemdata		*itemb = *b;
 	struct client					*ca = itema->c;
@@ -155,7 +155,7 @@ static void
 window_client_build(void *modedata, struct mode_tree_sort_criteria *sort_crit,
     __unused uint64_t *tag, const char *filter)
 {
-	struct window_client_modedata	*data = modedata;
+	struct window_client_modedata	*data = (struct window_client_modedata*) modedata;
 	struct window_client_itemdata	*item;
 	u_int				 i;
 	struct client			*c;
@@ -205,7 +205,7 @@ static void
 window_client_draw(__unused void *modedata, void *itemdata,
     struct screen_write_ctx *ctx, u_int sx, u_int sy)
 {
-	struct window_client_itemdata	*item = itemdata;
+	struct window_client_itemdata	*item = (struct window_client_itemdata*) itemdata;
 	struct client			*c = item->c;
 	struct screen			*s = ctx->s;
 	struct window_pane		*wp;
@@ -242,7 +242,7 @@ window_client_draw(__unused void *modedata, void *itemdata,
 static void
 window_client_menu(void *modedata, struct client *c, key_code key)
 {
-	struct window_client_modedata	*data = modedata;
+	struct window_client_modedata	*data = (struct window_client_modedata*) modedata;
 	struct window_pane		*wp = data->wp;
 	struct window_mode_entry	*wme;
 
@@ -260,7 +260,7 @@ window_client_init(struct window_mode_entry *wme,
 	struct window_client_modedata	*data;
 	struct screen			*s;
 
-	wme->data = data = xcalloc(1, sizeof *data);
+	wme->data = data = (struct window_client_modedata *) xcalloc(1, sizeof *data);
 	data->wp = wp;
 
 	if (args == NULL || !args_has(args, 'F'))
@@ -287,7 +287,7 @@ window_client_init(struct window_mode_entry *wme,
 static void
 window_client_free(struct window_mode_entry *wme)
 {
-	struct window_client_modedata	*data = wme->data;
+	struct window_client_modedata	*data = (struct window_client_modedata*) wme->data;
 	u_int				 i;
 
 	if (data == NULL)
@@ -308,7 +308,7 @@ window_client_free(struct window_mode_entry *wme)
 static void
 window_client_resize(struct window_mode_entry *wme, u_int sx, u_int sy)
 {
-	struct window_client_modedata	*data = wme->data;
+	struct window_client_modedata	*data = (struct window_client_modedata*) wme->data;
 
 	mode_tree_resize(data->data, sx, sy);
 }
@@ -316,7 +316,7 @@ window_client_resize(struct window_mode_entry *wme, u_int sx, u_int sy)
 static void
 window_client_update(struct window_mode_entry *wme)
 {
-	struct window_client_modedata	*data = wme->data;
+	struct window_client_modedata	*data = (struct window_client_modedata*) wme->data;
 
 	mode_tree_build(data->data);
 	mode_tree_draw(data->data);
@@ -327,8 +327,8 @@ static void
 window_client_do_detach(void *modedata, void *itemdata,
     __unused struct client *c, key_code key)
 {
-	struct window_client_modedata	*data = modedata;
-	struct window_client_itemdata	*item = itemdata;
+	struct window_client_modedata	*data = (struct window_client_modedata*) modedata;
+	struct window_client_itemdata	*item = (struct window_client_itemdata*) itemdata;
 
 	if (item == mode_tree_get_current(data->data))
 		mode_tree_down(data->data, 0);
@@ -346,7 +346,7 @@ window_client_key(struct window_mode_entry *wme, struct client *c,
     struct mouse_event *m)
 {
 	struct window_pane		*wp = wme->wp;
-	struct window_client_modedata	*data = wme->data;
+	struct window_client_modedata	*data = (struct window_client_modedata*) wme->data;
 	struct mode_tree_data		*mtd = data->data;
 	struct window_client_itemdata	*item;
 	int				 finished;
@@ -356,7 +356,7 @@ window_client_key(struct window_mode_entry *wme, struct client *c,
 	case 'd':
 	case 'x':
 	case 'z':
-		item = mode_tree_get_current(mtd);
+		item = (struct window_client_itemdata *) mode_tree_get_current(mtd);
 		window_client_do_detach(data, item, c, key);
 		mode_tree_build(mtd);
 		break;
@@ -367,7 +367,7 @@ window_client_key(struct window_mode_entry *wme, struct client *c,
 		mode_tree_build(mtd);
 		break;
 	case '\r':
-		item = mode_tree_get_current(mtd);
+		item = (struct window_client_itemdata *) mode_tree_get_current(mtd);
 		mode_tree_run_command(c, NULL, data->command, item->c->ttyname);
 		finished = 1;
 		break;
