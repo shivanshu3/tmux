@@ -67,7 +67,7 @@ struct popup_editor {
 static void
 popup_redraw_cb(const struct tty_ctx *ttyctx)
 {
-	struct popup_data	*pd = ttyctx->arg;
+	struct popup_data	*pd = (struct popup_data*) ttyctx->arg;
 
 	pd->c->flags |= CLIENT_REDRAWOVERLAY;
 }
@@ -75,7 +75,7 @@ popup_redraw_cb(const struct tty_ctx *ttyctx)
 static int
 popup_set_client_cb(struct tty_ctx *ttyctx, struct client *c)
 {
-	struct popup_data	*pd = ttyctx->arg;
+	struct popup_data	*pd = (struct popup_data*) ttyctx->arg;
 
 	if (c != pd->c)
 		return (0);
@@ -97,7 +97,7 @@ popup_set_client_cb(struct tty_ctx *ttyctx, struct client *c)
 static void
 popup_init_ctx_cb(struct screen_write_ctx *ctx, struct tty_ctx *ttyctx)
 {
-	struct popup_data	*pd = ctx->arg;
+	struct popup_data	*pd = (struct popup_data*) ctx->arg;
 
 	ttyctx->redraw_cb = popup_redraw_cb;
 	ttyctx->set_client_cb = popup_set_client_cb;
@@ -148,7 +148,7 @@ popup_write_screen(struct client *c, struct popup_data *pd)
 static struct screen *
 popup_mode_cb(struct client *c, u_int *cx, u_int *cy)
 {
-	struct popup_data	*pd = c->overlay_data;
+	struct popup_data	*pd = (struct popup_data*) c->overlay_data;
 
 	if (pd->ictx == NULL)
 		return (0);
@@ -160,7 +160,7 @@ popup_mode_cb(struct client *c, u_int *cx, u_int *cy)
 static int
 popup_check_cb(struct client *c, u_int px, u_int py)
 {
-	struct popup_data	*pd = c->overlay_data;
+	struct popup_data	*pd = (struct popup_data*) c->overlay_data;
 
 	if (px < pd->px || px > pd->px + pd->sx - 1)
 		return (1);
@@ -172,7 +172,7 @@ popup_check_cb(struct client *c, u_int px, u_int py)
 static void
 popup_draw_cb(struct client *c, __unused struct screen_redraw_ctx *ctx0)
 {
-	struct popup_data	*pd = c->overlay_data;
+	struct popup_data	*pd = (struct popup_data*) c->overlay_data;
 	struct tty		*tty = &c->tty;
 	struct screen		 s;
 	struct screen_write_ctx	 ctx;
@@ -197,7 +197,7 @@ popup_draw_cb(struct client *c, __unused struct screen_redraw_ctx *ctx0)
 static void
 popup_free_cb(struct client *c)
 {
-	struct popup_data	*pd = c->overlay_data;
+	struct popup_data	*pd = (struct popup_data*) c->overlay_data;
 	struct cmdq_item	*item = pd->item;
 	u_int			 i;
 
@@ -234,8 +234,8 @@ popup_handle_drag(struct client *c, struct popup_data *pd,
 	u_int	px, py;
 
 	if (!MOUSE_DRAG(m->b))
-		pd->dragging = OFF;
-	else if (pd->dragging == MOVE) {
+		pd->dragging = QUALIFIED_MEMBER(popup_data, OFF);
+	else if (pd->dragging == QUALIFIED_MEMBER(popup_data, MOVE)) {
 		if (m->x < pd->dx)
 			px = 0;
 		else if (m->x - pd->dx + pd->sx > c->tty.sx)
@@ -253,7 +253,7 @@ popup_handle_drag(struct client *c, struct popup_data *pd,
 		pd->dx = m->x - pd->px;
 		pd->dy = m->y - pd->py;
 		server_redraw_client(c);
-	} else if (pd->dragging == SIZE) {
+	} else if (pd->dragging == QUALIFIED_MEMBER(popup_data, SIZE)) {
 		if (m->x < pd->px + 3)
 			return;
 		if (m->y < pd->py + 3)
@@ -273,7 +273,7 @@ popup_handle_drag(struct client *c, struct popup_data *pd,
 static int
 popup_key_cb(struct client *c, struct key_event *event)
 {
-	struct popup_data	*pd = c->overlay_data;
+	struct popup_data	*pd = (struct popup_data*) c->overlay_data;
 	struct mouse_event	*m = &event->m;
 	struct cmd_find_state	*fs = &pd->fs;
 	struct format_tree	*ft;
@@ -284,7 +284,7 @@ popup_key_cb(struct client *c, struct key_event *event)
 	char			*error;
 
 	if (KEYC_IS_MOUSE(event->key)) {
-		if (pd->dragging != OFF) {
+		if (pd->dragging != QUALIFIED_MEMBER(popup_data, OFF)) {
 			popup_handle_drag(c, pd, m);
 			goto out;
 		}
@@ -304,9 +304,9 @@ popup_key_cb(struct client *c, struct key_event *event)
 			if (!MOUSE_DRAG(m->b))
 				goto out;
 			if (MOUSE_BUTTONS(m->lb) == 0)
-				pd->dragging = MOVE;
+				pd->dragging = QUALIFIED_MEMBER(popup_data, MOVE);
 			else if (MOUSE_BUTTONS(m->lb) == 2)
-				pd->dragging = SIZE;
+				pd->dragging = QUALIFIED_MEMBER(popup_data, SIZE);
 			pd->dx = m->lx - pd->px;
 			pd->dy = m->ly - pd->py;
 			goto out;
@@ -374,7 +374,7 @@ out:
 static void
 popup_job_update_cb(struct job *job)
 {
-	struct popup_data	*pd = job_get_data(job);
+	struct popup_data	*pd = (struct popup_data*) job_get_data(job);
 	struct evbuffer		*evb = job_get_event(job)->input;
 	struct client		*c = pd->c;
 	struct screen		*s = &pd->s;
@@ -387,7 +387,7 @@ popup_job_update_cb(struct job *job)
 	c->overlay_check = NULL;
 	c->tty.flags &= ~TTY_FREEZE;
 
-	input_parse_screen(pd->ictx, s, popup_init_ctx_cb, pd, data, size);
+	input_parse_screen(pd->ictx, s, popup_init_ctx_cb, pd, (u_char*)data, size);
 
 	c->tty.flags |= TTY_FREEZE;
 	c->overlay_check = popup_check_cb;
@@ -398,7 +398,7 @@ popup_job_update_cb(struct job *job)
 static void
 popup_job_complete_cb(struct job *job)
 {
-	struct popup_data	*pd = job_get_data(job);
+	struct popup_data	*pd = (struct popup_data*) job_get_data(job);
 	int			 status;
 
 	status = job_get_status(pd->job);
@@ -477,7 +477,7 @@ popup_display(int flags, struct cmdq_item *item, u_int px, u_int py, u_int sx,
 	if (c->tty.sx < sx || c->tty.sy < sy)
 		return (-1);
 
-	pd = xcalloc(1, sizeof *pd);
+	pd = (struct popup_data *) xcalloc(1, sizeof *pd);
 	pd->item = item;
 	pd->flags = flags;
 
@@ -502,7 +502,7 @@ popup_display(int flags, struct cmdq_item *item, u_int px, u_int py, u_int sx,
 
 	pd->nlines = nlines;
 	if (pd->nlines != 0)
-		pd->lines = xreallocarray(NULL, pd->nlines, sizeof *pd->lines);
+		pd->lines = (char **) xreallocarray(NULL, pd->nlines, sizeof *pd->lines);
 
 	for (i = 0; i < pd->nlines; i++)
 		pd->lines[i] = xstrdup(lines[i]);
@@ -538,7 +538,7 @@ popup_editor_free(struct popup_editor *pe)
 static void
 popup_editor_close_cb(int status, void *arg)
 {
-	struct popup_editor	*pe = arg;
+	struct popup_editor	*pe = (struct popup_editor*) arg;
 	FILE			*f;
 	char			*buf = NULL;
 	off_t			 len = 0;
@@ -557,7 +557,7 @@ popup_editor_close_cb(int status, void *arg)
 
 		if (len == 0 ||
 		    (uintmax_t)len > (uintmax_t)SIZE_MAX ||
-		    (buf = malloc(len)) == NULL ||
+		    (buf = (char *) malloc(len)) == NULL ||
 		    fread(buf, len, 1, f) != 1) {
 			free(buf);
 			buf = NULL;
@@ -595,7 +595,7 @@ popup_editor(struct client *c, const char *buf, size_t len,
 	}
 	fclose(f);
 
-	pe = xcalloc(1, sizeof *pe);
+	pe = (struct popup_editor *) xcalloc(1, sizeof *pe);
 	pe->path = xstrdup(path);
 	pe->cb = cb;
 	pe->arg = arg;
