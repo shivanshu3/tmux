@@ -398,7 +398,7 @@ input_key_build(void)
 			data = xstrdup(ike->data);
 			data[strcspn(data, "_")] = '0' + j;
 
-			new_ = xcalloc(1, sizeof *new_);
+			new_ = (struct input_key_entry *) xcalloc(1, sizeof *new_);
 			new_->key = key|input_key_modifiers[j];
 			new_->data = data;
 			RB_INSERT(input_key_tree, &input_key_tree, new_);
@@ -620,9 +620,9 @@ input_key_get_mouse(struct screen *s, struct mouse_event *m, u_int x, u_int y,
 		if (m->b > 0x7ff - 32 || x > 0x7ff - 33 || y > 0x7ff - 33)
 			return (0);
 		len = xsnprintf(buf, sizeof buf, "\033[M");
-		len += input_key_split2(m->b + 32, &buf[len]);
-		len += input_key_split2(x + 33, &buf[len]);
-		len += input_key_split2(y + 33, &buf[len]);
+		len += input_key_split2(m->b + 32, (u_char*)&buf[len]);
+		len += input_key_split2(x + 33, (u_char*)&buf[len]);
+		len += input_key_split2(y + 33, (u_char*)&buf[len]);
 	} else {
 		if (m->b > 223)
 			return (0);
