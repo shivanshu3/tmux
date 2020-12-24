@@ -116,7 +116,7 @@ session_create(const char *prefix, const char *name, const char *cwd,
 {
 	struct session	*s;
 
-	s = xcalloc(1, sizeof *s);
+	s = (struct session *) xcalloc(1, sizeof *s);
 	s->references = 1;
 	s->flags = 0;
 
@@ -132,7 +132,7 @@ session_create(const char *prefix, const char *name, const char *cwd,
 
 	s->tio = NULL;
 	if (tio != NULL) {
-		s->tio = xmalloc(sizeof *s->tio);
+		s->tio = (struct termios *) xmalloc(sizeof *s->tio);
 		memcpy(s->tio, tio, sizeof *s->tio);
 	}
 
@@ -183,7 +183,7 @@ session_remove_ref(struct session *s, const char *from)
 static void
 session_free(__unused int fd, __unused short events, void *arg)
 {
-	struct session	*s = arg;
+	struct session	*s = (struct session*) arg;
 
 	log_debug("session %s freed (%d references)", s->name, s->references);
 
@@ -249,7 +249,7 @@ session_check_name(const char *name)
 static void
 session_lock_timer(__unused int fd, __unused short events, void *arg)
 {
-	struct session	*s = arg;
+	struct session	*s = (struct session*) arg;
 
 	if (s->attached == 0)
 		return;
@@ -535,7 +535,7 @@ session_group_new(const char *name)
 	if ((sg = session_group_find(name)) != NULL)
 		return (sg);
 
-	sg = xcalloc(1, sizeof *sg);
+	sg = (struct session_group *) xcalloc(1, sizeof *sg);
 	sg->name = xstrdup(name);
 	TAILQ_INIT(&sg->sessions);
 

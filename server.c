@@ -297,7 +297,7 @@ server_send_exit(void)
 			server_client_lost(c);
 		else {
 			c->flags |= CLIENT_EXIT;
-			c->exit_type = CLIENT_EXIT_SHUTDOWN;
+			c->exit_type = QUALIFIED_MEMBER(client, CLIENT_EXIT_SHUTDOWN);
 		}
 		c->session = NULL;
 	}
@@ -514,7 +514,7 @@ server_add_message(const char *fmt, ...)
 
 	log_debug("message: %s", s);
 
-	msg = xcalloc(1, sizeof *msg);
+	msg = (struct message_entry *) xcalloc(1, sizeof *msg);
 	gettimeofday(&msg->msg_time, NULL);
 	msg->msg_num = message_next++;
 	msg->msg = s;
