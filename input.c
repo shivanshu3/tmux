@@ -27,6 +27,7 @@
 #include <time.h>
 
 #include "tmux.h"
+#include "extern-c.h"
 
 /*
  * Based on the description by Paul Williams at:
@@ -722,12 +723,12 @@ const struct input_transition input_state_consume_st_table[] = {
 static int
 input_table_compare(const void *key, const void *value)
 {
-	const struct input_ctx		*ictx = key;
-	const struct input_table_entry	*entry = value;
+	const struct input_ctx		*ictx = (const struct input_ctx*) key;
+	const struct input_table_entry	*entry = (const struct input_table_entry*) value;
 
 	if (ictx->ch != entry->ch)
 		return (ictx->ch - entry->ch);
-	return (strcmp(ictx->interm_buf, entry->interm));
+	return (strcmp((const char*)ictx->interm_buf, entry->interm));
 }
 
 /*
@@ -737,7 +738,7 @@ input_table_compare(const void *key, const void *value)
 static void
 input_timer_callback(__unused int fd, __unused short events, void *arg)
 {
-	struct input_ctx	*ictx = arg;
+	struct input_ctx	*ictx = (struct input_ctx*) arg;
 
 	log_debug("%s: %s expired" , __func__, ictx->state->name);
 	input_reset(ictx, 0);
@@ -799,12 +800,12 @@ input_init(struct window_pane *wp, struct bufferevent *bev)
 {
 	struct input_ctx	*ictx;
 
-	ictx = xcalloc(1, sizeof *ictx);
+	ictx = (struct input_ctx *) xcalloc(1, sizeof *ictx);
 	ictx->wp = wp;
 	ictx->event = bev;
 
 	ictx->input_space = INPUT_BUF_START;
-	ictx->input_buf = xmalloc(INPUT_BUF_START);
+	ictx->input_buf = (u_char *) xmalloc(INPUT_BUF_START);
 
 	ictx->since_ground = evbuffer_new();
 	if (ictx->since_ground == NULL)
@@ -823,7 +824,7 @@ input_free(struct input_ctx *ictx)
 	u_int	i;
 
 	for (i = 0; i < ictx->param_list_len; i++) {
-		if (ictx->param_list[i].type == INPUT_STRING)
+		if (ictx->param_list[i].type == QUALIFIED_MEMBER(input_param, INPUT_STRING))
 			free(ictx->param_list[i].str);
 	}
 
@@ -946,7 +947,7 @@ input_parse_pane(struct window_pane *wp)
 	size_t	 new_size;
 
 	new_data = window_pane_get_new_data(wp, &wp->offset, &new_size);
-	input_parse_buffer(wp, new_data, new_size);
+	input_parse_buffer(wp, (u_char*)new_data, new_size);
 	window_pane_update_used_data(wp, &wp->offset, new_size);
 }
 
@@ -1001,7 +1002,7 @@ input_split(struct input_ctx *ictx)
 	u_int			 i;
 
 	for (i = 0; i < ictx->param_list_len; i++) {
-		if (ictx->param_list[i].type == INPUT_STRING)
+		if (ictx->param_list[i].type == QUALIFIED_MEMBER(input_param, INPUT_STRING))
 			free(ictx->param_list[i].str);
 	}
 	ictx->param_list_len = 0;
@@ -1010,16 +1011,16 @@ input_split(struct input_ctx *ictx)
 		return (0);
 	ip = &ictx->param_list[0];
 
-	ptr = ictx->param_buf;
+	ptr = (char*) ictx->param_buf;
 	while ((out = strsep(&ptr, ";")) != NULL) {
 		if (*out == '\0')
-			ip->type = INPUT_MISSING;
+			ip->type = QUALIFIED_MEMBER(input_param, INPUT_MISSING);
 		else {
 			if (strchr(out, ':') != NULL) {
-				ip->type = INPUT_STRING;
+				ip->type = QUALIFIED_MEMBER(input_param, INPUT_STRING);
 				ip->str = xstrdup(out);
 			} else {
-				ip->type = INPUT_NUMBER;
+				ip->type = QUALIFIED_MEMBER(input_param, INPUT_NUMBER);
 				ip->num = strtonum(out, 0, INT_MAX, &errstr);
 				if (errstr != NULL)
 					return (-1);
@@ -1032,11 +1033,11 @@ input_split(struct input_ctx *ictx)
 
 	for (i = 0; i < ictx->param_list_len; i++) {
 		ip = &ictx->param_list[i];
-		if (ip->type == INPUT_MISSING)
+		if (ip->type == QUALIFIED_MEMBER(input_param, INPUT_MISSING))
 			log_debug("parameter %u: missing", i);
-		else if (ip->type == INPUT_STRING)
+		else if (ip->type == QUALIFIED_MEMBER(input_param, INPUT_STRING))
 			log_debug("parameter %u: string %s", i, ip->str);
-		else if (ip->type == INPUT_NUMBER)
+		else if (ip->type == QUALIFIED_MEMBER(input_param, INPUT_NUMBER))
 			log_debug("parameter %u: number %d", i, ip->num);
 	}
 
@@ -1053,9 +1054,9 @@ input_get(struct input_ctx *ictx, u_int validx, int minval, int defval)
 	if (validx >= ictx->param_list_len)
 	    return (defval);
 	ip = &ictx->param_list[validx];
-	if (ip->type == INPUT_MISSING)
+	if (ip->type == QUALIFIED_MEMBER(input_param, INPUT_MISSING))
 		return (defval);
-	if (ip->type == INPUT_STRING)
+	if (ip->type == QUALIFIED_MEMBER(input_param, INPUT_STRING))
 		return (-1);
 	retval = ip->num;
 	if (retval < minval)
@@ -1094,7 +1095,7 @@ input_clear(struct input_ctx *ictx)
 	*ictx->input_buf = '\0';
 	ictx->input_len = 0;
 
-	ictx->input_end = INPUT_END_ST;
+	ictx->input_end = QUALIFIED_MEMBER(input_ctx, INPUT_END_ST);
 
 	ictx->flags &= ~INPUT_DISCARD;
 }
@@ -1108,7 +1109,7 @@ input_ground(struct input_ctx *ictx)
 
 	if (ictx->input_space > INPUT_BUF_START) {
 		ictx->input_space = INPUT_BUF_START;
-		ictx->input_buf = xrealloc(ictx->input_buf, INPUT_BUF_START);
+		ictx->input_buf = (u_char *) xrealloc(ictx->input_buf, INPUT_BUF_START);
 	}
 }
 
@@ -2060,7 +2061,7 @@ input_csi_dispatch_sgr(struct input_ctx *ictx)
 	}
 
 	for (i = 0; i < ictx->param_list_len; i++) {
-		if (ictx->param_list[i].type == INPUT_STRING) {
+		if (ictx->param_list[i].type == QUALIFIED_MEMBER(input_param, INPUT_STRING)) {
 			input_csi_dispatch_sgr_colon(ictx, i);
 			continue;
 		}
@@ -2196,7 +2197,7 @@ input_end_bel(struct input_ctx *ictx)
 {
 	log_debug("%s", __func__);
 
-	ictx->input_end = INPUT_END_BEL;
+	ictx->input_end = QUALIFIED_MEMBER(input_ctx, INPUT_END_BEL);
 
 	return (0);
 }
@@ -2227,7 +2228,7 @@ input_dcs_dispatch(struct input_ctx *ictx)
 
 	log_debug("%s: \"%s\"", __func__, buf);
 
-	if (len >= prefixlen && strncmp(buf, prefix, prefixlen) == 0)
+	if (len >= prefixlen && strncmp((const char*)buf, prefix, prefixlen) == 0)
 		screen_write_rawstring(sctx, buf + prefixlen, len - prefixlen);
 
 	return (0);
@@ -2259,7 +2260,7 @@ input_exit_osc(struct input_ctx *ictx)
 		return;
 
 	log_debug("%s: \"%s\" (end %s)", __func__, p,
-	    ictx->input_end == INPUT_END_ST ? "ST" : "BEL");
+	    ictx->input_end == QUALIFIED_MEMBER(input_ctx, INPUT_END_ST) ? "ST" : "BEL");
 
 	option = 0;
 	while (*p >= '0' && *p <= '9')
@@ -2270,7 +2271,7 @@ input_exit_osc(struct input_ctx *ictx)
 	switch (option) {
 	case 0:
 	case 2:
-		if (screen_set_title(sctx->s, p) && wp != NULL) {
+		if (screen_set_title(sctx->s, (const char*)p) && wp != NULL) {
 			notify_pane("pane-title-changed", wp);
 			server_redraw_window_borders(wp->window);
 			server_status_window(wp->window);
