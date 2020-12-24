@@ -150,7 +150,7 @@ tty_set_size(struct tty *tty, u_int sx, u_int sy, u_int xpixel, u_int ypixel)
 static void
 tty_read_callback(__unused int fd, __unused short events, void *data)
 {
-	struct tty	*tty = data;
+	struct tty	*tty = (struct tty*) data;
 	struct client	*c = tty->client;
 	const char	*name = c->name;
 	size_t		 size = EVBUFFER_LENGTH(tty->in);
@@ -175,7 +175,7 @@ tty_read_callback(__unused int fd, __unused short events, void *data)
 static void
 tty_timer_callback(__unused int fd, __unused short events, void *data)
 {
-	struct tty	*tty = data;
+	struct tty	*tty = (struct tty*) data;
 	struct client	*c = tty->client;
 	struct timeval	 tv = { .tv_usec = TTY_BLOCK_INTERVAL };
 
@@ -220,7 +220,7 @@ tty_block_maybe(struct tty *tty)
 static void
 tty_write_callback(__unused int fd, __unused short events, void *data)
 {
-	struct tty	*tty = data;
+	struct tty	*tty = (struct tty*) data;
 	struct client	*c = tty->client;
 	size_t		 size = EVBUFFER_LENGTH(tty->out);
 	int		 nwrite;
@@ -282,7 +282,7 @@ tty_open(struct tty *tty, char **cause)
 static void
 tty_start_timer_callback(__unused int fd, __unused short events, void *data)
 {
-	struct tty	*tty = data;
+	struct tty	*tty = (struct tty*) data;
 	struct client	*c = tty->client;
 
 	log_debug("%s: start timer fired", c->name);
@@ -575,9 +575,9 @@ tty_putc(struct tty *tty, u_char ch)
 		if (acs != NULL)
 			tty_add(tty, acs, strlen(acs));
 		else
-			tty_add(tty, &ch, 1);
+			tty_add(tty, (const char*)&ch, 1);
 	} else
-		tty_add(tty, &ch, 1);
+		tty_add(tty, (const char*)&ch, 1);
 
 	if (ch >= 0x20 && ch != 0x7f) {
 		if (tty->cx >= tty->sx) {
@@ -605,7 +605,7 @@ tty_putn(struct tty *tty, const void *buf, size_t len, u_int width)
 	    tty->cx + len >= tty->sx)
 		len = tty->sx - tty->cx - 1;
 
-	tty_add(tty, buf, len);
+	tty_add(tty, (const char*)buf, len);
 	if (tty->cx + width > tty->sx) {
 		tty->cx = (tty->cx + width) - tty->sx;
 		if (tty->cx <= tty->sx)
@@ -883,21 +883,21 @@ tty_update_client_offset(struct client *c)
 static int
 tty_get_palette(int *palette, int c)
 {
-	int	new;
+	int	new_;
 
 	if (palette == NULL)
 		return (-1);
 
-	new = -1;
+	new_ = -1;
 	if (c < 8)
-		new = palette[c];
+		new_ = palette[c];
 	else if (c >= 90 && c <= 97)
-		new = palette[8 + c - 90];
+		new_ = palette[8 + c - 90];
 	else if (c & COLOUR_FLAG_256)
-		new = palette[c & ~COLOUR_FLAG_256];
-	if (new == 0)
+		new_ = palette[c & ~COLOUR_FLAG_256];
+	if (new_ == 0)
 		return (-1);
-	return (new);
+	return (new_);
 }
 
 /*
@@ -1232,7 +1232,7 @@ tty_draw_pane(struct tty *tty, const struct tty_ctx *ctx, u_int py)
 static const struct grid_cell *
 tty_check_codeset(struct tty *tty, const struct grid_cell *gc)
 {
-	static struct grid_cell	new;
+	static struct grid_cell	new_;
 	int			c;
 
 	/* Characters less than 0x7f are always fine, no matter what. */
@@ -1242,22 +1242,22 @@ tty_check_codeset(struct tty *tty, const struct grid_cell *gc)
 	/* UTF-8 terminal and a UTF-8 character - fine. */
 	if (tty->client->flags & CLIENT_UTF8)
 		return (gc);
-	memcpy(&new, gc, sizeof new);
+	memcpy(&new_, gc, sizeof new_);
 
 	/* See if this can be mapped to an ACS character. */
-	c = tty_acs_reverse_get(tty, gc->data.data, gc->data.size);
+	c = tty_acs_reverse_get(tty, (const char*)gc->data.data, gc->data.size);
 	if (c != -1) {
-		utf8_set(&new.data, c);
-		new.attr |= GRID_ATTR_CHARSET;
-		return (&new);
+		utf8_set(&new_.data, c);
+		new_.attr |= GRID_ATTR_CHARSET;
+		return (&new_);
 	}
 
 	/* Replace by the right number of underscores. */
-	new.data.size = gc->data.width;
-	if (new.data.size > UTF8_SIZE)
-		new.data.size = UTF8_SIZE;
-	memset(new.data.data, '_', new.data.size);
-	return (&new);
+	new_.data.size = gc->data.width;
+	if (new_.data.size > UTF8_SIZE)
+		new_.data.size = UTF8_SIZE;
+	memset(new_.data.data, '_', new_.data.size);
+	return (&new_);
 }
 
 static int
@@ -1894,7 +1894,7 @@ tty_cmd_cells(struct tty *tty, const struct tty_ctx *ctx)
 void
 tty_cmd_setselection(struct tty *tty, const struct tty_ctx *ctx)
 {
-	tty_set_selection(tty, ctx->ptr, ctx->num);
+	tty_set_selection(tty, (const char*)ctx->ptr, ctx->num);
 }
 
 void
@@ -1909,9 +1909,9 @@ tty_set_selection(struct tty *tty, const char *buf, size_t len)
 		return;
 
 	size = 4 * ((len + 2) / 3) + 1; /* storage for base64 */
-	encoded = xmalloc(size);
+	encoded = (char*) xmalloc(size);
 
-	b64_ntop(buf, len, encoded, size);
+	b64_ntop((const unsigned char*)buf, len, encoded, size);
 	tty_putcode_ptr2(tty, TTYC_MS, "", encoded);
 
 	free(encoded);
@@ -1920,7 +1920,7 @@ tty_set_selection(struct tty *tty, const char *buf, size_t len)
 void
 tty_cmd_rawstring(struct tty *tty, const struct tty_ctx *ctx)
 {
-	tty_add(tty, ctx->ptr, ctx->num);
+	tty_add(tty, (const char*) ctx->ptr, ctx->num);
 	tty_invalidate(tty);
 }
 
