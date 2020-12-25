@@ -22,13 +22,21 @@
 
 #include <ctype.h>
 #include <errno.h>
-#include <pwd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <wchar.h>
 
+#ifndef _WIN32
+#include <pwd.h>
+#include <unistd.h>
+#endif // _WIN32
+
 #include "tmux.h"
+
+// unreferenced label warnings
+#ifdef _WIN32
+#pragma warning (disable:4102)
+#endif
 
 static int			 yylex(void);
 static int			 yyparse(void);
@@ -751,10 +759,14 @@ cmd_parse_build_commands(struct cmd_parse_commands *cmds,
 	TAILQ_FOREACH(cmd, cmds, entry) {
 		name = cmd->argv[0];
 		log_debug("%s: %u %s", __func__, cmd->line, name);
+#ifndef _WIN32
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-security"
+#endif // _WIN32
 		cmd_log_argv(cmd->argc, cmd->argv, __func__);
+#ifndef _WIN32
 #pragma GCC diagnostic pop
+#endif // _WIN32
 
 		if (cmdlist == NULL ||
 		    ((~pi->flags & CMD_PARSE_ONEGROUP) && cmd->line != line)) {

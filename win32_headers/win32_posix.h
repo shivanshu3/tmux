@@ -19,8 +19,24 @@ typedef int pid_t;
 #define close _close
 #define getpid _getpid
 
+typedef struct uid_t
+{
+	int a;
+} uid_t;
+
+struct passwd
+{
+	char *pw_dir; // home directory
+};
+
 // WIN32_TODO: Return 1024
 int getdtablesize(void);
 
 // WIN32_TODO: https://stackoverflow.com/a/7850494/1544818
 int getpagesize(void);
+
+uid_t getuid(void);
+
+struct passwd *getpwnam(const char *name);
+
+struct passwd *getpwuid(uid_t uid);

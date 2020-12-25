@@ -19,14 +19,21 @@
 #ifndef TMUX_H
 #define TMUX_H
 
+#ifdef _WIN32
+#include "win32_numbers.h"
+#include "win32_posix.h"
+#include "win32_terminal.h"
+#else
 #include <sys/time.h>
 #include <sys/uio.h>
+#include <termios.h>
+extern char** environ;
+#endif
 
 #include <event.h>
 #include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <termios.h>
 
 #ifdef HAVE_UTEMPTER
 #include <utempter.h>
@@ -36,8 +43,6 @@
 #include "xmalloc.h"
 #include "osdep.h"
 #include "base64.h"
-
-extern char   **environ;
 
 struct args;
 struct args_value;

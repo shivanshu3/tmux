@@ -3,6 +3,7 @@ project(tmux)
 
 add_compile_definitions(TMUX_VERSION="4.0-win32")
 add_compile_definitions(HAVE_STRNLEN)
+add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
