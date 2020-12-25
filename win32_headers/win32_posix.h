@@ -40,3 +40,5 @@ uid_t getuid(void);
 struct passwd *getpwnam(const char *name);
 
 struct passwd *getpwuid(uid_t uid);
+
+int kill(pid_t pid, int sig);
