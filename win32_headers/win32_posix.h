@@ -19,6 +19,10 @@ typedef int pid_t;
 #define close _close
 #define getpid _getpid
 
+// WIN32_TODO: Maybe rearchitect the code which uses these macros?
+#define WIFEXITED(x) (1)
+#define WEXITSTATUS(x) (1)
+
 typedef struct uid_t
 {
 	int a;
@@ -27,6 +31,11 @@ typedef struct uid_t
 struct passwd
 {
 	char *pw_dir; // home directory
+};
+
+struct timezone
+{
+	int a;
 };
 
 // WIN32_TODO: Return 1024
@@ -42,3 +51,5 @@ struct passwd *getpwnam(const char *name);
 struct passwd *getpwuid(uid_t uid);
 
 int kill(pid_t pid, int sig);
+
+int gettimeofday(struct timeval *tv, struct timezone *tz);
