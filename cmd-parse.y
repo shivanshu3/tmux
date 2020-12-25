@@ -33,9 +33,11 @@
 
 #include "tmux.h"
 
-// unreferenced label warnings
 #ifdef _WIN32
+// unreferenced label warnings
 #pragma warning (disable:4102)
+// 'register' is no longer a supported storage class
+#pragma warning (disable:5033)
 #endif
 
 static int			 yylex(void);
