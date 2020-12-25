@@ -20,14 +20,18 @@
 #define TMUX_H
 
 #ifdef _WIN32
-#include "win32_numbers.h"
-#include "win32_posix.h"
-#include "win32_terminal.h"
+	#include "win32_numbers.h"
+	#include "win32_posix.h"
+	#include "win32_terminal.h"
 #else
-#include <sys/time.h>
-#include <sys/uio.h>
-#include <termios.h>
-extern char** environ;
+	#include <sys/time.h>
+	#include <sys/uio.h>
+	#include <termios.h>
+	#ifdef __cplusplus
+		extern "C" char** environ;
+	#else
+		extern char** environ;
+	#endif
 #endif
 
 #include <event.h>
