@@ -25,9 +25,9 @@
 
 static int	alerts_fired;
 
-static void	alerts_timer(int, short, void *);
+static void	alerts_timer(evutil_socket_t, short, void *);
 static int	alerts_enabled(struct window *, int);
-static void	alerts_callback(int, short, void *);
+static void	alerts_callback(evutil_socket_t, short, void *);
 static void	alerts_reset(struct window *);
 
 static int	alerts_action_applies(struct winlink *, const char *);
@@ -41,7 +41,7 @@ static void	alerts_set_message(struct winlink *, const char *,
 static TAILQ_HEAD(, window) alerts_list = TAILQ_HEAD_INITIALIZER(alerts_list);
 
 static void
-alerts_timer(__unused int fd, __unused short events, void *arg)
+alerts_timer(__unused evutil_socket_t fd, __unused short events, void *arg)
 {
 	struct window *w = (struct window*) arg;
 
@@ -50,7 +50,7 @@ alerts_timer(__unused int fd, __unused short events, void *arg)
 }
 
 static void
-alerts_callback(__unused int fd, __unused short events, __unused void *arg)
+alerts_callback(__unused evutil_socket_t fd, __unused short events, __unused void *arg)
 {
 	struct window	*w, *w1;
 	int		 alerts;
@@ -79,7 +79,7 @@ alerts_action_applies(struct winlink *wl, const char *name)
 	 * window and other means only for windows other than the current.
 	 */
 
-	action = options_get_number(wl->session->options, name);
+	action = (int) options_get_number(wl->session->options, name);
 	if (action == ALERT_ANY)
 		return (1);
 	if (action == ALERT_CURRENT)
@@ -148,7 +148,7 @@ alerts_reset(struct window *w)
 	event_del(&w->alerts_timer);
 
 	timerclear(&tv);
-	tv.tv_sec = options_get_number(w->options, "monitor-silence");
+	tv.tv_sec = (long) options_get_number(w->options, "monitor-silence");
 
 	log_debug("@%u alerts timer reset %u", w->id, (u_int)tv.tv_sec);
 	if (tv.tv_sec != 0)
@@ -306,7 +306,7 @@ alerts_set_message(struct winlink *wl, const char *type, const char *option)
 	 * mean both a bell and message is sent.
 	 */
 
-	visual = options_get_number(wl->session->options, option);
+	visual = (int) options_get_number(wl->session->options, option);
 	TAILQ_FOREACH(c, &clients, entry) {
 		if (c->session != wl->session || c->flags & CLIENT_CONTROL)
 			continue;
