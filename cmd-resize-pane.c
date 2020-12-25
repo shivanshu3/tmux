@@ -125,11 +125,11 @@ cmd_resize_pane_exec(struct cmd *self, struct cmdq_item *item)
 	}
 
 	if (args_has(args, 'L'))
-		layout_resize_pane(wp, LAYOUT_LEFTRIGHT, -adjust, 1);
+		layout_resize_pane(wp, LAYOUT_LEFTRIGHT, -(int)adjust, 1);
 	else if (args_has(args, 'R'))
 		layout_resize_pane(wp, LAYOUT_LEFTRIGHT, adjust, 1);
 	else if (args_has(args, 'U'))
-		layout_resize_pane(wp, LAYOUT_TOPBOTTOM, -adjust, 1);
+		layout_resize_pane(wp, LAYOUT_TOPBOTTOM, -(int)adjust, 1);
 	else if (args_has(args, 'D'))
 		layout_resize_pane(wp, LAYOUT_TOPBOTTOM, adjust, 1);
 	server_redraw_window(wl->window);
