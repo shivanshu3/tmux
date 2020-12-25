@@ -22,6 +22,7 @@
 #ifdef _WIN32
 	#include "win32_numbers.h"
 	#include "win32_posix.h"
+	#include "win32_strings.h"
 	#include "win32_terminal.h"
 #else
 	#include <sys/time.h>
