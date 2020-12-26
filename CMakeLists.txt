@@ -12,6 +12,7 @@ if (MSVC)
 	add_compile_options(/wd4018)
 	add_compile_options(/wd4244)
 	add_compile_options(/wd4267)
+	add_compile_options(/wd4700)
 	add_compile_options(/std:c++latest)
 	add_compile_options(/MP)
 else()
@@ -107,8 +108,6 @@ add_executable(tmux
 	arguments.c
 	attributes.c
 	cfg.c
-	client.c
-	cmd-attach-session.c
 	cmd-bind-key.c
 	cmd-break-pane.c
 	cmd-capture-pane.c
@@ -140,7 +139,6 @@ add_executable(tmux
 	cmd-new-session.c
 	cmd-new-window.c
 	cmd-paste-buffer.c
-	cmd-pipe-pane.c
 	cmd-queue.c
 	cmd-refresh-client.c
 	cmd-rename-session.c
@@ -150,7 +148,6 @@ add_executable(tmux
 	cmd-respawn-pane.c
 	cmd-respawn-window.c
 	cmd-rotate-window.c
-	cmd-run-shell.c
 	cmd-save-buffer.c
 	cmd-select-layout.c
 	cmd-select-pane.c
@@ -166,65 +163,74 @@ add_executable(tmux
 	cmd-split-window.c
 	cmd-swap-pane.c
 	cmd-swap-window.c
-	cmd-switch-client.c
 	cmd-unbind-key.c
 	cmd-wait-for.c
 	cmd.c
 	colour.c
 	control-notify.c
 	control.c
-	environ.c
 	file.c
 	format-draw.c
 	format.c
 	grid-view.c
 	grid.c
 	input-keys.c
-	input.c
-	job.c
 	key-bindings.c
 	key-string.c
 	layout-custom.c
 	layout-set.c
-	layout.c
-	log.c
 	menu.c
 	mode-tree.c
-	names.c
 	notify.c
-	options-table.c
-	options.c
 	paste.c
-	popup.c
-	proc.c
-	regsub.c
 	resize.c
 	screen-redraw.c
-	screen-write.c
-	screen.c
-	server-client.c
-	server-fn.c
-	server.c
-	session.c
-	spawn.c
-	status.c
 	style.c
-	tmux.c
 	tty-acs.c
 	tty-features.c
-	tty-keys.c
-	tty-term.c
-	tty.c
 	utf8.c
-	window-buffer.c
-	window-client.c
-	window-clock.c
-	window-copy.c
 	window-customize.c
 	window-tree.c
-	window.c
-	xmalloc.c
 )
+
+if (NOT MSVC)
+	target_sources(tmux PUBLIC
+		client.c
+		cmd-attach-session.c
+		cmd-pipe-pane.c
+		cmd-run-shell.c
+		cmd-switch-client.c
+		environ.c
+		input.c
+		job.c
+		layout.c
+		log.c
+		names.c
+		options-table.c
+		options.c
+		popup.c
+		proc.c
+		regsub.c
+		screen-write.c
+		screen.c
+		server-client.c
+		server-fn.c
+		server.c
+		session.c
+		spawn.c
+		status.c
+		tmux.c
+		tty-keys.c
+		tty-term.c
+		tty.c
+		window-buffer.c
+		window-client.c
+		window-clock.c
+		window-copy.c
+		window.c
+		xmalloc.c
+	)
+endif()
 
 target_link_libraries(tmux tmux_compat)
 target_link_libraries(tmux tmux_misc)
