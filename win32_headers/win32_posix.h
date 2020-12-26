@@ -23,6 +23,10 @@ typedef int pid_t;
 #define WIFEXITED(x) (1)
 #define WEXITSTATUS(x) (1)
 
+#define STDIN_FILENO 0
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
+
 typedef struct uid_t
 {
 	int a;

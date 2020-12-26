@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "tmux.h"
 
@@ -95,7 +94,7 @@ file_free(struct client_file *cf)
 }
 
 static void
-file_fire_done_cb(__unused int fd, __unused short events, void *arg)
+file_fire_done_cb(__unused evutil_socket_t fd, __unused short events, void *arg)
 {
 	struct client_file	*cf = (struct client_file*) arg;
 	struct client		*c = cf->c;
@@ -368,7 +367,7 @@ done:
 }
 
 static void
-file_push_cb(__unused int fd, __unused short events, void *arg)
+file_push_cb(__unused evutil_socket_t fd, __unused short events, void *arg)
 {
 	struct client_file	*cf = (struct client_file*) arg;
 	struct client		*c = cf->c;

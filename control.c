@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 
 #include "tmux.h"
 
@@ -1033,7 +1032,7 @@ control_check_subs_all_windows(struct client *c, struct control_sub *csub)
 
 /* Check subscriptions timer. */
 static void
-control_check_subs_timer(__unused int fd, __unused short events, void *data)
+control_check_subs_timer(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct client		*c = (struct client*) data;
 	struct control_state	*cs = c->control_state;
