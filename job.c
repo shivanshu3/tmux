@@ -122,9 +122,9 @@ job_run(const char *cmd, struct session *s, const char *cwd,
 		environ_free(env);
 
 		if (~flags & JOB_PTY) {
-			if (dup2(out[1], STDIN_FILENO) == -1)
+			if (TmuxPosixDup2(out[1], STDIN_FILENO) == -1)
 				fatal("dup2 failed");
-			if (dup2(out[1], STDOUT_FILENO) == -1)
+			if (TmuxPosixDup2(out[1], STDOUT_FILENO) == -1)
 				fatal("dup2 failed");
 			if (out[1] != STDIN_FILENO && out[1] != STDOUT_FILENO)
 				close(out[1]);
@@ -133,7 +133,7 @@ job_run(const char *cmd, struct session *s, const char *cwd,
 			nullfd = TmuxPosixOpen(_PATH_DEVNULL, O_RDWR, 0);
 			if (nullfd == -1)
 				fatal("open failed");
-			if (dup2(nullfd, STDERR_FILENO) == -1)
+			if (TmuxPosixDup2(nullfd, STDERR_FILENO) == -1)
 				fatal("dup2 failed");
 			if (nullfd != STDERR_FILENO)
 				close(nullfd);

@@ -132,22 +132,22 @@ cmd_pipe_pane_exec(struct cmd *self, struct cmdq_item *item)
 
 		null_fd = TmuxPosixOpen(_PATH_DEVNULL, O_WRONLY, 0);
 		if (out) {
-			if (dup2(pipe_fd[1], STDIN_FILENO) == -1)
+			if (TmuxPosixDup2(pipe_fd[1], STDIN_FILENO) == -1)
 				_exit(1);
 		} else {
-			if (dup2(null_fd, STDIN_FILENO) == -1)
+			if (TmuxPosixDup2(null_fd, STDIN_FILENO) == -1)
 				_exit(1);
 		}
 		if (in) {
-			if (dup2(pipe_fd[1], STDOUT_FILENO) == -1)
+			if (TmuxPosixDup2(pipe_fd[1], STDOUT_FILENO) == -1)
 				_exit(1);
 			if (pipe_fd[1] != STDOUT_FILENO)
 				close(pipe_fd[1]);
 		} else {
-			if (dup2(null_fd, STDOUT_FILENO) == -1)
+			if (TmuxPosixDup2(null_fd, STDOUT_FILENO) == -1)
 				_exit(1);
 		}
-		if (dup2(null_fd, STDERR_FILENO) == -1)
+		if (TmuxPosixDup2(null_fd, STDERR_FILENO) == -1)
 			_exit(1);
 		closefrom(STDERR_FILENO + 1);
 

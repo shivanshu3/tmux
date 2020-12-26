@@ -36,8 +36,10 @@
 
 #ifdef _WIN32
 	#define TmuxPosixOpen TmuxWin32PosixOpen
+	#define TmuxPosixDup2 TmuxWin32PosixDup2
 #else
 	#define TmuxPosixOpen open
+	#define TmuxPosixDup2 dup2
 #endif
 
 #ifdef _WIN32
