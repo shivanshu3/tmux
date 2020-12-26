@@ -19,9 +19,14 @@
 #include <sys/types.h>
 
 #include <errno.h>
-#include <glob.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _WIN32
+	#include "win32_headers/win32_glob.h"
+#else
+	#include <glob.h>
+#endif
 
 #include "tmux.h"
 
