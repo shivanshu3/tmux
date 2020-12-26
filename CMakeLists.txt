@@ -90,13 +90,6 @@ add_custom_command(
 	DEPENDS ${CMAKE_SOURCE_DIR}/cmd-parse.y
 )
 
-add_library(tmux_misc STATIC)
-if (MSVC)
-	target_sources(tmux_misc PUBLIC osdep-windows.c)
-else()
-	target_sources(tmux_misc PUBLIC osdep-linux.c)
-endif()
-
 # This file contains array designators which is not available in C++
 # The files which are compiled in the main tmux target can be C++, which is
 # why we need a separate target for this file which will always be C.
@@ -232,8 +225,13 @@ if (NOT MSVC)
 	)
 endif()
 
+if (MSVC)
+	target_sources(tmux PUBLIC osdep-windows.c)
+else()
+	target_sources(tmux PUBLIC osdep-linux.c)
+endif()
+
 target_link_libraries(tmux tmux_compat)
-target_link_libraries(tmux tmux_misc)
 target_link_libraries(tmux tmux_tty_term_codes)
 target_link_libraries(tmux ${CURSES_LIB})
 target_link_libraries(tmux ${EVENT_LIB})
@@ -249,10 +247,6 @@ endif()
 # we have to use C++ on that platform.
 if (TMUX_USE_CXX OR MSVC)
 	get_target_property(SOURCE_FILES_C_TMUX tmux SOURCES)
-	get_target_property(SOURCE_FILES_C_TMUX_COMPAT tmux_compat SOURCES)
-	get_target_property(SOURCE_FILES_C_TMUX_MISC tmux_misc SOURCES)
 	set_source_files_properties(${SOURCE_FILES_C_TMUX} PROPERTIES LANGUAGE CXX)
-	set_source_files_properties(${SOURCE_FILES_C_TMUX_COMPAT} PROPERTIES LANGUAGE CXX)
-	set_source_files_properties(${SOURCE_FILES_C_TMUX_MISC} PROPERTIES LANGUAGE CXX)
 endif()
 
