@@ -151,7 +151,7 @@ cmd_pipe_pane_exec(struct cmd *self, struct cmdq_item *item)
 			_exit(1);
 		closefrom(STDERR_FILENO + 1);
 
-		execl(_PATH_BSHELL, "sh", "-c", cmd, (char *) NULL);
+		TmuxPosixExecl(_PATH_BSHELL, "sh", "-c", cmd, (char *) NULL);
 		_exit(1);
 	default:
 		/* Parent process. */

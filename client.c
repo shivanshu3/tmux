@@ -763,7 +763,7 @@ client_exec(const char *shell, const char *shellcmd)
 	setblocking(STDERR_FILENO, 1);
 	closefrom(STDERR_FILENO + 1);
 
-	execl(shell, argv0, "-c", shellcmd, (char *) NULL);
+	TmuxPosixExecl(shell, argv0, "-c", shellcmd, (char *) NULL);
 	fatal("execl failed");
 }
 

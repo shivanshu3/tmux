@@ -140,7 +140,7 @@ job_run(const char *cmd, struct session *s, const char *cwd,
 		}
 		closefrom(STDERR_FILENO + 1);
 
-		execl(_PATH_BSHELL, "sh", "-c", cmd, (char *) NULL);
+		TmuxPosixExecl(_PATH_BSHELL, "sh", "-c", cmd, (char *) NULL);
 		fatal("execl failed");
 	}
 

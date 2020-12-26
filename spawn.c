@@ -429,14 +429,14 @@ spawn_pane(struct spawn_context *sc, char **cause)
 			xasprintf(&argv0, "%s", cp + 1);
 		else
 			xasprintf(&argv0, "%s", new_wp->shell);
-		execl(new_wp->shell, argv0, "-c", tmp, (char *)NULL);
+		TmuxPosixExecl(new_wp->shell, argv0, "-c", tmp, (char *)NULL);
 		_exit(1);
 	}
 	if (cp != NULL && cp[1] != '\0')
 		xasprintf(&argv0, "-%s", cp + 1);
 	else
 		xasprintf(&argv0, "-%s", new_wp->shell);
-	execl(new_wp->shell, argv0, (char *)NULL);
+	TmuxPosixExecl(new_wp->shell, argv0, (char *)NULL);
 	_exit(1);
 
 complete:
