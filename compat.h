@@ -35,6 +35,12 @@
 #endif
 
 #ifdef _WIN32
+	#define TmuxPosixOpen TmuxWin32PosixOpen
+#else
+	#define TmuxPosixOpen open
+#endif
+
+#ifdef _WIN32
 typedef SOCKET TMUX_SOCKET;
 #else
 typedef int TMUX_SOCKET;

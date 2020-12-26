@@ -555,7 +555,7 @@ client_write_open(void *data, size_t datalen)
 
 	cf->fd = -1;
 	if (msg->fd == -1)
-		cf->fd = open(path, msg->flags|flags, 0644);
+		cf->fd = TmuxPosixOpen(path, msg->flags|flags, 0644);
 	else {
 		if (msg->fd != STDOUT_FILENO && msg->fd != STDERR_FILENO)
 			errno = EBADF;
@@ -710,7 +710,7 @@ client_read_open(void *data, size_t datalen)
 
 	cf->fd = -1;
 	if (msg->fd == -1)
-		cf->fd = open(path, flags);
+		cf->fd = TmuxPosixOpen(path, flags);
 	else {
 		if (msg->fd != STDIN_FILENO)
 			errno = EBADF;
