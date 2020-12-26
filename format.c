@@ -17,19 +17,24 @@
  */
 
 #include <sys/types.h>
-#include <sys/wait.h>
 
 #include <ctype.h>
 #include <errno.h>
-#include <fnmatch.h>
-#include <libgen.h>
 #include <math.h>
-#include <regex.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+	#include "win32_headers/win32_time.h"
+	#include "win32_headers/win32_libgen.h"
+	#include "win32_headers/win32_regex.h"
+#else
+	#include <sys/wait.h>
+	#include <libgen.h>
+	#include <regex.h>
+#endif
 
 #include "tmux.h"
 
@@ -41,7 +46,7 @@
 struct format_expand_state;
 
 static char	*format_job_get(struct format_expand_state *, const char *);
-static void	 format_job_timer(int, short, void *);
+static void	 format_job_timer(evutil_socket_t, short, void *);
 static char	*format_expand1(struct format_expand_state *, const char *);
 static int	 format_replace(struct format_expand_state *, const char *,
 		     size_t, char **, size_t *, size_t *);
@@ -71,7 +76,7 @@ struct format_job {
 /* Format job tree. */
 static struct event format_job_event;
 static int format_job_cmp(struct format_job *, struct format_job *);
-static RB_HEAD(format_job_tree, format_job) format_jobs = RB_INITIALIZER();
+static RB_HEAD(format_job_tree, format_job) format_jobs = RB_INITIALIZER(0);
 RB_GENERATE_STATIC(format_job_tree, format_job, entry, format_job_cmp);
 
 /* Format job tree comparison function. */
@@ -434,7 +439,7 @@ format_lost_client(struct client *c)
 
 /* Remove old jobs periodically. */
 static void
-format_job_timer(__unused int fd, __unused short events, __unused void *arg)
+format_job_timer(__unused evutil_socket_t fd, __unused short events, __unused void *arg)
 {
 	struct client	*c;
 	struct timeval	 tv = { .tv_sec = 60 };
