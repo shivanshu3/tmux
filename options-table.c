@@ -347,9 +347,9 @@ const struct options_table_entry options_table[] = {
 	  .minimum = 0,
 	  .maximum = INT_MAX,
 	  .default_num = 1,
-	  .unit = "milliseconds",
 	  .text = "Maximum time between input to assume it pasting rather "
-		  "than typing."
+		  "than typing.",
+	  .unit = "milliseconds"
 	},
 
 	{ .name = "base-index",
@@ -387,8 +387,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "default-size",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_SESSION,
-	  .pattern = "[0-9]*x[0-9]*",
 	  .default_str = "80x24",
+	  .pattern = "[0-9]*x[0-9]*",
 	  .text = "Initial size of new sessions."
 	},
 
@@ -428,8 +428,8 @@ const struct options_table_entry options_table[] = {
 	  .minimum = 1,
 	  .maximum = INT_MAX,
 	  .default_num = 1000,
-	  .unit = "milliseconds",
-	  .text = "Time for which 'display-panes' should show pane numbers."
+	  .text = "Time for which 'display-panes' should show pane numbers.",
+	  .unit = "milliseconds"
 	},
 
 	{ .name = "display-time",
@@ -438,8 +438,8 @@ const struct options_table_entry options_table[] = {
 	  .minimum = 0,
 	  .maximum = INT_MAX,
 	  .default_num = 750,
-	  .unit = "milliseconds",
-	  .text = "Time for which status line messages should appear."
+	  .text = "Time for which status line messages should appear.",
+	  .unit = "milliseconds"
 	},
 
 	{ .name = "history-limit",
@@ -448,10 +448,10 @@ const struct options_table_entry options_table[] = {
 	  .minimum = 0,
 	  .maximum = INT_MAX,
 	  .default_num = 2000,
-	  .unit = "lines",
 	  .text = "Maximum number of lines to keep in the history for each "
 		  "pane. "
-		  "If changed, the new value applies only to new panes."
+		  "If changed, the new value applies only to new panes.",
+	  .unit = "lines"
 	},
 
 	{ .name = "key-table",
@@ -468,8 +468,8 @@ const struct options_table_entry options_table[] = {
 	  .minimum = 0,
 	  .maximum = INT_MAX,
 	  .default_num = 0,
-	  .unit = "seconds",
-	  .text = "Time after which a client is locked if not used."
+	  .text = "Time after which a client is locked if not used.",
+	  .unit = "seconds"
 	},
 
 	{ .name = "lock-command",
@@ -482,8 +482,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "message-command-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_SESSION,
-	  .default_str = "bg=black,fg=yellow",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "bg=black,fg=yellow",
 	  .separator = ",",
 	  .text = "Style of the command prompt when in command mode, if "
 		  "'mode-keys' is set to 'vi'."
@@ -492,8 +492,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "message-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_SESSION,
-	  .default_str = "bg=yellow,fg=black",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "bg=yellow,fg=black",
 	  .separator = ",",
 	  .text = "Style of the command prompt."
 	},
@@ -535,9 +535,9 @@ const struct options_table_entry options_table[] = {
 	  .minimum = 0,
 	  .maximum = SHRT_MAX,
 	  .default_num = 500,
-	  .unit = "milliseconds",
 	  .text = "Time to wait for a key binding to repeat, if it is bound "
-		  "with the '-r' flag."
+		  "with the '-r' flag.",
+	  .unit = "milliseconds"
 	},
 
 	{ .name = "set-titles",
@@ -604,8 +604,8 @@ const struct options_table_entry options_table[] = {
 	  .minimum = 0,
 	  .maximum = INT_MAX,
 	  .default_num = 15,
-	  .unit = "seconds",
-	  .text = "Number of seconds between status line updates."
+	  .text = "Number of seconds between status line updates.",
+	  .unit = "seconds"
 	},
 
 	{ .name = "status-justify",
@@ -643,8 +643,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "status-left-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_SESSION,
-	  .default_str = "default",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "default",
 	  .separator = ",",
 	  .text = "Style of the left side of the status line."
 	},
@@ -679,8 +679,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "status-right-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_SESSION,
-	  .default_str = "default",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "default",
 	  .separator = ",",
 	  .text = "Style of the right side of the status line."
 	},
@@ -688,8 +688,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "status-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_SESSION,
-	  .default_str = "bg=green,fg=black",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "bg=green,fg=black",
 	  .separator = ",",
 	  .text = "Style of the status line."
 	},
@@ -798,8 +798,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "copy-mode-match-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "bg=cyan,fg=black",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "bg=cyan,fg=black",
 	  .separator = ",",
 	  .text = "Style of search matches in copy mode."
 	},
@@ -807,8 +807,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "copy-mode-current-match-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "bg=magenta,fg=black",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "bg=magenta,fg=black",
 	  .separator = ",",
 	  .text = "Style of the current search match in copy mode."
 	},
@@ -816,8 +816,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "copy-mode-mark-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "bg=red,fg=black",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "bg=red,fg=black",
 	  .separator = ",",
 	  .text = "Style of the marked line in copy mode."
 	},
@@ -849,8 +849,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "mode-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "bg=yellow,fg=black",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "bg=yellow,fg=black",
 	  .separator = ",",
 	  .text = "Style of indicators and highlighting in modes."
 	},
@@ -899,8 +899,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "pane-active-border-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "#{?pane_in_mode,fg=yellow,#{?synchronize-panes,fg=red,fg=green}}",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "#{?pane_in_mode,fg=yellow,#{?synchronize-panes,fg=red,fg=green}}",
 	  .separator = ",",
 	  .text = "Style of the active pane border."
 	},
@@ -941,8 +941,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "pane-border-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "default",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "default",
 	  .separator = ",",
 	  .text = "Style of the pane status lines."
 	},
@@ -965,8 +965,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "window-active-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW|OPTIONS_TABLE_PANE,
-	  .default_str = "default",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "default",
 	  .separator = ",",
 	  .text = "Default style of the active pane."
 	},
@@ -986,8 +986,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "window-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW|OPTIONS_TABLE_PANE,
-	  .default_str = "default",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "default",
 	  .separator = ",",
 	  .text = "Default style of panes that are not the active pane."
 	},
@@ -995,8 +995,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "window-status-activity-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "reverse",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "reverse",
 	  .separator = ",",
 	  .text = "Style of windows in the status line with an activity alert."
 	},
@@ -1004,8 +1004,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "window-status-bell-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "reverse",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "reverse",
 	  .separator = ",",
 	  .text = "Style of windows in the status line with a bell alert."
 	},
@@ -1020,8 +1020,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "window-status-current-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "default",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "default",
 	  .separator = ",",
 	  .text = "Style of the current window in the status line."
 	},
@@ -1037,8 +1037,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "window-status-last-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "default",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "default",
 	  .separator = ",",
 	  .text = "Style of the last window in the status line."
 	},
@@ -1053,8 +1053,8 @@ const struct options_table_entry options_table[] = {
 	{ .name = "window-status-style",
 	  .type = OPTIONS_TABLE_STRING,
 	  .scope = OPTIONS_TABLE_WINDOW,
-	  .default_str = "default",
 	  .flags = OPTIONS_TABLE_IS_STYLE,
+	  .default_str = "default",
 	  .separator = ",",
 	  .text = "Style of windows in the status line, except the current and "
 		  "last windows."

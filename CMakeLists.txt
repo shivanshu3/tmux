@@ -29,7 +29,6 @@ if (TMUX_USING_CLANG)
 	if (TMUX_USE_CXX)
 		# Clang doesn't like it when we compile .c files as C++
 		add_compile_options(-Wno-deprecated)
-		add_compile_options(-Wno-reorder-init-list)
 	endif()
 endif()
 
