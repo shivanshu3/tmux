@@ -13,18 +13,23 @@
 #include <io.h>
 #include <errno.h>
 #include <process.h>
+#include <stdio.h>
 
 typedef int pid_t;
 typedef int mode_t;
 
 #define close _close
+#define fdopen _fdopen
 #define getpid _getpid
+#define unlink _unlink
 
 // WIN32_TODO: Maybe rearchitect the code which uses these macros?
 #define WIFEXITED(x) (1)
 #define WEXITSTATUS(x) (1)
 #define WIFSTOPPED(x) (1)
 #define WSTOPSIG(x) (1)
+#define WIFSIGNALED(x) (1)
+#define WTERMSIG(x) (1)
 
 #define STDIN_FILENO 0
 #define STDOUT_FILENO 1
@@ -34,7 +39,7 @@ typedef int mode_t;
 
 #define SIGTTIN 1
 #define SIGTTOU 1
-
+#define SIGHUP 1
 #define SIGCONT 1
 
 #define SHUT_WR 1
@@ -83,3 +88,9 @@ int TmuxWin32PosixOpen(const char *pathname, int flags, mode_t mode);
 int TmuxWin32PosixExecl(const char *path, const char *arg, ...);
 
 int ioctl(int fd, int cmd, ...);
+
+int fseeko(FILE *stream, off_t offset, int whence);
+
+off_t ftello(FILE *stream);
+
+int mkstemp(char *template_);

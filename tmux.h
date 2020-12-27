@@ -20,10 +20,12 @@
 #define TMUX_H
 
 #ifdef _WIN32
-	#include "win32_numbers.h"
-	#include "win32_posix.h"
-	#include "win32_strings.h"
-	#include "win32_terminal.h"
+	#ifndef TMUX_TTY_TERM_CODES
+		#include "win32_numbers.h"
+		#include "win32_posix.h"
+		#include "win32_strings.h"
+		#include "win32_terminal.h"
+	#endif
 #else
 	#include <sys/time.h>
 	#include <sys/uio.h>

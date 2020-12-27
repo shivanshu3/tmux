@@ -17,12 +17,13 @@
  */
 
 #include <sys/types.h>
-#include <sys/wait.h>
-
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#ifndef _WIN32
+#include <sys/wait.h>
+#endif
 
 #include "tmux.h"
 

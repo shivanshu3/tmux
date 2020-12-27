@@ -19,19 +19,24 @@
 #include <sys/types.h>
 
 #include <ctype.h>
-#include <libgen.h>
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#include "win32_headers/win32_libgen.h"
+#else
+#include <libgen.h>
+#endif
+
 #include "tmux.h"
 
-static void	 name_time_callback(int, short, void *);
+static void	 name_time_callback(evutil_socket_t, short, void *);
 static int	 name_time_expired(struct window *, struct timeval *);
 
 static char	*format_window_name(struct window *);
 
 static void
-name_time_callback(__unused int fd, __unused short events, void *arg)
+name_time_callback(__unused evutil_socket_t fd, __unused short events, void *arg)
 {
 	struct window	*w = (struct window*) arg;
 

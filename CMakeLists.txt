@@ -176,8 +176,12 @@ add_executable(tmux
 	layout-set.c
 	menu.c
 	mode-tree.c
+	names.c
 	notify.c
+	options-table.c
+	options.c
 	paste.c
+	popup.c
 	resize.c
 	screen-redraw.c
 	style.c
@@ -198,10 +202,6 @@ if (NOT MSVC)
 		environ.c
 		layout.c
 		log.c
-		names.c
-		options-table.c
-		options.c
-		popup.c
 		proc.c
 		regsub.c
 		screen-write.c
