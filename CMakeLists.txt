@@ -13,6 +13,7 @@ if (MSVC)
 	add_compile_options(/wd4244)
 	add_compile_options(/wd4267)
 	add_compile_options(/wd4700)
+	add_compile_options(/wd5033)
 	add_compile_options(/std:c++latest)
 	add_compile_options(/MP)
 else()
@@ -168,6 +169,8 @@ add_executable(tmux
 	grid-view.c
 	grid.c
 	input-keys.c
+	input.c
+	job.c
 	key-bindings.c
 	key-string.c
 	layout-custom.c
@@ -194,8 +197,6 @@ if (NOT MSVC)
 		cmd-run-shell.c
 		cmd-switch-client.c
 		environ.c
-		input.c
-		job.c
 		layout.c
 		log.c
 		names.c

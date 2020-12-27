@@ -18,10 +18,7 @@
 
 #include <sys/types.h>
 
-#include <netinet/in.h>
-
 #include <ctype.h>
-#include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -736,7 +733,7 @@ input_table_compare(const void *key, const void *value)
  * long, so reset to ground.
  */
 static void
-input_timer_callback(__unused int fd, __unused short events, void *arg)
+input_timer_callback(__unused evutil_socket_t fd, __unused short events, void *arg)
 {
 	struct input_ctx	*ictx = (struct input_ctx*) arg;
 

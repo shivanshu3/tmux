@@ -17,15 +17,17 @@
  */
 
 #include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
 
 #include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+#include "win32_headers/win32_signal.h"
+#else
+#include <sys/wait.h>
+#endif
 
 #include "tmux.h"
 #include "extern-c.h"
