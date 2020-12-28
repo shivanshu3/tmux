@@ -465,10 +465,10 @@ client_send_identify(const char *ttynam, const char *cwd, int feat)
 	    strlen(ttynam) + 1);
 	proc_send(client_peer, MSG_IDENTIFY_CWD, -1, cwd, strlen(cwd) + 1);
 
-	if ((fd = dup(STDIN_FILENO)) == -1)
+	if ((fd = TmuxPosixDup(STDIN_FILENO)) == -1)
 		fatal("dup failed");
 	proc_send(client_peer, MSG_IDENTIFY_STDIN, fd, NULL, 0);
-	if ((fd = dup(STDOUT_FILENO)) == -1)
+	if ((fd = TmuxPosixDup(STDOUT_FILENO)) == -1)
 		fatal("dup failed");
 	proc_send(client_peer, MSG_IDENTIFY_STDOUT, fd, NULL, 0);
 
@@ -560,7 +560,7 @@ client_write_open(void *data, size_t datalen)
 		if (msg->fd != STDOUT_FILENO && msg->fd != STDERR_FILENO)
 			errno = EBADF;
 		else {
-			cf->fd = dup(msg->fd);
+			cf->fd = TmuxPosixDup(msg->fd);
 			if (~client_flags & CLIENT_CONTROL)
 				close(msg->fd); /* can only be used once */
 		}
@@ -715,7 +715,7 @@ client_read_open(void *data, size_t datalen)
 		if (msg->fd != STDIN_FILENO)
 			errno = EBADF;
 		else {
-			cf->fd = dup(msg->fd);
+			cf->fd = TmuxPosixDup(msg->fd);
 			if (~client_flags & CLIENT_CONTROL)
 				close(msg->fd); /* can only be used once */
 		}
