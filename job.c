@@ -23,9 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN32
-#include "win32_headers/win32_signal.h"
-#else
+#ifndef _WIN32
 #include <sys/wait.h>
 #endif
 

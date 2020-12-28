@@ -26,7 +26,6 @@
 
 #ifdef _WIN32
 	#include "win32_headers/win32_utsname.h"
-	#include "win32_headers/win32_signal.h"
 #else
 	#include <sys/utsname.h>
 #endif

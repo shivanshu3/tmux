@@ -37,17 +37,23 @@ typedef int mode_t;
 
 #define TIOCSWINSZ 1
 
+#define SIGCHLD 1
+#define SIGCONT 1
+#define SIGHUP 1
+#define SIGPIPE 1
+#define SIGQUIT 1
+#define SIGTSTP 1
 #define SIGTTIN 1
 #define SIGTTOU 1
-#define SIGHUP 1
-#define SIGCONT 1
-#define SIGPIPE 1
-#define SIGTSTP 1
-#define SIGQUIT 1
-#define SIGCHLD 1
 #define SIGUSR1 1
 #define SIGUSR2 1
 #define SIGWINCH 1
+
+#define SIG_BLOCK 1
+#define SIG_UNBLOCK 1
+#define SIG_SETMASK 1
+
+#define SA_RESTART 1
 
 #define SHUT_WR 1
 
@@ -64,6 +70,53 @@ struct passwd
 struct timezone
 {
 	int a;
+};
+
+typedef struct sigset_t
+{
+	int a;
+} sigset_t;
+
+union sigval
+{
+	int a;
+};
+
+typedef struct siginfo_t
+{
+	int      si_signo;     /* Signal number */
+	int      si_errno;     /* An errno value */
+	int      si_code;      /* Signal code */
+	int      si_trapno;    /* Trap number that caused hardware-generated signal (unused on most architectures) */
+	pid_t    si_pid;       /* Sending process ID */
+	uid_t    si_uid;       /* Real user ID of sending process */
+	int      si_status;    /* Exit value or signal */
+	clock_t  si_utime;     /* User time consumed */
+	clock_t  si_stime;     /* System time consumed */
+	union sigval si_value; /* Signal value */
+	int      si_int;       /* POSIX.1b signal */
+	void    *si_ptr;       /* POSIX.1b signal */
+	int      si_overrun;   /* Timer overrun count; POSIX.1b timers */
+	int      si_timerid;   /* Timer ID; POSIX.1b timers */
+	void    *si_addr;      /* Memory location which caused fault */
+	long     si_band;      /* Band event (was int in glibc 2.3.2 and earlier) */
+	int      si_fd;        /* File descriptor */
+	short    si_addr_lsb;  /* Least significant bit of address (since Linux 2.6.32) */
+	void    *si_lower;     /* Lower bound when address violation occurred (since Linux 3.19) */
+	void    *si_upper;     /* Upper bound when address violation occurred (since Linux 3.19) */
+	int      si_pkey;      /* Protection key on PTE that caused fault (since Linux 4.6) */
+	void    *si_call_addr; /* Address of system call instruction (since Linux 3.5) */
+	int      si_syscall;   /* Number of attempted system call (since Linux 3.5) */
+	unsigned int si_arch;  /* Architecture of attempted system call (since Linux 3.5) */
+} siginfo_t;
+
+struct sigaction
+{
+	void     (*sa_handler)(int);
+	void     (*sa_sigaction)(int, siginfo_t *, void *);
+	sigset_t   sa_mask;
+	int        sa_flags;
+	void     (*sa_restorer)(void);
 };
 
 // WIN32_TODO: Return 1024
@@ -101,3 +154,13 @@ int fseeko(FILE *stream, off_t offset, int whence);
 off_t ftello(FILE *stream);
 
 int mkstemp(char *template_);
+
+int sigemptyset(sigset_t *set);
+
+int sigfillset(sigset_t *set);
+
+int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
+
+int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
+
+int killpg(int pgrp, int sig);
