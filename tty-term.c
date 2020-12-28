@@ -23,10 +23,13 @@
 #elif defined(HAVE_NCURSES_H)
 #include <ncurses.h>
 #endif
-#include <fnmatch.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef _WIN32
 #include <term.h>
+#include <fnmatch.h>
+#endif
 
 #include "tmux.h"
 #include "tty-term.h"
@@ -432,14 +435,14 @@ tty_term_string3(struct tty_term *term, enum tty_code_code code, int a, int b,
 const char *
 tty_term_ptr1(struct tty_term *term, enum tty_code_code code, const void *a)
 {
-	return (tparm((char *) tty_term_string(term, code), (long)a, 0, 0, 0, 0, 0, 0, 0, 0));
+	return (tparm((char *) tty_term_string(term, code), TMUX_PTR_TO_INT(long, a), 0, 0, 0, 0, 0, 0, 0, 0));
 }
 
 const char *
 tty_term_ptr2(struct tty_term *term, enum tty_code_code code, const void *a,
     const void *b)
 {
-	return (tparm((char *) tty_term_string(term, code), (long)a, (long)b, 0, 0, 0, 0, 0, 0, 0));
+	return (tparm((char *) tty_term_string(term, code), TMUX_PTR_TO_INT(long, a), TMUX_PTR_TO_INT(long, b), 0, 0, 0, 0, 0, 0, 0));
 }
 
 int

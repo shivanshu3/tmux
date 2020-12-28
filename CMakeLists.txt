@@ -201,6 +201,7 @@ add_executable(tmux
 	tty-acs.c
 	tty-features.c
 	tty-keys.c
+	tty-term.c
 	utf8.c
 	window-customize.c
 	window-tree.c
@@ -214,7 +215,6 @@ if (NOT MSVC)
 		server.c
 		spawn.c
 		tmux.c
-		tty-term.c
 		tty.c
 		window-buffer.c
 		window-client.c
