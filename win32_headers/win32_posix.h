@@ -41,6 +41,13 @@ typedef int mode_t;
 #define SIGTTOU 1
 #define SIGHUP 1
 #define SIGCONT 1
+#define SIGPIPE 1
+#define SIGTSTP 1
+#define SIGQUIT 1
+#define SIGCHLD 1
+#define SIGUSR1 1
+#define SIGUSR2 1
+#define SIGWINCH 1
 
 #define SHUT_WR 1
 

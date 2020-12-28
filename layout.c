@@ -327,6 +327,7 @@ layout_count_cells(struct layout_cell *lc)
 		return (count);
 	default:
 		fatalx("bad layout type");
+		return 0;
 	}
 }
 
@@ -666,7 +667,7 @@ layout_resize_pane_grow(struct window *w, struct layout_cell *lc,
 	if (size > (u_int) needed)
 		size = needed;
 	layout_resize_adjust(w, lcadd, type, size);
-	layout_resize_adjust(w, lcremove, type, -size);
+	layout_resize_adjust(w, lcremove, type, -(int)size);
 	return (size);
 }
 
@@ -698,7 +699,7 @@ layout_resize_pane_shrink(struct window *w, struct layout_cell *lc,
 	if (size > (u_int) -needed)
 		size = -needed;
 	layout_resize_adjust(w, lcadd, type, size);
-	layout_resize_adjust(w, lcremove, type, -size);
+	layout_resize_adjust(w, lcremove, type, -(int)size);
 	return (size);
 }
 

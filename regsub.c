@@ -17,9 +17,13 @@
  */
 
 #include <sys/types.h>
-
-#include <regex.h>
 #include <string.h>
+
+#ifdef _WIN32
+#include "win32_headers/win32_regex.h"
+#else
+#include <regex.h>
+#endif
 
 #include "tmux.h"
 

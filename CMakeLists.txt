@@ -48,7 +48,7 @@ endif()
 
 find_library(CURSES_LIB ${CURSES_LIB_NAME} REQUIRED)
 find_path(CURSES_PATH curses.h REQUIRED)
-add_compile_definitions(HAVE_NCURSES_H)
+add_compile_definitions(HAVE_CURSES_H)
 
 message("Curses lib found: ${CURSES_LIB}")
 message("Curses header found: ${CURSES_PATH}")
@@ -174,6 +174,8 @@ add_executable(tmux
 	key-string.c
 	layout-custom.c
 	layout-set.c
+	layout.c
+	log.c
 	menu.c
 	mode-tree.c
 	names.c
@@ -182,6 +184,8 @@ add_executable(tmux
 	options.c
 	paste.c
 	popup.c
+	proc.c
+	regsub.c
 	resize.c
 	screen-redraw.c
 	style.c
@@ -200,10 +204,6 @@ if (NOT MSVC)
 		cmd-run-shell.c
 		cmd-switch-client.c
 		environ.c
-		layout.c
-		log.c
-		proc.c
-		regsub.c
 		screen-write.c
 		screen.c
 		server-client.c

@@ -17,15 +17,19 @@
  */
 
 #include <sys/types.h>
-#include <sys/uio.h>
-#include <sys/utsname.h>
 
 #include <errno.h>
 #include <event.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+	#include "win32_headers/win32_utsname.h"
+	#include "win32_headers/win32_signal.h"
+#else
+	#include <sys/utsname.h>
+#endif
 
 #if defined(HAVE_NCURSES_H)
 #include <ncurses.h>
@@ -37,7 +41,7 @@ struct tmuxproc {
 	const char	 *name;
 	int		  exit;
 
-	void		(*signalcb)(int);
+	void		(*signalcb)(evutil_socket_t);
 
 	struct event	  ev_sigint;
 	struct event	  ev_sighup;
@@ -66,7 +70,7 @@ static int	peer_check_version(struct tmuxpeer *, struct imsg *);
 static void	proc_update_event(struct tmuxpeer *);
 
 static void
-proc_event_cb(__unused int fd, short events, void *arg)
+proc_event_cb(__unused evutil_socket_t fd, short events, void *arg)
 {
 	struct tmuxpeer	*peer = (struct tmuxpeer*) arg;
 	ssize_t		 n;
@@ -115,7 +119,7 @@ proc_event_cb(__unused int fd, short events, void *arg)
 }
 
 static void
-proc_signal_cb(int signo, __unused short events, void *arg)
+proc_signal_cb(evutil_socket_t signo, __unused short events, void *arg)
 {
 	struct tmuxproc	*tp = (struct tmuxproc*) arg;
 
@@ -224,7 +228,7 @@ proc_exit(struct tmuxproc *tp)
 }
 
 void
-proc_set_signals(struct tmuxproc *tp, void (*signalcb)(int))
+proc_set_signals(struct tmuxproc *tp, void (*signalcb)(evutil_socket_t))
 {
 	struct sigaction	sa;
 

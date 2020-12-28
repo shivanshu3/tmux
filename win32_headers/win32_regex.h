@@ -11,8 +11,6 @@ typedef int64_t regoff_t;
 typedef struct regmatch_t {
 	regoff_t rm_so; // Byte offset from start of string to start of substring.
 	regoff_t rm_eo; // Byte offset from start of string of the first character after the end of substring.
-
-	regmatch_t(int);
 } regmatch_t;
 
 #define REG_EXTENDED 1
@@ -21,5 +19,5 @@ typedef struct regmatch_t {
 #define REG_NEWLINE 1
 
 int regcomp(regex_t *, const char *, int);
-int regexec(const regex_t *, const char *, size_t, regmatch_t, int);
+int regexec(const regex_t* preg, const char* string, size_t nmatch, regmatch_t pmatch[], int eflags);
 void regfree(regex_t *);
