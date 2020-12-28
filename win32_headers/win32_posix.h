@@ -161,7 +161,7 @@ int TmuxWin32PosixDup(int);
 
 int TmuxWin32PosixDup2(int oldfd, int newfd);
 
-#ifndef TMUX_TTY_TERM_CODES
+#ifndef TMUX_CXX_DISABLED
 int TmuxWin32PosixOpen(const char *pathname, int flags, mode_t mode = 0);
 #endif
 

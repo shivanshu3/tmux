@@ -20,7 +20,7 @@
 #define TMUX_H
 
 #ifdef _WIN32
-	#ifndef TMUX_TTY_TERM_CODES
+	#ifndef TMUX_CXX_DISABLED
 		#include "win32_numbers.h"
 		#include "win32_posix.h"
 		#include "win32_strings.h"
@@ -182,7 +182,7 @@ typedef unsigned long long key_code;
 /* Special key codes. */
 // Note: MSVC's enum doesn't automatically expand to 8 bytes. It has to be explicitly
 // set. That's why this hackery is needed.
-#ifndef TMUX_TTY_TERM_CODES
+#ifndef TMUX_CXX_DISABLED
 enum
 #ifdef _WIN32
 : uint64_t
@@ -276,7 +276,7 @@ enum
 	KEYC_KP_ZERO,
 	KEYC_KP_PERIOD,
 };
-#endif // TMUX_TTY_TERM_CODES
+#endif // TMUX_CXX_DISABLED
 
 /* Termcap codes. */
 enum tty_code_code {

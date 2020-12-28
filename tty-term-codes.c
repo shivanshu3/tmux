@@ -1,4 +1,4 @@
-#define TMUX_TTY_TERM_CODES
+#define TMUX_CXX_DISABLED
 
 #include "tty-term.h"
 
