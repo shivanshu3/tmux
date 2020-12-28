@@ -21,11 +21,6 @@
 #endif
 
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/uio.h>
-#include <sys/un.h>
-#include <sys/wait.h>
-#include <sys/file.h>
 
 #include <errno.h>
 #include <event.h>
@@ -33,7 +28,12 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#ifndef _WIN32
+#include <sys/wait.h>
+#include <sys/un.h>
+#include <sys/file.h>
+#endif
 
 #include "tmux.h"
 

@@ -101,6 +101,7 @@ add_executable(tmux
 	arguments.c
 	attributes.c
 	cfg.c
+	client.c
 	cmd-bind-key.c
 	cmd-break-pane.c
 	cmd-capture-pane.c
@@ -198,7 +199,6 @@ add_executable(tmux
 
 if (NOT MSVC)
 	target_sources(tmux PUBLIC
-		client.c
 		cmd-attach-session.c
 		cmd-pipe-pane.c
 		cmd-run-shell.c

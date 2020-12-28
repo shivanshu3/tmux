@@ -10,10 +10,12 @@
 #include <Mswsock.h>
 #include <ws2tcpip.h>
 #include <iphlpapi.h>
+#include <afunix.h>
 #include <io.h>
 #include <errno.h>
 #include <process.h>
 #include <stdio.h>
+#include <sys/types.h>
 
 typedef int pid_t;
 typedef int mode_t;
@@ -38,16 +40,16 @@ typedef int mode_t;
 #define TIOCSWINSZ 1
 
 #define SIGCHLD 1
-#define SIGCONT 1
-#define SIGHUP 1
-#define SIGPIPE 1
-#define SIGQUIT 1
-#define SIGTSTP 1
-#define SIGTTIN 1
-#define SIGTTOU 1
-#define SIGUSR1 1
-#define SIGUSR2 1
-#define SIGWINCH 1
+#define SIGCONT 2
+#define SIGHUP 3
+#define SIGPIPE 4
+#define SIGQUIT 5
+#define SIGTSTP 6
+#define SIGTTIN 7
+#define SIGTTOU 8
+#define SIGUSR1 9
+#define SIGUSR2 10
+#define SIGWINCH 11
 
 #define SIG_BLOCK 1
 #define SIG_UNBLOCK 1
@@ -56,6 +58,20 @@ typedef int mode_t;
 #define SA_RESTART 1
 
 #define SHUT_WR 1
+
+#define ICRNL 1
+#define IXANY 1
+#define OPOST 1
+#define ONLCR 1
+#define CREAD 1
+#define CS8 1
+#define HUPCL 1
+#define VMIN 1
+#define VTIME 1
+#define TCSANOW 1
+#define TCSAFLUSH 1
+#define O_NONBLOCK 1
+#define WNOHANG 1
 
 typedef struct uid_t
 {
@@ -141,9 +157,13 @@ pid_t fork(void);
 
 int chdir(const char *path);
 
+int TmuxWin32PosixDup(int);
+
 int TmuxWin32PosixDup2(int oldfd, int newfd);
 
-int TmuxWin32PosixOpen(const char *pathname, int flags, mode_t mode);
+#ifndef TMUX_TTY_TERM_CODES
+int TmuxWin32PosixOpen(const char *pathname, int flags, mode_t mode = 0);
+#endif
 
 int TmuxWin32PosixExecl(const char *path, const char *arg, ...);
 
@@ -164,3 +184,13 @@ int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
 
 int killpg(int pgrp, int sig);
+
+int tcgetattr(int fd, struct termios *termios_p);
+
+int tcsetattr(int fd, int optional_actions, const struct termios *termios_p);
+
+pid_t getppid(void);
+
+char *strsignal(int sig);
+
+pid_t waitpid(pid_t pid, int *status, int options);
