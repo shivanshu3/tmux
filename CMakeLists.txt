@@ -102,6 +102,7 @@ add_executable(tmux
 	attributes.c
 	cfg.c
 	client.c
+	cmd-attach-session.c
 	cmd-bind-key.c
 	cmd-break-pane.c
 	cmd-capture-pane.c
@@ -133,6 +134,7 @@ add_executable(tmux
 	cmd-new-session.c
 	cmd-new-window.c
 	cmd-paste-buffer.c
+	cmd-pipe-pane.c
 	cmd-queue.c
 	cmd-refresh-client.c
 	cmd-rename-session.c
@@ -142,6 +144,7 @@ add_executable(tmux
 	cmd-respawn-pane.c
 	cmd-respawn-window.c
 	cmd-rotate-window.c
+	cmd-run-shell.c
 	cmd-save-buffer.c
 	cmd-select-layout.c
 	cmd-select-pane.c
@@ -157,6 +160,7 @@ add_executable(tmux
 	cmd-split-window.c
 	cmd-swap-pane.c
 	cmd-swap-window.c
+	cmd-switch-client.c
 	cmd-unbind-key.c
 	cmd-wait-for.c
 	cmd.c
@@ -189,6 +193,7 @@ add_executable(tmux
 	regsub.c
 	resize.c
 	screen-redraw.c
+	status.c
 	style.c
 	tty-acs.c
 	tty-features.c
@@ -199,10 +204,6 @@ add_executable(tmux
 
 if (NOT MSVC)
 	target_sources(tmux PUBLIC
-		cmd-attach-session.c
-		cmd-pipe-pane.c
-		cmd-run-shell.c
-		cmd-switch-client.c
 		environ.c
 		screen-write.c
 		screen.c
@@ -211,7 +212,6 @@ if (NOT MSVC)
 		server.c
 		session.c
 		spawn.c
-		status.c
 		tmux.c
 		tty-keys.c
 		tty-term.c

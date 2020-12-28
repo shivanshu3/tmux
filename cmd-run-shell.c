@@ -18,10 +18,12 @@
  */
 
 #include <sys/types.h>
-#include <sys/wait.h>
-
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef _WIN32
+#include <sys/wait.h>
+#endif
 
 #include "tmux.h"
 
@@ -31,7 +33,7 @@
 
 static enum cmd_retval	cmd_run_shell_exec(struct cmd *, struct cmdq_item *);
 
-static void	cmd_run_shell_timer(int, short, void *);
+static void	cmd_run_shell_timer(evutil_socket_t, short, void *);
 static void	cmd_run_shell_callback(struct job *);
 static void	cmd_run_shell_free(void *);
 static void	cmd_run_shell_print(struct job *, const char *);
@@ -141,7 +143,7 @@ cmd_run_shell_exec(struct cmd *self, struct cmdq_item *item)
 }
 
 static void
-cmd_run_shell_timer(__unused int fd, __unused short events, void* arg)
+cmd_run_shell_timer(__unused evutil_socket_t fd, __unused short events, void* arg)
 {
 	struct cmd_run_shell_data	*cdata = (struct cmd_run_shell_data*) arg;
 
