@@ -72,6 +72,8 @@ typedef int mode_t;
 #define TCSAFLUSH 1
 #define O_NONBLOCK 1
 #define WNOHANG 1
+#define VERASE 1
+#define _POSIX_VDISABLE 1
 
 typedef struct uid_t
 {

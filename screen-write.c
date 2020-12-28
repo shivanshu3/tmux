@@ -57,7 +57,7 @@ struct screen_write_collect_line {
 };
 
 static void
-screen_write_offset_timer(__unused int fd, __unused short events, void *data)
+screen_write_offset_timer(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct window	*w = (struct window*) data;
 

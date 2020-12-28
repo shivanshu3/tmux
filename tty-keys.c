@@ -17,17 +17,16 @@
  */
 
 #include <sys/types.h>
-#include <sys/time.h>
-
-#include <netinet/in.h>
-
 #include <ctype.h>
 #include <limits.h>
-#include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
-#include <termios.h>
-#include <unistd.h>
+
+#ifndef _WIN32
+#include <sys/time.h>
+#include <netinet/in.h>
+#include <resolv.h>
+#endif
 
 #include "tmux.h"
 
@@ -46,7 +45,7 @@ static struct tty_key *tty_keys_find(struct tty *, const char *, size_t,
 		    size_t *);
 static int	tty_keys_next1(struct tty *, const char *, size_t, key_code *,
 		    size_t *, int);
-static void	tty_keys_callback(int, short, void *);
+static void	tty_keys_callback(evutil_socket_t, short, void *);
 static int	tty_keys_extended_key(struct tty *, const char *, size_t,
 		    size_t *, key_code *);
 static int	tty_keys_mouse(struct tty *, const char *, size_t, size_t *,
@@ -846,7 +845,7 @@ discard_key:
 
 /* Key timer callback. */
 static void
-tty_keys_callback(__unused int fd, __unused short events, void *data)
+tty_keys_callback(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct tty	*tty = (struct tty*) data;
 

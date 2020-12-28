@@ -193,10 +193,14 @@ add_executable(tmux
 	regsub.c
 	resize.c
 	screen-redraw.c
+	screen-write.c
+	screen.c
+	session.c
 	status.c
 	style.c
 	tty-acs.c
 	tty-features.c
+	tty-keys.c
 	utf8.c
 	window-customize.c
 	window-tree.c
@@ -205,15 +209,11 @@ add_executable(tmux
 if (NOT MSVC)
 	target_sources(tmux PUBLIC
 		environ.c
-		screen-write.c
-		screen.c
 		server-client.c
 		server-fn.c
 		server.c
-		session.c
 		spawn.c
 		tmux.c
-		tty-keys.c
 		tty-term.c
 		tty.c
 		window-buffer.c
