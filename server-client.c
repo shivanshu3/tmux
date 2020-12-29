@@ -2213,7 +2213,7 @@ server_client_dispatch_identify(struct client *c, struct imsg *imsg)
 	case MSG_IDENTIFY_CWD:
 		if (datalen == 0 || data[datalen - 1] != '\0')
 			fatalx("bad MSG_IDENTIFY_CWD string");
-		if (access(data, X_OK) == 0)
+		if (TmuxPosixAccess(data, X_OK) == 0)
 			c->cwd = xstrdup(data);
 		else if ((home = find_home()) != NULL)
 			c->cwd = xstrdup(home);

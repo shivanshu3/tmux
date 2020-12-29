@@ -88,7 +88,7 @@ checkshell(const char *shell)
 		return (0);
 	if (areshell(shell))
 		return (0);
-	if (access(shell, X_OK) != 0)
+	if (TmuxPosixAccess(shell, X_OK) != 0)
 		return (0);
 	return (1);
 }
