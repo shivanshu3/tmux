@@ -16,25 +16,23 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifdef _WIN32
-#include "win32_headers/win32_posix.h"
-#endif
-
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/utsname.h>
 
 #include <errno.h>
 #include <event.h>
 #include <fcntl.h>
-#include <langinfo.h>
 #include <locale.h>
-#include <pwd.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
+
+#ifndef _WIN32
+#include <sys/utsname.h>
+#include <langinfo.h>
+#include <pwd.h>
+#endif
 
 #include "tmux.h"
 

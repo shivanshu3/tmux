@@ -167,6 +167,7 @@ add_executable(tmux
 	colour.c
 	control-notify.c
 	control.c
+	environ.c
 	file.c
 	format-draw.c
 	format.c
@@ -202,6 +203,7 @@ add_executable(tmux
 	spawn.c
 	status.c
 	style.c
+	tmux.c
 	tty-acs.c
 	tty-features.c
 	tty-keys.c
@@ -217,13 +219,6 @@ add_executable(tmux
 	window.c
 	xmalloc.c
 )
-
-if (NOT MSVC)
-	target_sources(tmux PUBLIC
-		environ.c
-		tmux.c
-	)
-endif()
 
 if (MSVC)
 	target_sources(tmux PUBLIC osdep-windows.c)

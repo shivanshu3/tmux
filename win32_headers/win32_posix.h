@@ -20,6 +20,7 @@
 
 typedef int pid_t;
 typedef int mode_t;
+typedef int uid_t;
 
 #define close _close
 #define fdopen _fdopen
@@ -31,6 +32,7 @@ typedef int mode_t;
 #define execvp _execvp
 #define umask _umask
 #define chmod _chmod
+#define tzset _tzset
 
 // WIN32_TODO: Maybe rearchitect the code which uses these macros?
 #define WIFEXITED(x) (1)
@@ -39,6 +41,8 @@ typedef int mode_t;
 #define WSTOPSIG(x) (1)
 #define WIFSIGNALED(x) (1)
 #define WTERMSIG(x) (1)
+
+#define S_ISDIR(x) (1)
 
 #define STDIN_FILENO 0
 #define STDOUT_FILENO 1
@@ -112,15 +116,17 @@ typedef int mode_t;
 #define S_IXOTH 1
 #define S_IXUSR 1
 #define WUNTRACED 1
-
-typedef struct uid_t
-{
-	int a;
-} uid_t;
+#define PATH_MAX 4096
+#define F_GETFL 1
+#define F_SETFL 1
+#define CLOCK_MONOTONIC 1
+#define CLOCK_REALTIME 1
+#define CODESET 1
 
 struct passwd
 {
 	char *pw_dir; // home directory
+	char *pw_shell;
 };
 
 struct timezone
@@ -240,3 +246,15 @@ int fcntl(int fd, int cmd, ...);
 int usleep(uint64_t usec);
 
 int TmuxWin32PosixAccess(const char *pathname, int mode);
+
+char *realpath(const char *path, char *resolved_path);
+
+int mkdir(const char *path, int mode);
+
+int lstat(const char *path, struct stat *buf);
+
+int clock_gettime(int clk_id, struct timespec* tp);
+
+char* getcwd(char* buf, size_t size);
+
+char* nl_langinfo(int item);
