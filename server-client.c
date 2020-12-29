@@ -17,8 +17,6 @@
  */
 
 #include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/uio.h>
 
 #include <errno.h>
 #include <event.h>
@@ -26,18 +24,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
+
+#ifndef _WIN32
+#include <sys/ioctl.h>
+#include <sys/uio.h>
+#endif
 
 #include "tmux.h"
 
-static void	server_client_free(int, short, void *);
+static void	server_client_free(evutil_socket_t, short, void *);
 static void	server_client_check_pane_focus(struct window_pane *);
 static void	server_client_check_pane_resize(struct window_pane *);
 static void	server_client_check_pane_buffer(struct window_pane *);
 static void	server_client_check_window_resize(struct window *);
 static key_code	server_client_check_mouse(struct client *, struct key_event *);
-static void	server_client_repeat_timer(int, short, void *);
-static void	server_client_click_timer(int, short, void *);
+static void	server_client_repeat_timer(evutil_socket_t, short, void *);
+static void	server_client_click_timer(evutil_socket_t, short, void *);
 static void	server_client_check_exit(struct client *);
 static void	server_client_check_redraw(struct client *);
 static void	server_client_check_modes(struct client *);
@@ -86,7 +88,7 @@ server_client_how_many(void)
 
 /* Overlay timer callback. */
 static void
-server_client_overlay_timer(__unused int fd, __unused short events, void *data)
+server_client_overlay_timer(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	server_client_clear_overlay((struct client*)data);
 }
@@ -364,7 +366,7 @@ server_client_unref(struct client *c)
 
 /* Free dead client. */
 static void
-server_client_free(__unused int fd, __unused short events, void *arg)
+server_client_free(__unused evutil_socket_t fd, __unused short events, void *arg)
 {
 	struct client	*c = (struct client*) arg;
 
@@ -1401,7 +1403,7 @@ server_client_check_window_resize(struct window *w)
 
 /* Resize timer event. */
 static void
-server_client_resize_timer(__unused int fd, __unused short events, void *data)
+server_client_resize_timer(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct window_pane	*wp = (struct window_pane*) data;
 
@@ -1421,7 +1423,7 @@ server_client_start_resize_timer(struct window_pane *wp)
 
 /* Force timer event. */
 static void
-server_client_force_timer(__unused int fd, __unused short events, void *data)
+server_client_force_timer(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct window_pane	*wp = (struct window_pane*) data;
 
@@ -1715,7 +1717,7 @@ server_client_reset_state(struct client *c)
 
 /* Repeat time callback. */
 static void
-server_client_repeat_timer(__unused int fd, __unused short events, void *data)
+server_client_repeat_timer(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct client	*c = (struct client*) data;
 
@@ -1728,7 +1730,7 @@ server_client_repeat_timer(__unused int fd, __unused short events, void *data)
 
 /* Double-click callback. */
 static void
-server_client_click_timer(__unused int fd, __unused short events, void *data)
+server_client_click_timer(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct client		*c = (struct client*) data;
 	struct key_event	*event;
@@ -1804,7 +1806,7 @@ server_client_check_exit(struct client *c)
 
 /* Redraw timer callback. */
 static void
-server_client_redraw_timer(__unused int fd, __unused short events,
+server_client_redraw_timer(__unused evutil_socket_t fd, __unused short events,
     __unused void *data)
 {
 	log_debug("redraw timer fired");
@@ -1890,7 +1892,7 @@ server_client_check_redraw(struct client *c)
 				if (wp->flags & PANE_REDRAW) {
 					log_debug("%s: pane %%%u needs redraw",
 					    c->name, wp->id);
-					c->redraw_panes |= (1 << bit);
+					c->redraw_panes |= ((uint64_t)1 << bit);
 				}
 				if (++bit == 64) {
 					/*
@@ -1923,7 +1925,7 @@ server_client_check_redraw(struct client *c)
 			if (wp->flags & PANE_REDRAW)
 				redraw = 1;
 			else if (c->flags & CLIENT_REDRAWPANES)
-				redraw = !!(c->redraw_panes & (1 << bit));
+				redraw = !!(c->redraw_panes & ((uint64_t)1 << bit));
 			bit++;
 			if (!redraw)
 				continue;

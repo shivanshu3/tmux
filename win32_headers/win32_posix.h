@@ -97,6 +97,7 @@ typedef int mode_t;
 #define ECHOKE 1
 #define ISIG 1
 #define TCIOFLUSH 1
+#define X_OK 1
 
 typedef struct uid_t
 {
@@ -223,3 +224,5 @@ pid_t waitpid(pid_t pid, int *status, int options);
 int fcntl(int fd, int cmd, ...);
 
 int usleep(uint64_t usec);
+
+int TmuxWin32PosixAccess(const char *pathname, int mode);

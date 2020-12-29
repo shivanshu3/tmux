@@ -195,6 +195,7 @@ add_executable(tmux
 	screen-redraw.c
 	screen-write.c
 	screen.c
+	server-client.c
 	session.c
 	status.c
 	style.c
@@ -215,7 +216,6 @@ add_executable(tmux
 if (NOT MSVC)
 	target_sources(tmux PUBLIC
 		environ.c
-		server-client.c
 		server-fn.c
 		server.c
 		spawn.c
