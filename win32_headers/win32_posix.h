@@ -15,6 +15,7 @@
 #include <errno.h>
 #include <process.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 typedef int pid_t;
@@ -24,6 +25,8 @@ typedef int mode_t;
 #define fdopen _fdopen
 #define getpid _getpid
 #define unlink _unlink
+#define isatty _isatty
+#define write _write
 
 // WIN32_TODO: Maybe rearchitect the code which uses these macros?
 #define WIFEXITED(x) (1)
@@ -74,6 +77,26 @@ typedef int mode_t;
 #define WNOHANG 1
 #define VERASE 1
 #define _POSIX_VDISABLE 1
+#define TIOCGWINSZ 1
+#define F_SETFD 1
+#define FD_CLOEXEC 1
+#define IXON 1
+#define IXOFF 1
+#define INLCR 1
+#define IGNCR 1
+#define ISTRIP 1
+#define IGNBRK 1
+#define OCRNL 1
+#define ONLRET 1
+#define IEXTEN 1
+#define ICANON 1
+#define ECHO 1
+#define ECHOE 1
+#define ECHONL 1
+#define ECHOCTL 1
+#define ECHOKE 1
+#define ISIG 1
+#define TCIOFLUSH 1
 
 typedef struct uid_t
 {
@@ -196,3 +219,7 @@ pid_t getppid(void);
 char *strsignal(int sig);
 
 pid_t waitpid(pid_t pid, int *status, int options);
+
+int fcntl(int fd, int cmd, ...);
+
+int usleep(uint64_t usec);

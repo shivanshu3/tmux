@@ -17,6 +17,7 @@ typedef struct regmatch_t {
 #define REG_ICASE 1
 #define REG_NOSUB 1
 #define REG_NEWLINE 1
+#define REG_NOTBOL 1
 
 int regcomp(regex_t *, const char *, int);
 int regexec(const regex_t* preg, const char* string, size_t nmatch, regmatch_t pmatch[], int eflags);

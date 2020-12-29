@@ -19,10 +19,15 @@
 #include <sys/types.h>
 
 #include <ctype.h>
-#include <regex.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#ifdef _WIN32
+#include "win32_headers/win32_regex.h"
+#else
+#include <regex.h>
+#endif
 
 #include "tmux.h"
 
@@ -290,7 +295,7 @@ struct window_copy_mode_data {
 };
 
 static void
-window_copy_scroll_timer(__unused int fd, __unused short events, void *arg)
+window_copy_scroll_timer(__unused evutil_socket_t fd, __unused short events, void *arg)
 {
 	struct window_mode_entry	*wme = (struct window_mode_entry*) arg;
 	struct window_pane		*wp = wme->wp;

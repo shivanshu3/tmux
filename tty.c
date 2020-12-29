@@ -17,18 +17,19 @@
  */
 
 #include <sys/types.h>
-#include <sys/ioctl.h>
-
-#include <netinet/in.h>
 
 #include <curses.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <resolv.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef _WIN32
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <resolv.h>
 #include <termios.h>
-#include <unistd.h>
+#endif
 
 #include "tmux.h"
 
@@ -148,7 +149,7 @@ tty_set_size(struct tty *tty, u_int sx, u_int sy, u_int xpixel, u_int ypixel)
 }
 
 static void
-tty_read_callback(__unused int fd, __unused short events, void *data)
+tty_read_callback(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct tty	*tty = (struct tty*) data;
 	struct client	*c = tty->client;
@@ -173,7 +174,7 @@ tty_read_callback(__unused int fd, __unused short events, void *data)
 }
 
 static void
-tty_timer_callback(__unused int fd, __unused short events, void *data)
+tty_timer_callback(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct tty	*tty = (struct tty*) data;
 	struct client	*c = tty->client;
@@ -218,7 +219,7 @@ tty_block_maybe(struct tty *tty)
 }
 
 static void
-tty_write_callback(__unused int fd, __unused short events, void *data)
+tty_write_callback(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct tty	*tty = (struct tty*) data;
 	struct client	*c = tty->client;
@@ -280,7 +281,7 @@ tty_open(struct tty *tty, char **cause)
 }
 
 static void
-tty_start_timer_callback(__unused int fd, __unused short events, void *data)
+tty_start_timer_callback(__unused evutil_socket_t fd, __unused short events, void *data)
 {
 	struct tty	*tty = (struct tty*) data;
 	struct client	*c = tty->client;

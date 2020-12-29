@@ -202,7 +202,12 @@ add_executable(tmux
 	tty-features.c
 	tty-keys.c
 	tty-term.c
+	tty.c
 	utf8.c
+	window-buffer.c
+	window-client.c
+	window-clock.c
+	window-copy.c
 	window-customize.c
 	window-tree.c
 )
@@ -215,11 +220,6 @@ if (NOT MSVC)
 		server.c
 		spawn.c
 		tmux.c
-		tty.c
-		window-buffer.c
-		window-client.c
-		window-clock.c
-		window-copy.c
 		window.c
 		xmalloc.c
 	)

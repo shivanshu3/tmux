@@ -17,8 +17,10 @@ struct termios
 
 struct winsize
 {
-	int ws_row;
-	int ws_col;
+	u_int ws_row;
+	u_int ws_col;
+	u_int ws_xpixel;
+	u_int ws_ypixel;
 };
 
 typedef struct TERMINAL
@@ -41,3 +43,4 @@ int tigetnum(const char *capname);
 char *tigetstr(const char *capname);
 int del_curterm(TERMINAL *oterm);
 char *tparm(const char *str, ...);
+int tcflush(int fd, int queue_selector);
