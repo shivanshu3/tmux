@@ -17,13 +17,17 @@
  */
 
 #include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/uio.h>
 
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+#include "win32_headers/win32_time.h"
+#else
+#include <sys/wait.h>
+#include <sys/uio.h>
+#endif
 
 #include "tmux.h"
 

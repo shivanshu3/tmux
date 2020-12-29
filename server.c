@@ -17,11 +17,7 @@
  */
 
 #include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
 #include <sys/stat.h>
-#include <sys/un.h>
-#include <sys/wait.h>
 
 #include <errno.h>
 #include <event.h>
@@ -30,9 +26,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <termios.h>
 #include <time.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+#else
+#include <sys/un.h>
+#include <sys/wait.h>
+#endif
 
 #include "tmux.h"
 
@@ -55,7 +55,7 @@ struct message_list	 message_log;
 
 static int	server_loop(void);
 static void	server_send_exit(void);
-static void	server_accept(int, short, void *);
+static void	server_accept(evutil_socket_t, short, void *);
 static void	server_signal(int);
 static void	server_child_signal(void);
 static void	server_child_exited(pid_t, int);
@@ -344,7 +344,7 @@ server_update_socket(void)
 
 /* Callback for server socket. */
 static void
-server_accept(int fd, short events, __unused void *data)
+server_accept(evutil_socket_t fd, short events, __unused void *data)
 {
 	struct sockaddr_storage	sa;
 	socklen_t		slen = sizeof sa;

@@ -17,19 +17,23 @@
  */
 
 #include <sys/types.h>
-#include <sys/ioctl.h>
 
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <fnmatch.h>
-#include <regex.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
+
+#ifdef _WIN32
+#include "win32_headers/win32_regex.h"
+#else
+#include <sys/ioctl.h>
+#include <regex.h>
+#include <fnmatch.h>
+#endif
 
 #include "tmux.h"
 

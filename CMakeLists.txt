@@ -196,7 +196,10 @@ add_executable(tmux
 	screen-write.c
 	screen.c
 	server-client.c
+	server-fn.c
+	server.c
 	session.c
+	spawn.c
 	status.c
 	style.c
 	tty-acs.c
@@ -211,17 +214,14 @@ add_executable(tmux
 	window-copy.c
 	window-customize.c
 	window-tree.c
+	window.c
+	xmalloc.c
 )
 
 if (NOT MSVC)
 	target_sources(tmux PUBLIC
 		environ.c
-		server-fn.c
-		server.c
-		spawn.c
 		tmux.c
-		window.c
-		xmalloc.c
 	)
 endif()
 

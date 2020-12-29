@@ -27,6 +27,10 @@ typedef int mode_t;
 #define unlink _unlink
 #define isatty _isatty
 #define write _write
+#define strdup _strdup
+#define execvp _execvp
+#define umask _umask
+#define chmod _chmod
 
 // WIN32_TODO: Maybe rearchitect the code which uses these macros?
 #define WIFEXITED(x) (1)
@@ -98,6 +102,16 @@ typedef int mode_t;
 #define ISIG 1
 #define TCIOFLUSH 1
 #define X_OK 1
+#define S_IRGRP 1
+#define S_IROTH 1
+#define S_IRUSR 1
+#define S_IRWXG 1
+#define S_IRWXO 1
+#define S_IRWXU 1
+#define S_IXGRP 1
+#define S_IXOTH 1
+#define S_IXUSR 1
+#define WUNTRACED 1
 
 typedef struct uid_t
 {
